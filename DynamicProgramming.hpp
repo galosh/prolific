@@ -10157,7 +10157,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       } // End if row_i >= 1
 
       return
-        calculateAlignmentProfilePosition (
+        calculateAlignmentProfilePosition(
           parameters,
           profile,
           prev_row_match_distribution,
@@ -11898,9 +11898,11 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
   DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::AlignmentProfile::
     operator+= ( AlignmentProfile const& other_profile )
     {
+      /*   //TAH  2/12 compiler doesn't like return with no value on non-void funcs.
       if( length() == 0 ) {
         return;
       }
+      */
       assert( length() == other_profile.length() );
       uint32_t last_pos = length() - 1;
       uint32_t pos_i;
@@ -18839,7 +18841,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       */
 
       return matrix_value_type_score;
-    } // calculateAlignmentProfilePosition( Parameters const&, Profile const&, Sequence<SequenceResidueType> const&, uint32_t, Row const&, Row const&, Row const&, AlignmentProfilePosition & ) const
+    } // calculateAlignmentProfilePosition ( Parameters const&, Profile const&, Sequence<SequenceResidueType> const&, uint32_t, Row const&, Row const&, Row const&, AlignmentProfilePosition & ) const
 
 #ifdef ALLOW_BOLTZMANN_GIBBS
   template <typename ResidueType,
