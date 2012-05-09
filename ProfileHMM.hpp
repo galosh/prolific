@@ -1,30 +1,26 @@
-/*---------------------------------------------------------------------------##
-##  Library:
-##      galosh::prolific
-##  File:
-##      ProfileHMM.hpp
-##  Author:
-##      D'Oleris Paul Thatcher Edlefsen   paul@galosh.org
-##  Description:
-##      Class definition for the Galosh Profile HMM types, based on the
-##      "Plan 7" model used by HMMer and SAM.
-##
-##      More about Plan7 can be found at
-##      http://www.csb.yale.edu/userguides/seq/hmmer/docs/node11.html
-##      (or any other HMMER docs mirror, node 11)
-##
-#******************************************************************************
-#*
-#*    This file is part of prolific, a library of useful C++ classes for
-#*    working with genomic sequence data and Profile HMMs.  Please see the
-#*    document CITING, which should have been included with this file.  You may
-#*    use at will, subject to the license (Apache v2.0), but *please cite the
-#*    relevant papers* in your documentation and publications associated with
-#*    uses of this library.  Thank you!
-#*
-#*    Copyright (C) 2008, 2011 by Paul T. Edlefsen, Fred Hutchinson Cancer
-#*    Research Center.
-#*
+/**
+ * \file ProfileHMM.hpp
+ * \author D'Oleris Paul Thatcher Edlefsen   paul@galosh.org
+ * \par Library:
+ *      galosh::prolific
+ * \brief
+ *      Class definition for the Galosh Profile HMM types, based on the
+ *      "Plan 7" model used by HMMer and SAM.
+ * \details
+ *      More about Plan7 can be found at
+ *      http://www.csb.yale.edu/userguides/seq/hmmer/docs/node11.html
+ *      (or any other HMMER docs mirror, node 11)
+ * \par Overview:
+ *    This file is part of prolific, a library of useful C++ classes for
+ *    working with genomic sequence data and Profile HMMs.  Please see the
+ *    document CITING, which should have been included with this file.  You may
+ *    use at will, subject to the license (Apache v2.0), but *please cite the
+ *    relevant papers* in your documentation and publications associated with
+ *    uses of this library.  Thank you!
+ *
+ * \copyright &copy; 2008, 2011 by Paul T. Edlefsen, Fred Hutchinson Cancer
+ *    Research Center.
+ * \par License:
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
@@ -36,7 +32,7 @@
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
-#*****************************************************************************/
+ *****************************************************************************/
 
 #if     _MSC_VER > 1000
 #pragma once
@@ -51,7 +47,7 @@
 
 namespace galosh {
 
-//////////////////////////////////////////////////////////////////////////////
+/* ///////////////////////////////////////////////////////////////////////////// */
 
 /**
 .Spec.StateLabel:
@@ -71,7 +67,7 @@ specialization tag class.
 struct _StateLabel {};
 typedef seqan::SimpleType<unsigned char,_StateLabel> StateLabel;
 
-//////////////////////////////////////////////////////////////////////////////
+/* ///////////////////////////////////////////////////////////////////////////// */
 
 template <typename T = void>
 struct _Translate_Table_StateLabel_2_Ascii

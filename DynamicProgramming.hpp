@@ -1,27 +1,23 @@
-/*---------------------------------------------------------------------------##
-##  Library:
-##      galosh::prolific
-##  File:
-##      DynamicProgramming.hpp
-##  Author:
-##      D'Oleris Paul Thatcher Edlefsen   paul@galosh.org
-##  Description:
-##      Class definition for the Galosh DynamicProgramming class.  This is a
-##      super (duper) class with many subclasses and static member functions
-##      for doing useful things.
-##
-#******************************************************************************
-#*
-#*    This file is part of prolific, a library of useful C++ classes for
-#*    working with genomic sequence data and Profile HMMs.  Please see the
-#*    document CITING, which should have been included with this file.  You may
-#*    use at will, subject to the license (Apache v2.0), but *please cite the
-#*    relevant papers* in your documentation and publications associated with
-#*    uses of this library.  Thank you!
-#*
-#*    Copyright (C) 2008, 2011 by Paul T. Edlefsen, Fred Hutchinson Cancer
-#*    Research Center.
-#*
+/**
+ * \file DynamicProgramming.hpp
+ * \author D'Oleris Paul Thatcher Edlefsen   paul@galosh.org with some additions
+ * by Ted Holzman
+ * \par Library:
+ * galosh::prolific
+ * \brief Class definition(s) for the Galosh DynamicProgramming class.  This is a
+ *  super (duper) class with many subclasses and static member functions
+ *  for doing useful things.
+ * \par Overview:
+ *    This file is part of prolific, a library of useful C++ classes for
+ *    working with genomic sequence data and Profile HMMs.  Please see the
+ *    document CITING, which should have been included with this file.  You may
+ *    use at will, subject to the license (Apache v2.0), but *please cite the
+ *    relevant papers* in your documentation and publications associated with
+ *    uses of this library.  Thank you!
+ *
+ * \copyright &copy; 2008, 2011 by Paul T. Edlefsen, Fred Hutchinson Cancer
+ *    Research Center.
+ * \par License:
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
@@ -33,7 +29,7 @@
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
-#*****************************************************************************/
+ *****************************************************************************/
 
 #if     _MSC_VER > 1000
 #pragma once
@@ -42,7 +38,7 @@
 #ifndef __GALOSH_DYNAMICPROGRAMMING_HPP__
 #define __GALOSH_DYNAMICPROGRAMMING_HPP__
 
- // TODO: REMOVE
+ // \todo REMOVE
 //#include <cassert>
 
 #include "Prolific.hpp"
@@ -97,12 +93,26 @@ using std::copy;
 #include <string>
 #include <iostream>
 #include <sstream>
-#include <limits> // for numeric_limits<double>
+//#include <limits> // for numeric_limits<double>
+                  /// TAH 3/12 for converting between FILE* and istream
+#include <map>
+#include <boost/iostreams/device/file_descriptor.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <cstdio>
 
 #include <boost/serialization/nvp.hpp>
 #include <boost/serialization/utility.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/version.hpp>
+
+/**
+ * For scanning and parsing alignment profiles.  \see AlignmentProfileAccessor
+ */
+#include "ProlificIOHelpers.hpp"
+#include <boost/iostreams/device/file.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/xpressive/xpressive.hpp>
+#include <boost/xpressive/regex_actions.hpp>
 
 // For conversion between muscle's MSA class and our MultipleAlignment class
 #ifdef __HAVE_MUSCLE
@@ -327,7 +337,7 @@ namespace galosh {
         os << "DeletionOut";
 #endif // USE_DEL_IN_DEL_OUT && !USE_SWENTRY_SWEXIT
       } else {
-        // TODO: ?
+        /// \todo ?
         os << "ERROR!";
       }
 
@@ -354,12 +364,12 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
      * Boltzmann-Gibbs scale.  Here is where we store it.  It should be a type
      * that can represent the entire Real range.
      */
-    // TODO: PUT BACK!  TESTING.
-    //typedef ProbabilityType BoltzmannGibbsValueType;
-    //typedef bfloat BoltzmannGibbsValueType;
-    //typedef logspace BoltzmannGibbsValueType;
+    /// \todo PUT BACK!  TESTING.
+    ///typedef ProbabilityType BoltzmannGibbsValueType;
+    ///typedef bfloat BoltzmannGibbsValueType;
+    ///typedef logspace BoltzmannGibbsValueType;
     typedef realspace BoltzmannGibbsValueType;
-    //typedef double BoltzmannGibbsValueType;
+    ///typedef double BoltzmannGibbsValueType;
 
     // For Baldi-style gradient ascent:
     template <typename ResidueType, typename ScoreType>
@@ -511,6 +521,8 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       } // serialize( Archive &, const unsigned int )
 
     public:
+      typedef ResidueType APPPResidueType;
+
       AlignmentProfilePositionParameters ();
 
       void
@@ -591,14 +603,14 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       GALOSH_OPERATORS_GlobalParameters( ParameterType )
 
       /**
-       * Divide each contained distrubution value by denominator.
+       * Divide each contained distribution value by denominator.
        */
       template <typename AnyValueType>
       AlignmentProfilePositionParameters &
       operator/= ( AnyValueType const& denominator );
   
       /**
-       * Multiply each contained distrubution value by scalar.
+       * Multiply each contained distribution value by scalar.
        */
       template <typename AnyValueType>
       AlignmentProfilePositionParameters &
@@ -692,7 +704,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
        * This can be used to calculate the (self-)entropy by calling
        * this->crossEntropy( *this ).  It can also be used to calculate the KL
        * divergence by taking the difference of the cross-entropy and the
-       * self-entropy, or the symmeterized KL divergence by summing the KL
+       * self-entropy, or the symmetrized KL divergence by summing the KL
        * divergences computed both ways.
        *
        * See also the other crossEntropy method, which accepts a weights argument.
@@ -980,7 +992,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
        * probabilities.  Note that these are (usually) not conditioned on there
        * being a Match at all (that is, the probs don't sum to 1; instead they
        * sum to 1-P(Deletion)).  If the include_nonemission_prob argument is
-       * true, the probability of a cooccurring deletion will be included in the
+       * true, the probability of a co-occurring deletion will be included in the
        * calculation. Note also that this is symmetric, so calling
        * the other position's calculateMatchEmissionCooccurrenceProbability
        * with this pos as an argument will return the same thing.
@@ -998,26 +1010,26 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           galosh::calculateEmissionCooccurrenceProbability<ParameterType>( *this, other_pos, Emission::Match );
 
         if( include_nonemission_prob ) {
-          // Include the probability that there's no match at all.
-          // TODO: PUT BACK
+          /// Include the probability that there's no match at all.
+          /// \todo PUT BACK
           prob += ( ( 1.0 - ( *this )[ Emission::Match ].total() ) * ( 1.0 - other_pos[ Emission::Match ].total() ) );
-          // TODO: REMOVE.  TESTING.
-          //ParameterType tmp1 = ( *this )[ Emission::Match ].total();
-          //if( tmp1 == 1.0 ) {
-          //  return prob;
-          //}
-          //if( tmp1 > 1.0 ) {
-          //  // Is the > operator busted for Algebra?
-          //  if( tmp1 == 1 ) {
-          //    cerr << "IT IS 1" << endl;
-          //  }
-          //  cerr << "Uh oh: this has a prob(Match) = " << tmp1 << " > 1.0!?: it is " << (*this) << endl;
-          //}
-          //assert( tmp1 <= 1.0 );
-          //ParameterType tmp2 = other_pos[ Emission::Match ].total();
-          //if( tmp2 == 1.0 ) {
-          //  return prob;
-          //}
+          /// \todo REMOVE.  TESTING.
+          ///ParameterType tmp1 = ( *this )[ Emission::Match ].total();
+          ///if( tmp1 == 1.0 ) {
+          ///  return prob;
+          ///}
+          ///if( tmp1 > 1.0 ) {
+          ///  // Is the > operator busted for Algebra?
+          ///  if( tmp1 == 1 ) {
+          ///    cerr << "IT IS 1" << endl;
+          ///  }
+          ///  cerr << "Uh oh: this has a prob(Match) = " << tmp1 << " > 1.0!?: it is " << (*this) << endl;
+          ///}
+          ///assert( tmp1 <= 1.0 );
+          ///ParameterType tmp2 = other_pos[ Emission::Match ].total();
+          ///if( tmp2 == 1.0 ) {
+          ///  return prob;
+          ///}
           //if( tmp2 > 1.0 ) {
           //  cerr << "Uh oh: other_pos has a prob(Match) = " << tmp2 << " > 1.0!?: it is " << other_pos << endl;
           //}
@@ -1176,7 +1188,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
        * you might not encounter underflow).
        */
       bool useRabinerScaling;
-      // NOTE THAT RIGHT NOW, RABINER SCALING SEEMS TO BE BROKEN.  TODO: FIX!
+      /// NOTE THAT RIGHT NOW, RABINER SCALING SEEMS TO BE BROKEN.  \todo FIX!
   #define DEFAULT_useRabinerScaling false
 
       /**
@@ -1191,9 +1203,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
        * unless rabinerScaling_useMaximumValue is true.
        */
       bool rabinerScaling_useMaximumValue;
-      // TODO: Make this depend on the MatrixValueType?  If using bfloats or logs, we don't need to do this.  We can avoid a few calculations if we have this false.
+      /// \todo Make this depend on the MatrixValueType?  If using bfloats or logs, we don't need to do this.  We can avoid a few calculations if we have this false.
 //#define DEFAULT_rabinerScaling_useMaximumValue true
-// TODO: put back true.  Testing.
+/// \todo put back true.  Testing.
 #define DEFAULT_rabinerScaling_useMaximumValue false
 
       /**
@@ -1205,7 +1217,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
        * the MatrixValueType.
        */
       double matrixRowScaleFactor;
-      // TODO: Make this depend on the MatrixValueType?  If using bfloats or logs, we don't need to scale it.
+      /// \todo Make this depend on the MatrixValueType?  If using bfloats or logs, we don't need to scale it.
 //#define DEFAULT_matrixRowScaleFactor ( pow( numeric_limits<float>::max(), .25f ) - 1.0f )
 //#define DEFAULT_matrixRowScaleFactor ( pow( numeric_limits<double>::max(), .0625 ) - 1.0 )
 #define DEFAULT_matrixRowScaleFactor 1
@@ -1528,9 +1540,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
      */
     typedef ScalableParameterCollection<ScoreType, PositionSpecificParameters<ResidueType, MatrixValueType> > PositionEntente;
 
-    // TODO: PUT BACK.. TESTING.
+    // \todo  PUT BACK.. TESTING.
     typedef ScalableParameterCollection<ScoreType, AlignmentProfilePositionParameters<ResidueType, MatrixValueType> > AlignmentProfilePosition;
-    // TODO: REMOVE.  TESTING.
+    // \todo  REMOVE.  TESTING.
     //typedef ScalableParameterCollection<ScoreType, AlignmentProfilePositionParameters<ResidueType, doublerealspace> > AlignmentProfilePosition;
 
     /**
@@ -1561,7 +1573,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
          string tmp_str;
          for( pos_i = 0; pos_i <= last_pos; pos_i++ ) {
            tmp_str = "pos_" + boost::lexical_cast<std::string>(pos_i);
-           ar & boost::serialization::make_nvp(tmp_str.c_str(), ( *this )[ pos_i ]);
+           ar & boost::serialization::make_nvp(tmp_str.c_str(), ( this )[ pos_i ]);
          }
         } // End if length > 0, serialize positions
       } // serialize( Archive &, const unsigned int )
@@ -1906,7 +1918,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           if( lp_vec[ i ] > ( max - fifty ) ) {
             prob_vec[ i ] = exp( ( lp_vec[ i ] - max ) - denom );
           } else {
-            prob_vec[ i ] = 0.0; // TODO: Use parameter for profile minimumValue?
+            prob_vec[ i ] = 0.0; // \todo  Use parameter for profile minimumValue?
           }
         }
       } // static exponentiateAndNormalize( vector<double> const&, vector<ProbabilityType> & )
@@ -1919,7 +1931,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       public vector<MatchEmissionParameters<ResidueType, DirichletParameterType> >
     {
     public:
-      // TODO: Protect access, ensure it sums to 1 (and is non-negative), etc.
+      // \todo  Protect access, ensure it sums to 1 (and is non-negative), etc.
       vector<ProbabilityType> m_mixingProbs;
     
       DirichletMixtureMatchEmissionPrior () :
@@ -2062,7 +2074,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               log( m_mixingProbs[ mixing_component_i ] );
             log_mixing_posteriors[ mixing_component_i ] +=
               calculateLogPosterior( entente, mixing_component_i );
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "calculateMixingPosteriors: log mixing_posteriors[ " << mixing_component_i << " ] is " << mixing_posteriors[ mixing_component_i ] << endl;
           } // End foreach mixing_component_i
           // Now exponentiate and normalize
@@ -2070,7 +2082,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             log_mixing_posteriors,
             mixing_posteriors
           );
-          // TODO: REMOVE
+          // \todo  REMOVE
           //for( mixing_component_i = 0;
           //     mixing_component_i < num_mixing_components;
           //     mixing_component_i++ ) {
@@ -2101,7 +2113,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           // log type).
           MatchEmissionParametersType prior_counts( entente );
           prior_counts.operator=( ( *this )[ 0 ] );
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "In incorporatePrior(..): prior_counts before scaling is " << prior_counts << endl;
           if( has_m_scalar<MatchEmissionParametersType>() ) {
             getScalar<ScoreType, MatchEmissionParametersType>( prior_counts ) /=
@@ -2115,7 +2127,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           return;
         } // End if num_mixing_components == 1
     
-        // TODO: We could further speed this up by doing everything in
+        // \todo  We could further speed this up by doing everything in
         // ProbabilityType type, and instead of dividing the entente by the scalar,
         // multiply the prior by the scalar.  If it ends up being 0, then just
         // return.  Also, why *is* the entente scalar in scoretype anyway?
@@ -2142,46 +2154,46 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           entente_scalar = 1.0;
         }
 
-        // TODO: Code is copied for each type.  Could separate it out into a
+        // \todo  Code is copied for each type.  Could separate it out into a
         // function of the type tag.
         alphabet_size =
           entente[ Emission::Match ].size();
-        // TODO: REMOVE
+        // \todo  REMOVE
         //cout << "entente[ Match ].total() returns " << entente[ Emission::Match ].total() << endl;
         totc =
           entente[ Emission::Match ].total();
-        // TODO: REMOVE
+        // \todo  REMOVE
         //cout << "totc before scaling is " << totc << endl;
         totc /= entente_scalar;
-        // TODO: REMOVE
+        // \todo  REMOVE
         //cout << "totc after scaling is " << totc << endl;
         //cout << "as a double, totc is " << toDouble( totc ) << endl;
         for( i = 0; i < alphabet_size; i++ ) {
           unscaled_entente_value =
             entente[ Emission::Match ][ i ];
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "[" << i << "] scaled_entente_value is " << unscaled_entente_value << endl;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "\t (before converting to ScoreType, this was " << entente[ Emission::Match ][ i ] << ")" << endl;
           unscaled_entente_value /= entente_scalar;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "[" << i << "] unscaled_entente_value is " << unscaled_entente_value << endl;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "\t as double, this is " << toDouble( unscaled_entente_value ) << endl;
           xi = 0.0;
           for( mixing_component_i = 0;
                mixing_component_i < num_mixing_components;
                mixing_component_i++ ) {
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] component prior total is " << ( *this )[ mixing_component_i ][ Emission::Match ].total() << endl;
             //tot = ( *this )[ mixing_component_i ][ Emission::Match ].total();
             //cout << "\t as a ScoreType, this is " << tot << endl;
             tot = totc;
             tot +=
               ( *this )[ mixing_component_i ][ Emission::Match ].total();
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] tot is " << tot << endl;
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] mixing_posteriors[ " << mixing_component_i << " ] is " << mixing_posteriors[ mixing_component_i ] << endl;
             tmp_mvt = unscaled_entente_value;
             tmp_mvt +=
@@ -2192,7 +2204,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                 
             xi += tmp_mvt;
 
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] Just added to xi " << mixing_posteriors[ mixing_component_i ] << " * " << "( ( " << toDouble( unscaled_entente_value ) << " + " << toDouble( ( *this )[ mixing_component_i ][ Emission::Match ][ i ] ) << " ) / " << toDouble( tot ) << " )" << endl;
             //cout << "[" << i << ", " << mixing_component_i << "] xi is now " << xi << endl;
           }
@@ -2200,7 +2212,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           tmp_st *= entente_scalar;
           entente[ Emission::Match ][ i ] = tmp_st;
 
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "[" << i << "] new entente value is " << entente[ Emission::Match ][ i ] << endl;
         } // End foreach residue i
       } // incorporatePrior( MatchEmissionParametersType & ) const
@@ -2209,7 +2221,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
        * Calculate and return ln( P( entente | dirichlet ) ) for component
        * mixing_component_i.  Sums up over the different alphabet types.
        */
-      // TODO: Is adding the logposteriors the right thing to do?
+      // \todo  Is adding the logposteriors the right thing to do?
       template <typename MatchEmissionParametersType>
       double
       calculateLogPosterior (
@@ -2242,7 +2254,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       public vector<GlobalParameters<ResidueType, DirichletParameterType> >
     {
     public:
-      // TODO: Protect access, ensure it sums to 1 (and is non-negative), etc.
+      // \todo  Protect access, ensure it sums to 1 (and is non-negative), etc.
       vector<ProbabilityType> m_mixingProbs;
     
       DirichletMixtureGlobalPrior () :
@@ -2405,7 +2417,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               log( m_mixingProbs[ mixing_component_i ] );
             log_mixing_posteriors[ mixing_component_i ] +=
               calculateLogPosterior( entente, mixing_component_i );
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "calculateMixingPosteriors: log mixing_posteriors[ " << mixing_component_i << " ] is " << mixing_posteriors[ mixing_component_i ] << endl;
           } // End foreach mixing_component_i
           // Now exponentiate and normalize
@@ -2413,7 +2425,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             log_mixing_posteriors,
             mixing_posteriors
           );
-          // TODO: REMOVE
+          // \todo  REMOVE
           //for( mixing_component_i = 0;
           //     mixing_component_i < num_mixing_components;
           //     mixing_component_i++ ) {
@@ -2446,7 +2458,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           //ScalableParameterCollection<ScoreType, GlobalParameters<ResidueType, DirichletParameterType> prior_counts =
           //  ScalableParameterCollection<ScoreType, GlobalParameters<ResidueType, DirichletParameterType> >();
           prior_counts.operator=( ( *this )[ 0 ] );
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "In incorporatePrior(..): prior_counts before scaling is " << prior_counts << endl;
           if( has_m_scalar<GlobalParametersType>() ) {
              getScalar<ScoreType, GlobalParametersType>( prior_counts ) /=
@@ -2460,7 +2472,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           return;
         } // End if num_mixing_components == 1
     
-        // TODO: We could further speed this up by doing everything in
+        // \todo  We could further speed this up by doing everything in
         // ProbabilityType type, and instead of dividing the entente by the scalar,
         // multiply the prior by the scalar.  If it ends up being 0, then just
         // return.  Also, why *is* the entente scalar in scoretype anyway?
@@ -2487,46 +2499,46 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           entente_scalar = 1.0;
         }
 
-        // TODO: Code is copied for each type.  Could separate it out into a
+        // \todo  Code is copied for each type.  Could separate it out into a
         // function of the type tag.
         alphabet_size =
           entente[ Emission::Insertion ].size();
-        // TODO: REMOVE
+        // \todo  REMOVE
         //cout << "entente[ Match ].total() returns " << entente[ Emission::Insertion ].total() << endl;
         totc =
           entente[ Emission::Insertion ].total();
-        // TODO: REMOVE
+        // \todo  REMOVE
         //cout << "totc before scaling is " << totc << endl;
         totc /= entente_scalar;
-        // TODO: REMOVE
+        // \todo  REMOVE
         //cout << "totc after scaling is " << totc << endl;
         //cout << "as a double, totc is " << toDouble( totc ) << endl;
         for( i = 0; i < alphabet_size; i++ ) {
           unscaled_entente_value =
             entente[ Emission::Insertion ][ i ];
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "[" << i << "] scaled_entente_value is " << unscaled_entente_value << endl;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "\t (before converting to ScoreType, this was " << entente[ Emission::Insertion ][ i ] << ")" << endl;
           unscaled_entente_value /= entente_scalar;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "[" << i << "] unscaled_entente_value is " << unscaled_entente_value << endl;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "\t as double, this is " << toDouble( unscaled_entente_value ) << endl;
           xi = 0.0;
           for( mixing_component_i = 0;
                mixing_component_i < num_mixing_components;
                mixing_component_i++ ) {
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] component prior total is " << ( *this )[ mixing_component_i ][ Emission::Insertion ].total() << endl;
             //tot = ( *this )[ mixing_component_i ][ Emission::Insertion ].total();
             //cout << "\t as a ScoreType, this is " << tot << endl;
             tot = totc;
             tot +=
               ( *this )[ mixing_component_i ][ Emission::Insertion ].total();
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] tot is " << tot << endl;
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] mixing_posteriors[ " << mixing_component_i << " ] is " << mixing_posteriors[ mixing_component_i ] << endl;
             tmp_mvt = unscaled_entente_value;
             tmp_mvt +=
@@ -2537,7 +2549,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                 
             xi += tmp_mvt;
 
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] Just added to xi " << mixing_posteriors[ mixing_component_i ] << " * " << "( ( " << toDouble( unscaled_entente_value ) << " + " << toDouble( ( *this )[ mixing_component_i ][ Emission::Insertion ][ i ] ) << " ) / " << toDouble( tot ) << " )" << endl;
             //cout << "[" << i << ", " << mixing_component_i << "] xi is now " << xi << endl;
           }
@@ -2545,7 +2557,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           tmp_st *= entente_scalar;
           entente[ Emission::Insertion ][ i ] = tmp_st;
 
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "[" << i << "] new entente value is " << entente[ Emission::Insertion ][ i ] << endl;
         } // End foreach residue i
     
@@ -2553,29 +2565,29 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         // Match
         totc =
           entente[ Transition::fromMatch ].total();
-        // TODO: REMOVE
+        // \todo  REMOVE
         //cout << "totc before scaling is " << totc << endl;
         totc /= entente_scalar;
-        // TODO: REMOVE
+        // \todo  REMOVE
         //cout << "totc after scaling is " << totc << endl;
         //cout << "as a double, totc is " << toDouble( totc ) << endl;
         for( i = 0; i < seqan::ValueSize<TransitionFromMatch>::VALUE; i++ ) {
           unscaled_entente_value =
             entente[ Transition::fromMatch ][ i ];
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "[" << i << "] scaled_entente_value is " << unscaled_entente_value << endl;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "\t (before converting to ScoreType, this was " << entente[ Emission::Match ][ i ] << ")" << endl;
           unscaled_entente_value /= entente_scalar;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "[" << i << "] unscaled_entente_value is " << unscaled_entente_value << endl;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "\t as double, this is " << toDouble( unscaled_entente_value ) << endl;
           xi = 0.0;
           for( mixing_component_i = 0;
                mixing_component_i < num_mixing_components;
                mixing_component_i++ ) {
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] component prior total is " << ( *this )[ mixing_component_i ][ Transition::fromMatch ].total() << endl;
             //tot = ( *this )[ mixing_component_i ][ Transition::fromMatch ].total();
             //cout << "\t as a ScoreType, this is " << tot << endl;
@@ -2583,9 +2595,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             tot +=
               ( *this )[ mixing_component_i ][ Transition::fromMatch ].total();
 
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] tot is " << tot << endl;
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] mixing_posteriors[ " << mixing_component_i << " ] is " << mixing_posteriors[ mixing_component_i ] << endl;
             tmp_mvt = unscaled_entente_value;
             tmp_mvt +=
@@ -2596,14 +2608,14 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             
             xi += tmp_mvt;
 
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] Just added to xi " << mixing_posteriors[ mixing_component_i ] << " * " << "( ( " << toDouble( unscaled_entente_value ) << " + " << toDouble( ( *this )[ mixing_component_i ][ Transition::fromMatch ][ i ] ) << " ) / " << toDouble( tot ) << " )" << endl;
             //cout << "[" << i << ", " << mixing_component_i << "] xi is now " << xi << endl;
           }
           tmp_st = xi;
           tmp_st *= entente_scalar;
           entente[ Transition::fromMatch ][ i ] = tmp_st;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "[" << i << "] new Match entente value is " << entente[ Transition::fromMatch ][ i ] << endl;
         } // End foreach Match transition target i
 
@@ -2611,29 +2623,29 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         // Insertion transitions
         totc =
           entente[ Transition::fromInsertion ].total();
-        // TODO: REMOVE
+        // \todo  REMOVE
         //cout << "totc before scaling is " << totc << endl;
         totc /= entente_scalar;
-        // TODO: REMOVE
+        // \todo  REMOVE
         //cout << "totc after scaling is " << totc << endl;
         //cout << "as a double, totc is " << toDouble( totc ) << endl;
         for( i = 0; i < seqan::ValueSize<TransitionFromInsertion>::VALUE; i++ ) {
           unscaled_entente_value =
             entente[ Transition::fromInsertion ][ i ];
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "[" << i << "] scaled_entente_value is " << unscaled_entente_value << endl;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "\t (before converting to ScoreType, this was " << entente[ Emission::Match ][ i ] << ")" << endl;
           unscaled_entente_value /= entente_scalar;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "[" << i << "] unscaled_entente_value is " << unscaled_entente_value << endl;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "\t as double, this is " << toDouble( unscaled_entente_value ) << endl;
           xi = 0.0;
           for( mixing_component_i = 0;
                mixing_component_i < num_mixing_components;
                mixing_component_i++ ) {
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] component prior total is " << ( *this )[ mixing_component_i ][ Transition::fromInsertion ].total() << endl;
             //tot = ( *this )[ mixing_component_i ][ Transition::fromInsertion ].total();
             //cout << "\t as a ScoreType, this is " << tot << endl;
@@ -2641,9 +2653,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             tot +=
               ( *this )[ mixing_component_i ][ Transition::fromInsertion ].total();
 
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] tot is " << tot << endl;
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] mixing_posteriors[ " << mixing_component_i << " ] is " << mixing_posteriors[ mixing_component_i ] << endl;
             tmp_mvt = unscaled_entente_value;
             tmp_mvt +=
@@ -2654,14 +2666,14 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             
             xi += tmp_mvt;
 
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] Just added to xi " << mixing_posteriors[ mixing_component_i ] << " * " << "( ( " << toDouble( unscaled_entente_value ) << " + " << toDouble( ( *this )[ mixing_component_i ][ Transition::fromInsertion ][ i ] ) << " ) / " << toDouble( tot ) << " )" << endl;
             //cout << "[" << i << ", " << mixing_component_i << "] xi is now " << xi << endl;
           }
           tmp_st = xi;
           tmp_st *= entente_scalar;
           entente[ Transition::fromInsertion ][ i ] = tmp_st;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "[" << i << "] new Insertion entente value is " << entente[ Transition::fromInsertion ][ i ] << endl;
         } // End foreach Insertion transition target i
 
@@ -2669,29 +2681,29 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         // Deletion
         totc =
           entente[ Transition::fromDeletion ].total();
-        // TODO: REMOVE
+        // \todo  REMOVE
         //cout << "totc before scaling is " << totc << endl;
         totc /= entente_scalar;
-        // TODO: REMOVE
+        // \todo  REMOVE
         //cout << "totc after scaling is " << totc << endl;
         //cout << "as a double, totc is " << toDouble( totc ) << endl;
         for( i = 0; i < seqan::ValueSize<TransitionFromDeletion>::VALUE; i++ ) {
           unscaled_entente_value =
             entente[ Transition::fromDeletion ][ i ];
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "[" << i << "] scaled_entente_value is " << unscaled_entente_value << endl;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "\t (before converting to ScoreType, this was " << entente[ Emission::Match ][ i ] << ")" << endl;
           unscaled_entente_value /= entente_scalar;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "[" << i << "] unscaled_entente_value is " << unscaled_entente_value << endl;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "\t as double, this is " << toDouble( unscaled_entente_value ) << endl;
           xi = 0.0;
           for( mixing_component_i = 0;
                mixing_component_i < num_mixing_components;
                mixing_component_i++ ) {
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] component prior total is " << ( *this )[ mixing_component_i ][ Transition::fromDeletion ].total() << endl;
             //tot = ( *this )[ mixing_component_i ][ Transition::fromDeletion ].total();
             //cout << "\t as a ScoreType, this is " << tot << endl;
@@ -2699,9 +2711,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             tot +=
               ( *this )[ mixing_component_i ][ Transition::fromDeletion ].total();
 
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] tot is " << tot << endl;
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] mixing_posteriors[ " << mixing_component_i << " ] is " << mixing_posteriors[ mixing_component_i ] << endl;
             tmp_mvt = unscaled_entente_value;
             tmp_mvt +=
@@ -2712,14 +2724,14 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             
             xi += tmp_mvt;
 
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] Just added to xi " << mixing_posteriors[ mixing_component_i ] << " * " << "( ( " << toDouble( unscaled_entente_value ) << " + " << toDouble( ( *this )[ mixing_component_i ][ Transition::fromDeletion ][ i ] ) << " ) / " << toDouble( tot ) << " )" << endl;
             //cout << "[" << i << ", " << mixing_component_i << "] xi is now " << xi << endl;
           }
           tmp_st = xi;
           tmp_st *= entente_scalar;
           entente[ Transition::fromDeletion ][ i ] = tmp_st;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "[" << i << "] new Deletion entente value is " << entente[ Transition::fromDeletion ][ i ] << endl;
         } // End foreach Deletion transition target i
 
@@ -2727,29 +2739,29 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         // PreAlign
         totc =
           entente[ Transition::fromPreAlign ].total();
-        // TODO: REMOVE
+        // \todo  REMOVE
         //cout << "totc before scaling is " << totc << endl;
         totc /= entente_scalar;
-        // TODO: REMOVE
+        // \todo  REMOVE
         //cout << "totc after scaling is " << totc << endl;
         //cout << "as a double, totc is " << toDouble( totc ) << endl;
         for( i = 0; i < seqan::ValueSize<TransitionFromPreAlign>::VALUE; i++ ) {
           unscaled_entente_value =
             entente[ Transition::fromPreAlign ][ i ];
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "[" << i << "] scaled_entente_value is " << unscaled_entente_value << endl;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "\t (before converting to ScoreType, this was " << entente[ Emission::Match ][ i ] << ")" << endl;
           unscaled_entente_value /= entente_scalar;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "[" << i << "] unscaled_entente_value is " << unscaled_entente_value << endl;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "\t as double, this is " << toDouble( unscaled_entente_value ) << endl;
           xi = 0.0;
           for( mixing_component_i = 0;
                mixing_component_i < num_mixing_components;
                mixing_component_i++ ) {
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] component prior total is " << ( *this )[ mixing_component_i ][ Transition::fromPreAlign ].total() << endl;
             //tot = ( *this )[ mixing_component_i ][ Transition::fromPreAlign ].total();
             //cout << "\t as a ScoreType, this is " << tot << endl;
@@ -2757,9 +2769,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             tot +=
               ( *this )[ mixing_component_i ][ Transition::fromPreAlign ].total();
 
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] tot is " << tot << endl;
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] mixing_posteriors[ " << mixing_component_i << " ] is " << mixing_posteriors[ mixing_component_i ] << endl;
             tmp_mvt = unscaled_entente_value;
             tmp_mvt +=
@@ -2770,56 +2782,56 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             
             xi += tmp_mvt;
 
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] Just added to xi " << mixing_posteriors[ mixing_component_i ] << " * " << "( ( " << toDouble( unscaled_entente_value ) << " + " << toDouble( ( *this )[ mixing_component_i ][ Transition::fromPreAlign ][ i ] ) << " ) / " << toDouble( tot ) << " )" << endl;
             //cout << "[" << i << ", " << mixing_component_i << "] xi is now " << xi << endl;
           }
           tmp_st = xi;
           tmp_st *= entente_scalar;
           entente[ Transition::fromPreAlign ][ i ] = tmp_st;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "[" << i << "] new PreAlign entente value is " << entente[ Transition::fromPreAlign ][ i ] << endl;
         } // End foreach PreAlign transition target i
 
 #ifdef USE_FLANKING_EMISSION_DISTRIBUTIONS
         alphabet_size =
           entente[ Emission::PreAlignInsertion ].size();
-        // TODO: REMOVE
+        // \todo  REMOVE
         //cout << "entente[ Match ].total() returns " << entente[ Emission::PreAlignInsertion ].total() << endl;
         totc =
           entente[ Emission::PreAlignInsertion ].total();
-        // TODO: REMOVE
+        // \todo  REMOVE
         //cout << "totc before scaling is " << totc << endl;
         totc /= entente_scalar;
-        // TODO: REMOVE
+        // \todo  REMOVE
         //cout << "totc after scaling is " << totc << endl;
         //cout << "as a double, totc is " << toDouble( totc ) << endl;
         for( i = 0; i < alphabet_size; i++ ) {
           unscaled_entente_value =
             entente[ Emission::PreAlignInsertion ][ i ];
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "[" << i << "] scaled_entente_value is " << unscaled_entente_value << endl;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "\t (before converting to ScoreType, this was " << entente[ Emission::PreAlignInsertion ][ i ] << ")" << endl;
           unscaled_entente_value /= entente_scalar;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "[" << i << "] unscaled_entente_value is " << unscaled_entente_value << endl;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "\t as double, this is " << toDouble( unscaled_entente_value ) << endl;
           xi = 0.0;
           for( mixing_component_i = 0;
                mixing_component_i < num_mixing_components;
                mixing_component_i++ ) {
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] component prior total is " << ( *this )[ mixing_component_i ][ Emission::PreAlignInsertion ].total() << endl;
             //tot = ( *this )[ mixing_component_i ][ Emission::PreAlignInsertion ].total();
             //cout << "\t as a ScoreType, this is " << tot << endl;
             tot = totc;
             tot +=
               ( *this )[ mixing_component_i ][ Emission::PreAlignInsertion ].total();
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] tot is " << tot << endl;
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] mixing_posteriors[ " << mixing_component_i << " ] is " << mixing_posteriors[ mixing_component_i ] << endl;
             tmp_mvt = unscaled_entente_value;
             tmp_mvt +=
@@ -2830,7 +2842,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                 
             xi += tmp_mvt;
         
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] Just added to xi " << mixing_posteriors[ mixing_component_i ] << " * " << "( ( " << toDouble( unscaled_entente_value ) << " + " << toDouble( ( *this )[ mixing_component_i ][ Emission::PreAlignInsertion ][ i ] ) << " ) / " << toDouble( tot ) << " )" << endl;
             //cout << "[" << i << ", " << mixing_component_i << "] xi is now " << xi << endl;
           }
@@ -2838,7 +2850,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           tmp_st *= entente_scalar;
           entente[ Emission::PreAlignInsertion ][ i ] = tmp_st;
         
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "[" << i << "] new entente value is " << entente[ Emission::PreAlignInsertion ][ i ] << endl;
         } // End foreach residue i
 #endif // USE_FLANKING_EMISSION_DISTRIBUTIONS
@@ -2848,29 +2860,29 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         // Begin
         totc =
           entente[ Transition::fromBegin ].total();
-        // TODO: REMOVE
+        // \todo  REMOVE
         //cout << "totc before scaling is " << totc << endl;
         totc /= entente_scalar;
-        // TODO: REMOVE
+        // \todo  REMOVE
         //cout << "totc after scaling is " << totc << endl;
         //cout << "as a double, totc is " << toDouble( totc ) << endl;
         for( i = 0; i < seqan::ValueSize<TransitionFromBegin>::VALUE; i++ ) {
           unscaled_entente_value =
             entente[ Transition::fromBegin ][ i ];
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "[" << i << "] scaled_entente_value is " << unscaled_entente_value << endl;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "\t (before converting to ScoreType, this was " << entente[ Emission::Match ][ i ] << ")" << endl;
           unscaled_entente_value /= entente_scalar;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "[" << i << "] unscaled_entente_value is " << unscaled_entente_value << endl;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "\t as double, this is " << toDouble( unscaled_entente_value ) << endl;
           xi = 0.0;
           for( mixing_component_i = 0;
                mixing_component_i < num_mixing_components;
                mixing_component_i++ ) {
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] component prior total is " << ( *this )[ mixing_component_i ][ Transition::fromBegin ].total() << endl;
             //tot = ( *this )[ mixing_component_i ][ Transition::fromBegin ].total();
             //cout << "\t as a ScoreType, this is " << tot << endl;
@@ -2878,9 +2890,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             tot +=
               ( *this )[ mixing_component_i ][ Transition::fromBegin ].total();
 
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] tot is " << tot << endl;
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] mixing_posteriors[ " << mixing_component_i << " ] is " << mixing_posteriors[ mixing_component_i ] << endl;
             tmp_mvt = unscaled_entente_value;
             tmp_mvt +=
@@ -2891,14 +2903,14 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             
             xi += tmp_mvt;
 
-            // TODO: REMOVE
+            // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] Just added to xi " << mixing_posteriors[ mixing_component_i ] << " * " << "( ( " << toDouble( unscaled_entente_value ) << " + " << toDouble( ( *this )[ mixing_component_i ][ Transition::fromBegin ][ i ] ) << " ) / " << toDouble( tot ) << " )" << endl;
             //cout << "[" << i << ", " << mixing_component_i << "] xi is now " << xi << endl;
           }
           tmp_st = xi;
           tmp_st *= entente_scalar;
           entente[ Transition::fromBegin ][ i ] = tmp_st;
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "[" << i << "] new Begin entente value is " << entente[ Transition::fromBegin ][ i ] << endl;
         } // End foreach Begin transition target i
 
@@ -2907,16 +2919,16 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         // DeletionIn
         totc =
           entente[ Transition::fromDeletionIn ].total();
-        // TODO: REMOVE
+        // \todo  REMOVE
         //cout << "totc before scaling is " << totc << endl;
         totc /= entente_scalar;
-        // TODO: REMOVE
+        // \todo  REMOVE
         //cout << "totc after scaling is " << totc << endl;
         //cout << "as a double, totc is " << toDouble( totc ) << endl;
         for( i = 0; i < seqan::ValueSize<TransitionFromDeletionIn>::VALUE; i++ ) {
           unscaled_entente_value =
             entente[ Transition::fromDeletionIn ][ i ];
-          // TODO: REMOVE
+          // \todo  REMOVE
           //cout << "[" << i << "] scaled_entente_value is " << unscaled_entente_value << endl;
           // TODO: REMOVE
           //cout << "\t (before converting to ScoreType, this was " << entente[ Emission::Match ][ i ] << ")" << endl;
@@ -3531,7 +3543,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       public vector<PositionTransitionParameters<ResidueType, DirichletParameterType> >
     {
     public:
-      // TODO: Protect access, ensure it sums to 1 (and is non-negative), etc.
+      /// \todo  Protect access, ensure it sums to 1 (and is non-negative), etc.
       vector<ProbabilityType> m_mixingProbs;
     
       DirichletMixturePositionTransitionPrior () :
@@ -5012,7 +5024,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       {
         uint32_t last_pos = distances.size() - 1;
         uint32_t pos_i;
-        uint32_t last_seq = distances[ 0 ].size() - 1;
+        uint32_t last_seq = ((std::vector<PositionEntenteDistances>)(distances[ 0 ])).size() - 1;
         uint32_t seq_i;
         for( seq_i = 0; seq_i <= last_seq ; seq_i++ ) {
           os << "From Sequence " << seq_i << ":" << endl;
@@ -5233,11 +5245,11 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       double
       euclideanDistanceSquared (
         PositionSpecificSequenceScoreCoefficientsTemplate const& other_pos
-      ) const {
+      )  {
         // Since the coefficients class uses scaling, we need to be careful
         // here.  Fortunately we don't need this function to be extremely fast.
-        if( m_inverseScalar != other_pos.inverseScalar ) {
-          return createUnscaledCopy().euclideanDistanceSquared( other_pos.createUnscaledCopy() );
+        if( m_inverseScalar != other_pos->inverseScalar ) {
+          return createUnscaledCopy().euclideanDistanceSquared( other_pos->createUnscaledCopy()) ;
         }
         double squared_euclidean_distance =
             PositionSpecificParameters<ResidueType, CoefficientsType>::euclideanDistanceSquared( other_pos );
@@ -5484,6 +5496,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         } else {
           // ?!
           cerr << "ERROR: Unrecognized subcell value!" << endl;
+          assert( false );  //TAH 2/12 copied from Paul's earlier code
+          return m_deletion; // I have to return *something*..
+
         }
       } // operator[] ( Subcell const & ) const
     
@@ -8051,7 +8066,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       ) :
         m_profileTree( profile_tree ),
         m_sequences( sequences ),
-        m_sequence_count( ( arg_sequence_count_arg == 0 ) ? sequences.size() : min( arg_sequence_count_arg, sequences.size() ) ),
+        m_sequence_count( ( arg_sequence_count_arg == 0 ) ? sequences->size() : min( arg_sequence_count_arg, sequences->size() ) ),
         m_sequenceOrder( m_sequence_count ),
         m_sequenceIndices( sequence_indices ),
         m_profileProfileAlignments( profile_profile_alignments ),
@@ -8084,7 +8099,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       {
         m_profileTree = profile_tree;
         m_sequences = sequences;
-        m_sequence_count = ( ( sequence_count == 0 ) ? sequences->size() : min( sequence_count, sequences->size() ) );
+        m_sequence_count = ( ( sequence_count == 0 ) ? sequences->size() : min( (size_t &)sequence_count, sequences->size() ) );
         m_sequenceIndices = sequence_indices;
         m_profileProfileAlignments = profile_profile_alignments;
 
@@ -9258,7 +9273,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         for( uint32_t to = 0; to < size; to++ ) {
           for( uint32_t from = 0; from < size; from++ ) {
             this->operator()( from, to ) =
-              static_cast<DistanceType>( toDouble( alignment_profiles[ from ][ pos_i ].crossEntropy( alignment_profiles[ to ][ pos_i ],
+              static_cast<DistanceType>( toDouble( static_cast<AlignmentProfilePositionParameters<ResidueType,MatrixValueType> >(alignment_profiles[ from ][ pos_i ]).crossEntropy( alignment_profiles[ to ][ pos_i ],
                                                                                                                         ( weights ? &( *weights )[ pos_i ] : ( AlignmentProfilePosition const * )0 )
 
 ) ) );
@@ -9382,7 +9397,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           } // End foreach to
         } // End foreach from
         // It is symmetric, but things are still stored in the full matrix. The
-        // storage schemes are different, so I can't make it symmeterized
+        // storage schemes are different, so I can't make it symmetrized
         // inline -- though one could create a copy of this with is_symmetric
         // true.
       } // setToSymmeterizedKullbackLeiblerDivergences()
@@ -9433,7 +9448,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           for( uint32_t to = 0; to < from; to++ ) {
             this->operator()( from, to ) =
               // TODO: Include something other than just the Match Emission dist?
-              static_cast<DistanceType>( alignment_profiles[ from ][ pos_i ][ Emission::Match ].euclideanDistance( alignment_profiles[ to ][ pos_i ][ Emission::Match ] ) );
+              static_cast<DistanceType>(static_cast<MultinomialDistribution<ResidueType,ProbabilityType> >( alignment_profiles[ from ][ pos_i ][ Emission::Match ]).euclideanDistance( alignment_profiles[ to ][ pos_i ][ Emission::Match ] ) );
           } // End foreach to
           this->operator()( from, from ) = 0;
         } // End foreach from
@@ -11860,7 +11875,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       } // unscale()
 
     /**
-     * Divide each contained distrubution value by denominator.
+     * Divide each contained distribution value by denominator.
      */
   template <typename ResidueType,
             typename ProbabilityType,
@@ -23240,11 +23255,11 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       TreeMultipleAlignment<ProfileTreeType, SequenceResidueType> & multiple_alignment
     ) const
     {
-      // Note that this disregards del-in and del-out counts -- it treats all
-      // deletions the same.
+      /// Note that this disregards del-in and del-out counts -- it treats all
+      /// deletions the same.
 
       static const bool be_extra_verbose = false;//true;
-      // TODO: Make this a parameter
+      /// \todo Make this a parameter
       static const bool use_DFS_sequence_order = true;
 
       const uint32_t root_length =
@@ -23253,7 +23268,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
 
       const uint32_t node_count = multiple_alignment.m_sequenceIndices->size();
       //cout << "NODE COUNT is " << node_count << endl;
-      // TODO: make a multiple_alignment.m_profileTree->nodeCount() method, and assert we get the same result.
+      /// \todo make a multiple_alignment.m_profileTree->nodeCount() method, and assert we get the same result.
 
       // Calculate all of the profile-profile alignments.
       vector<vector<uint32_t> > profile_profile_alignments( node_count - 1 );
@@ -23348,7 +23363,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           assert( profile_profile_alignment_index == ( parent_length + 1 ) );
         } // End foreach parent_node_i
       } else { // if use_sibling_alignments .. else ..
-        // TODO: Make these parameters
+        /// \todo Make these parameters
         const double indel_open_cost = 1.0;//20.0;//10.0;//.25;
         const double indel_extension_cost = 1.0;//20.0;//10.0;//.25;
 
@@ -23602,7 +23617,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           } // End if be_extra_verbose
 
           // Move along
-          // Don't decend further here.
+          // Don't descend further here.
           while( ( node_i != 0 ) && ( node_i_which_child == multiple_alignment.m_profileTree->childCount( node_i_parent ) ) ) {
             if( be_extra_verbose ) {
               cout << "This is the last child of its parent.  Ascending tree." << endl;
@@ -23644,6 +23659,209 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
  
       return;
     } // alignLeaves( Parameters const &, ProfileTreeType const &, MultipleAlignment & )
+
+
+    /**
+     * \class AlignmentProfileAccessor
+     * \author Ted Holzman
+     * \date 2/29/2012
+     *
+     * This is a class to access the inner class DynamicProgramming::AlignmentProfile.
+     * It contains input and accessor functions.
+     */
+
+    namespace io = boost::iostreams;
+    using namespace std;
+    using namespace galosh;
+    namespace bx = boost::xpressive;
+    using namespace bx;
+
+    template <typename ResidueType,
+            typename ProbabilityType,
+            typename ScoreType,
+            typename MatrixValueType>
+    class
+    AlignmentProfileAccessor :
+       public DynamicProgramming<ResidueType,ProbabilityType,ScoreType,MatrixValueType>::AlignmentProfile
+    {
+       private:
+          int m_orig_nseq;
+
+       public:
+          AlignmentProfileAccessor () {
+             m_orig_nseq = 0;
+          }
+
+          AlignmentProfileAccessor(int nseq) : m_orig_nseq(nseq)
+          {}     
+
+          typedef ResidueType APAResidueType;
+          /**
+           * \var std::map<std::string,std::string> > kvPairs;
+           *
+           * When parsing an Alignment Profile, there may be lines whose first non-blank character is a pound-sign.
+       	   * Everything after the pound-sign is ignored <em> in so far as the Alignment Profile proper</em> is concerned.
+           * However, the comment lines may contain key-value pairs of the form <key>=<value>.  These can be accessed
+           * later for any purpose.  Our first use is to supply the n-of-sequences which went into the generation of
+           * the alignment profile, in a format like this:
+           *
+           *    nseq=10
+           */
+
+          std::map<std::string,std::string> kvPairs;
+          /**
+           * Stream reader/parsing routines
+           *
+           * \operator >>
+           * Clear current AlignmentProfile.  Read in a new one.
+           */
+           friend std::istream &
+           operator>> (
+              std::istream & normalStream,
+              AlignmentProfileAccessor<ResidueType, ProbabilityType, ScoreType, MatrixValueType> & prof
+           )
+           {
+              static io::filtering_istream is;
+              galosh::input_comment_diversion_filter * icdf;
+              is.push(galosh::input_comment_diversion_filter());
+              icdf = is.component<input_comment_diversion_filter>((int)(is.size()-1));
+              is.push(normalStream);
+
+              /**
+               * Don't even begin if the input stream is at EOF or in a failed state.
+               * Otherwise, clear the current vector and iterate through the stream.  Each
+               * line is an <AlignmentProfilePosition> in square brackets.  It consists of
+               * MatchEmissionParameters followed by GlobalParameters
+               */
+               assert( !is.fail() && !is.eof());
+               prof.clear();
+               int lcount = 0;  //debug and/or error reporting
+               char c;
+               while( !is.eof()) {
+            	  typename DynamicProgramming<ResidueType,ProbabilityType,ScoreType,MatrixValueType>::AlignmentProfilePosition curPosition;
+            	      //is >> "[ ";
+            	  c = is.get();
+            	  if(c == '\n' || c == -1) continue;
+                  assert(c == '[');
+                  assert(is.get() == ' ');
+                  MatchEmissionParameters<ResidueType,ProbabilityType> tmpMEP;
+                  tmpMEP.readMatchEmissionParameters(is);
+                  curPosition.MatchEmissionParameters<ResidueType,ProbabilityType>::copyFrom(tmpMEP);
+                  assert(is.get() ==',');
+                  assert(is.get() ==' ');
+                  GlobalParameters<ResidueType,ProbabilityType> tmpGP;
+                  tmpGP.readGlobalParameters(is);
+                  curPosition.GlobalParameters<ResidueType,ProbabilityType>::copyFrom(tmpGP);
+                  c = is.get();
+                  if(c != ' ') {
+                     std::cerr << "Problem parsing alignment profile on line " << lcount+1 << std::endl;
+                     std::cerr << "Expected ' ]', saw: " << std::endl;
+                     do {
+                        std::cerr << c << std::endl;
+                     } while ((c = is.get()) != '\n');
+                  }
+                  prof.push_back(curPosition);
+                  ++lcount;
+                  is.ignore( 100000, '\n' );
+              }
+
+              ///TAH 3/12  debug code:
+              //std::cerr << "Read " << ++lcount << " alignment profile lines.\n"; std::cerr.flush();
+              /**
+               * having read in and created an AlignmentProfile, make sure it the same when we
+               * output it again
+               */
+              /*
+                std::ofstream testout("test.profile.out");
+                testout << static_cast<typename DynamicProgramming<ResidueType,ProbabilityType,ScoreType,MatrixValueType>::AlignmentProfile>(prof);
+                testout.close();
+              */
+              ///TAH 3/12 end debug code
+
+              /**
+               * For detailed information on the "placeholder" thing, see the documentation for xpressive.  Basically it is a way
+               * of allowing the semantic portion of a xpressive regular expression (the part in braces) to access a variable that
+               * has no lvalue at compile time.
+               */
+
+              placeholder<std::map<std::string,std::string> > dummy;
+              // match a quoted string
+              sregex quoteStr = as_xpr('"') >> *~(as_xpr('"')) >> '"';
+              // match a kv pair, where the v can be a quoted string
+              sregex pair = -*_ >> ( (s1= +_w) >> "=" >> (s2= (+_w | quoteStr)) )
+                 [ dummy[s1] = bx::as<std::string>(s2) ];
+              // Match one or more token=token pairs, separated
+              // by anything
+              sregex pairs = pair >> *(-+_ >> pair);
+              bx::smatch what;
+              what.let(dummy = prof.kvPairs);
+              regex_search(icdf->get_raw_comments(),what,pairs);
+              /// TAH 4/12 debug code:
+              /*
+              std::cerr << "Contents of raw comment string\n";
+              std::cerr << icdf->get_raw_comments() << std::endl; cerr.flush();
+              std::cerr << "Contents of key/value map\n";
+              for(map<string,string>::iterator  it = prof.kvPairs.begin(); it != prof.kvPairs.end(); it++ ) {
+                 std::cerr << "key: " << it->first << ", val: " << it->second << endl;
+              }
+              std::cerr.flush();
+              */
+              //end debug code
+              /// Side effect. The idea here:  if somebody pre-set the number of original sequences (before the alignment
+              /// profile is read in, then that number will take precedence over any comment in the sequence.
+              /// Otherwise, nseq=10 will set the number of aligned sequences to 10.
+              if(prof.kvPairs.count("nseq")) {
+            	  if(prof.m_orig_nseq == 0) prof.m_orig_nseq = atoi(prof.kvPairs["nseq"].c_str());
+              }
+
+              /**
+               * \note - it is an interesting question whether we should return \a is (the filtering iStream) or \a normalStream
+               * the non-filtering one. I think that, for the time being, it is fine to return either.  It may be useful, in the
+               * future to capture the returned filtering_istream, get its input_comment_diversion_filter, and get the raw comments
+               * from it.  But currently we're only interested in the key=value pairs, which are made available in kvPairs.
+               **/
+               return is;
+           }; // operator>>(std::istream,alignmentprofile)
+
+    	   bool
+           fromFile (
+    	      std::istream & is,
+              AlignmentProfileAccessor<ResidueType, ProbabilityType, ScoreType, MatrixValueType> & prof
+           ) 
+           {
+              is >> prof;
+              return true;
+           }  // fromFile(stream, AlignmentProfile) wrapper around >>
+
+           bool
+           fromFile (
+              char *fn,
+              AlignmentProfileAccessor<ResidueType, ProbabilityType, ScoreType, MatrixValueType> & prof
+           )
+           {
+               std::ifstream profileFile(const_cast<char *>(fn));
+        	   return fromFile(profileFile,prof);
+    	   } // fromFile(stream, AlignmentProfile) wrapper around >>
+
+           /// \todo check that the next two functions work when they're
+           /// actually compiled.
+
+           bool
+           fromFile (const char *fn)
+           {
+              return fromFile(fn,this);
+           } // fromFile(char *) Read this AlignmentProfile
+
+           bool
+           fromFile (std::istream & is) {
+              return fromFile(is,this);
+           } // fromFile(std::istream) Read this AlignmentProfile
+
+           int
+           orig_nseq () { // access original number of sequences in alignment
+              return m_orig_nseq;
+           } // orig_nseq
+   }; // AlignmentProfileAccessor
 
 } // End namespace galosh
 

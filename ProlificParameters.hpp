@@ -1,28 +1,25 @@
-/*---------------------------------------------------------------------------##
-##  Library:
-##      galosh::prolific
-##  File:
-##      ProlificParameters.hpp
-##  Author:
-##      D'Oleris Paul Thatcher Edlefsen   paul@galosh.org
-##  Description:
-##      The galosh::Parameters decendent for programs using the
-##      prolific library (inherits from
-##      galosh::DynamicProgramming::Parameters).  Adds parameters relating to
-##      priors and initial values for Profile HMMs.
-#*
-#******************************************************************************
-#*
-#*    This file is part of prolific, a library of useful C++ classes for
-#*    working with genomic sequence data and Profile HMMs.  Please see the
-#*    document CITING, which should have been included with this file.  You may
-#*    use at will, subject to the license (Apache v2.0), but *please cite the
-#*    relevant papers* in your documentation and publications associated with
-#*    uses of this library.  Thank you!
-#*
-#*    Copyright (C) 2008, 2011 by Paul T. Edlefsen, Fred Hutchinson Cancer
-#*    Research Center.
-#*
+/**
+ * \file ProlificParameters.hpp
+ * \author D'Oleris Paul Thatcher Edlefsen   paul@galosh.org
+ *  \par Library:
+ *      galosh::prolific
+ *  \brief
+ * The galosh::Parameters descendant for programs using the
+ * prolific library (inherits from galosh::DynamicProgramming::Parameters).  
+ * Adds parameters relating to priors and initial values for Profile HMMs.
+ *
+ * \par Overview:
+ *    This file is part of prolific, a library of useful C++ classes for
+ *    working with genomic sequence data and Profile HMMs.  Please see the
+ *    document CITING, which should have been included with this file.  You may
+ *    use at will, subject to the license (Apache v2.0), but *please cite the
+ *    relevant papers* in your documentation and publications associated with
+ *    uses of this library.  Thank you!
+ *
+ *    \copyright &copy; 2008, 2011 by Paul T. Edlefsen, Fred Hutchinson Cancer
+ *    Research Center.
+ *
+ *    \par License:
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
@@ -34,7 +31,7 @@
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
-#*****************************************************************************/
+ *****************************************************************************/
 
 #if     _MSC_VER > 1000
 #pragma once
@@ -42,6 +39,8 @@
 
 #ifndef __GALOSH_PROLIFICPARAMETERS_HPP__
 #define __GALOSH_PROLIFICPARAMETERS_HPP__
+
+#include "Prolific.hpp"
 
 #include "Parameters.hpp"
 using galosh::Parameters;
@@ -79,10 +78,14 @@ template <class ResidueType,
         ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP( dynamic_programming_parameters_t );
 
         ar & BOOST_SERIALIZATION_NVP( useDeletionsForInsertionsParameters );
-        ar & BOOST_SERIALIZATION_NVP( expectedDeletionsCounts );
-        ar & BOOST_SERIALIZATION_NVP( expectedInsertionsCounts );
-        ar & BOOST_SERIALIZATION_NVP( expectedDeletionLengthAsProfileLengthFractions );
-        ar & BOOST_SERIALIZATION_NVP( expectedInsertionLengthAsProfileLengthFractions );
+//        ar & BOOST_SERIALIZATION_NVP( expectedDeletionsCounts );   /// TAH 4/2012 macro has problems with pointer types
+        ar & boost::serialization::make_nvp<vector<double> >("expectedDeletionsCounts",(*expectedDeletionsCounts));
+//        ar & BOOST_SERIALIZATION_NVP( expectedInsertionsCounts );
+        ar & boost::serialization::make_nvp<vector<double> >("expectedInsertionsCounts",(*expectedInsertionsCounts));
+//        ar & BOOST_SERIALIZATION_NVP( expectedDeletionLengthAsProfileLengthFractions );
+        ar & boost::serialization::make_nvp<vector<double> >("expectedDeletionLengthAsProfileLengthFractions",(*expectedDeletionLengthAsProfileLengthFractions));
+//        ar & BOOST_SERIALIZATION_NVP( expectedInsertionLengthAsProfileLengthFractions );
+        ar & boost::serialization::make_nvp<vector<double> >("expectedInsertionLengthAsProfileLengthFractions",(*expectedInsertionLengthAsProfileLengthFractions));
         ar & BOOST_SERIALIZATION_NVP( minExpectedDeletionLength );
         ar & BOOST_SERIALIZATION_NVP( minExpectedInsertionLength );
         ar & BOOST_SERIALIZATION_NVP( preAlignInsertion );
@@ -923,7 +926,7 @@ template <class ResidueType,
           os << "expectedDeletionsCounts = NULL" << endl;
               } else {
           os << "expectedDeletionsCounts = { ";
-          for( uint32_t cr_i = 0; cr_i < expectedDeletionsCounts->size(); cr_i++ ) {
+          for( uint32_t cr_i = 0; cr_i < ((std::vector<double> *)expectedDeletionsCounts)->size(); cr_i++ ) {
             if( cr_i > 0 ) {
               os << ", ";
             }
@@ -936,7 +939,7 @@ template <class ResidueType,
           os << "expectedInsertionsCounts = NULL" << endl;
               } else {
           os << "expectedInsertionsCounts = { ";
-          for( uint32_t cr_i = 0; cr_i < expectedInsertionsCounts->size(); cr_i++ ) {
+          for( uint32_t cr_i = 0; cr_i < ((std::vector<double> *)expectedInsertionsCounts)->size(); cr_i++ ) {
             if( cr_i > 0 ) {
               os << ", ";
             }
@@ -949,7 +952,7 @@ template <class ResidueType,
           os << "expectedDeletionLengthAsProfileLengthFractions = NULL" << endl;
               } else {
           os << "expectedDeletionLengthAsProfileLengthFractions = { ";
-          for( uint32_t cr_i = 0; cr_i < expectedDeletionLengthAsProfileLengthFractions->size(); cr_i++ ) {
+          for( uint32_t cr_i = 0; cr_i < ((std::vector<double> *)expectedDeletionLengthAsProfileLengthFractions)->size(); cr_i++ ) {
             if( cr_i > 0 ) {
               os << ", ";
             }
@@ -962,7 +965,7 @@ template <class ResidueType,
           os << "expectedInsertionLengthAsProfileLengthFractions = NULL" << endl;
               } else {
           os << "expectedInsertionLengthAsProfileLengthFractions = { ";
-          for( uint32_t cr_i = 0; cr_i < expectedInsertionLengthAsProfileLengthFractions->size(); cr_i++ ) {
+          for( uint32_t cr_i = 0; cr_i < ((std::vector<double> *)expectedInsertionLengthAsProfileLengthFractions)->size(); cr_i++ ) {
             if( cr_i > 0 ) {
               os << ", ";
             }

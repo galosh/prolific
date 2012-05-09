@@ -1,26 +1,22 @@
-/*---------------------------------------------------------------------------##
-##  Library:
-##      galosh::prolific
-##  File:
-##      Ambiguous.hpp
-##  Author:
-##      D'Oleris Paul Thatcher Edlefsen   paul@galosh.org
-##  Description:
-##      Metafunctions for describing how one residue type (eg seqan::Dna5 or
-##      seqan::Iupac) is ambigous over another (eg seqan::Dna).
-##
-#******************************************************************************
-#*
-#*    This file is part of prolific, a library of useful C++ classes for
-#*    working with genomic sequence data and Profile HMMs.  Please see the
-#*    document CITING, which should have been included with this file.  You may
-#*    use at will, subject to the license (Apache v2.0), but *please cite the
-#*    relevant papers* in your documentation and publications associated with
-#*    uses of this library.  Thank you!
-#*
-#*    Copyright (C) 2008, 2011 by Paul T. Edlefsen, Fred Hutchinson Cancer
-#*    Research Center.
-#*
+/**
+ * \file Ambiguous.hpp
+ * \author  D'Oleris Paul Thatcher Edlefsen   paul@galosh.org
+ * \par Library:
+ *      galosh::prolific
+ * \brief
+ *      Metafunctions for describing how one residue type (eg seqan::Dna5 or
+ *      seqan::Iupac) is ambiguous over another (eg seqan::Dna).
+ * \par Oveview:
+ *    This file is part of prolific, a library of useful C++ classes for
+ *    working with genomic sequence data and Profile HMMs.  Please see the
+ *    document CITING, which should have been included with this file.  You may
+ *    use at will, subject to the license (Apache v2.0), but *please cite the
+ *    relevant papers* in your documentation and publications associated with
+ *    uses of this library.  Thank you!
+ *
+ * \copyright &copy; 2008, 2011 by Paul T. Edlefsen, Fred Hutchinson Cancer
+ *    Research Center.
+ * \par License: 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
@@ -32,7 +28,7 @@
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
-#*****************************************************************************/
+ *****************************************************************************/
 
 #if     _MSC_VER > 1000
 #pragma once
@@ -52,9 +48,9 @@
 
 namespace galosh {
 
-//////////////////////////////////////////////////////////////////////////////
+/* ///////////////////////////////////////////////////////////////////////////// */
 //IsAmbiguous
-//////////////////////////////////////////////////////////////////////////////
+/* ////////////////////////////////////////////////////////////////////////////// */
 
 /**
 .Metafunction.IsAmbiguous:
@@ -133,8 +129,8 @@ inline size_t ambiguousCount ( seqan::Dna5 const & source, seqan::Dna const & )
     galosh::_Size_Table_Ambiguous_Dna5_2_Dna<>::VALUE[ source.value ];
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Iupac is ambiguous over Dna
+/*/////////////////////////////////////////////////////////////////////////////
+// Iupac is ambiguous over Dna */
 template <>
 struct IsAmbiguous<seqan::Iupac, seqan::Dna>
 {

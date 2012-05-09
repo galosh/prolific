@@ -1,26 +1,22 @@
-/*---------------------------------------------------------------------------##
-##  Library:
-##      galosh::prolific
-##  File:
-##      MultinomialDistribution.hpp
-##  Author:
-##      D'Oleris Paul Thatcher Edlefsen   paul@galosh.org
-##  Description:
-##      Class definition for the galosh::MultinomialDistribution class.  It
-##      represents a discrete distribution over a finite set of categories.
-##
-#******************************************************************************
-#*
-#*    This file is part of prolific, a library of useful C++ classes for
-#*    working with genomic sequence data and Profile HMMs.  Please see the
-#*    document CITING, which should have been included with this file.  You may
-#*    use at will, subject to the license (Apache v2.0), but *please cite the
-#*    relevant papers* in your documentation and publications associated with
-#*    uses of this library.  Thank you!
-#*
-#*    Copyright (C) 2008, 2011 by Paul T. Edlefsen, Fred Hutchinson Cancer
-#*    Research Center.
-#*
+/**
+ * \file MultinomialDistribution.hpp
+ * \author  D'Oleris Paul Thatcher Edlefsen   paul@galosh.org
+ * \par Library:
+ *      galosh::prolific
+ * \brief
+ *      Class definition for the galosh::MultinomialDistribution class.  It
+ *      represents a discrete distribution over a finite set of categories.
+ * \par Overview:
+ *    This file is part of prolific, a library of useful C++ classes for
+ *    working with genomic sequence data and Profile HMMs.  Please see the
+ *    document CITING, which should have been included with this file.  You may
+ *    use at will, subject to the license (Apache v2.0), but *please cite the
+ *    relevant papers* in your documentation and publications associated with
+ *    uses of this library.  Thank you!
+ *
+ * \copyright &copy; 2008, 2011 by Paul T. Edlefsen, Fred Hutchinson Cancer
+ *    Research Center.
+ * \par License:
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
@@ -32,7 +28,7 @@
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
-#*****************************************************************************/
+ *****************************************************************************/
 
 #if     _MSC_VER > 1000
 #pragma once
@@ -53,6 +49,8 @@ using std::vector;
 #include <limits>
 using std::numeric_limits;
 #include <math.h>
+#include </usr/include/stdint.h>
+#include </usr/include/assert.h>
 
 #include "Random.hpp"
 #include "Ambiguous.hpp"
@@ -61,8 +59,11 @@ using std::numeric_limits;
 #include <boost/serialization/utility.hpp>
 #include <boost/serialization/list.hpp>
 #include <boost/serialization/version.hpp>
+#include <boost/lexical_cast.hpp>   ///TAH 2/12
 
 #include <seqan/basic.h>
+#include "Algebra.hpp"
+using seqan::ordValue;
 
 namespace galosh {
 
@@ -90,7 +91,10 @@ namespace galosh {
     // template instantiations need to directly access each other's values...
     static uint32_t const m_elementCount = seqan::ValueSize<ValueType>::VALUE;
     ProbabilityType m_probs[ m_elementCount ];
-
+    
+    std::string 
+    toString () const;
+ 
     /**
      * Inner class for ambiguous values with callbacks for any change.  Note
      * that the AmbiguousValue will not change if you alter the
@@ -438,7 +442,7 @@ namespace galosh {
       ValueType v;
       for( size_t i = 0; i < num_ambiguous_elements; i++ ) {
         galosh::ambiguousAssign( v, ambiguity_code, i );
-        prob.unambiguousIncrement( m_probs[ ordValue( v ) ] );
+        prob.unambiguousIncrement( m_probs[ seqan::ordValue( v ) ] );
       }
 
       return prob;
@@ -818,6 +822,53 @@ namespace galosh {
       // Call operator=
       *this = copy_from;
     } // <init>( MultinomialDistribution<AnyProbabilityType> const & )
+
+  /**
+   * \fn std::string MultinomialDistribution::toString() const
+   * \brief create a string representation of a MultinomialDistribution object.
+   *
+   * This has been split off from Paul's original writeMultinomialDistribution, so
+   * so that the string for applications other than direct output (e.g. output to
+   * somewhere other than cout.
+   *
+   * TAH 1/12
+   */
+
+  template <typename ValueType,
+            typename ProbabilityType>
+  GALOSH_INLINE_INIT
+  std::string
+  MultinomialDistribution<ValueType,ProbabilityType>:: 
+  toString() const {
+    	   if(m_elementCount == 0) return "()";
+   	   std::string retVal = "(";
+   	   for( uint32_t i = 0; i < m_elementCount; i++ )
+   	   {
+   	      if( i != 0 ) {
+   	         retVal += ",";
+   	      }
+   	      retVal += ValueType( i );
+   	      retVal += "=";
+              /// Paul's original note from writeMultnomialDistribution
+                /// The cast to double forces the printed output to be how a double
+   	        /// prints, not how a ProbabilityType prints.  This is safe because we
+   	        /// generally keep values above some minimal value.  See normalize(
+   	        /// ProbabilityType ).
+   	        /// os << ( double )m_probs[ i ];
+                /// 
+                /// \todo Here we're using lexical_cast instead of ( double ) - this is after
+                /// hours of suffering with "createRandomSequence" which uses "floatrealspace"
+                /// for its ProbabilityType and somehow failed to compile.  It would be good
+                /// to understand the compilation failure.  
+              std::ostringstream oss;
+              oss << m_probs[ i ];
+       	      retVal += oss.str();
+
+   	   }
+   	   retVal += ")";
+   	   return retVal;
+  }
+
 
   template <typename ValueType,
             typename ProbabilityType>

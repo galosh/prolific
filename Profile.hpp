@@ -1,36 +1,33 @@
-/*---------------------------------------------------------------------------##
-##  Library:
-##      galosh::prolific
-##  File:
-##      Profile.hpp
-##  Author:
-##      D'Oleris Paul Thatcher Edlefsen   paul@galosh.org
-##  Description:
-##      Class definition for the Galosh Profile HMM class.  A Profile is a data
-##      structure for the model parameters.  Conceptually, for every position
-##      of the profile there are a bunch of parameters for each kind of Plan 7
-##      profile transition/emission.  We make this a vector of maps from
-##      ProfileKeys (eg. Transition) to maps from ProfileKey-specific params
-##      (eg. Transition_M_to_D) to the values of those params.
-##
-##      Also defines dirichlet priors for each set of profile parameters.
-##
-##      More about Plan7 can be found at
-##      http://www.csb.yale.edu/userguides/seq/hmmer/docs/node11.html
-##      (or any other HMMER docs mirror, node 11)
-##
-#******************************************************************************
-#*
-#*    This file is part of prolific, a library of useful C++ classes for
-#*    working with genomic sequence data and Profile HMMs.  Please see the
-#*    document CITING, which should have been included with this file.  You may
-#*    use at will, subject to the license (Apache v2.0), but *please cite the
-#*    relevant papers* in your documentation and publications associated with
-#*    uses of this library.  Thank you!
-#*
-#*    Copyright (C) 2008, 2011 by Paul T. Edlefsen, Fred Hutchinson Cancer
-#*    Research Center.
-#*
+/**
+ * \file Profile.hpp
+ * \author  D'Oleris Paul Thatcher Edlefsen   paul@galosh.org
+ * \par Library:
+ * \brief
+ *      Class definition for the Galosh Profile HMM class.  
+ *
+ *      A Profile is a data
+ *      structure for the model parameters.  Conceptually, for every position
+ *      of the profile there are a bunch of parameters for each kind of Plan 7
+ *      profile transition/emission.  We make this a vector of maps from
+ *      ProfileKeys (eg. Transition) to maps from ProfileKey-specific params
+ *      (eg. Transition_M_to_D) to the values of those params.
+ *
+ *      Also defines dirichlet priors for each set of profile parameters.
+ *
+ *      More about Plan7 can be found at
+ *      http://www.csb.yale.edu/userguides/seq/hmmer/docs/node11.html
+ *      (or any other HMMER docs mirror, node 11)
+ * \par Overview:
+ *    This file is part of prolific, a library of useful C++ classes for
+ *    working with genomic sequence data and Profile HMMs.  Please see the
+ *    document CITING, which should have been included with this file.  You may
+ *    use at will, subject to the license (Apache v2.0), but *please cite the
+ *    relevant papers* in your documentation and publications associated with
+ *    uses of this library.  Thank you!
+ *
+ * \copyright &copy; 2008, 2011 by Paul T. Edlefsen, Fred Hutchinson Cancer
+ *    Research Center.
+ * \par License:
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
@@ -42,7 +39,7 @@
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
-#*****************************************************************************/
+ *****************************************************************************/
 
 #if     _MSC_VER > 1000
 #pragma once
@@ -82,7 +79,12 @@ using std::vector;
 
 #include <seqan/basic.h>
 
-/// Note that in the ProfileTreeRoot code we differentiate between size(), which returns the actual underlying size of the vector that holds the ProfilePositions, and length(), which might be overridden to return something other than size() (as it is in the case of the PositionEntente in DynamicProgramming.hpp).  Also for this reason we differentiate between operator[] (which might be overridden) and vector<ProfilePosition<ResidueType, ProbabilityType> >::operator[] (which always returns the corresponding index into the underlying array).
+/// Note that in the ProfileTreeRoot code we differentiate between size(), which returns the 
+/// actual underlying size of the vector that holds the ProfilePositions, and length(), which
+/// might be overridden to return something other than size() (as it is in the case of the 
+/// PositionEntente in DynamicProgramming.hpp).  Also for this reason we differentiate between 
+/// operator[] (which might be overridden) and vector<ProfilePosition<ResidueType, ProbabilityType> >\::operator[]
+/// (which always returns the corresponding index into the underlying array).
 
 namespace galosh {
 
@@ -535,7 +537,7 @@ const profile_PostAlign_emission_distribution_tag Emission::PostAlignInsertion =
     copyFrom ( MatchEmissionParameters<ResidueType, AnyProbabilityType> const& other_pos );
 
     /**
-     * Divide each contained distrubution value by denominator.  Note that
+     * Divide each contained distribution value by denominator.  Note that
      * this violates the rule that the probabilities sum to 1.
      */
     template <typename AnyProbabilityType>
@@ -740,7 +742,7 @@ const profile_PostAlign_emission_distribution_tag Emission::PostAlignInsertion =
     void
     readParameterCollection (
       std::istream & is
-    ) const
+    )
     {
       readMatchEmissionParameters( is );
     } // readParameterCollection( istream & )
@@ -1046,7 +1048,7 @@ template <typename ResidueType, typename ProbabilityType, typename IsActualInser
     void
     readParameterCollection (
       std::istream & is
-    ) const
+    )
     {
       readInsertionEmissionParameters( is );
     } // readParameterCollection( istream & )
@@ -1343,7 +1345,7 @@ template <typename ResidueType, typename ProbabilityType, typename IsActualInser
     void
     readParameterCollection (
       std::istream & is
-    ) const
+    )
     {
       readPositionTransitionParameters( is );
     } // readParameterCollection( istream & )
@@ -1562,7 +1564,7 @@ template <typename ResidueType, typename ProbabilityType, typename IsActualInser
     void
     readParameterCollection (
       std::istream & is
-    ) const
+    )
     {
       readPositionSpecificParameters( is );
     } // readParameterCollection( istream & )
@@ -1917,7 +1919,7 @@ template <typename ResidueType, typename ProbabilityType, typename IsActualInser
     void
     readParameterCollection (
       std::istream & is
-    ) const
+    )
     {
       readPreAlignParameters( is );
     } // readParameterCollection( istream & )
@@ -2329,7 +2331,7 @@ template <typename ResidueType, typename ProbabilityType, typename IsActualInser
     void
     readParameterCollection (
       std::istream & is
-    ) const
+    )
     {
       readPostAlignParameters( is );
     } // readParameterCollection( istream & )
@@ -2633,7 +2635,7 @@ template <typename ResidueType, typename ProbabilityType, typename IsActualInser
     void
     readParameterCollection (
       std::istream & is
-    ) const
+    )
     {
       readGlobalParameters( is );
     } // readParameterCollection( istream & )
@@ -3433,7 +3435,7 @@ template <typename ResidueType, typename ProbabilityType, typename IsActualInser
 
     /**
      * Set all values (except position-specific values) such that each
-     * distrubution is randomly distributed.
+     * distribution is randomly distributed.
      */
     void
     uniformExceptPositions ( Random & random )
@@ -3442,7 +3444,7 @@ template <typename ResidueType, typename ProbabilityType, typename IsActualInser
     } // uniformExceptPositions( Random & )
 
     /**
-     * Set allposition-specific values such that each distrubution is randomly
+     * Set all position-specific values such that each distribution is randomly
      * distributed.
      */
     void
@@ -3673,7 +3675,7 @@ template <typename ResidueType, typename ProbabilityType, typename IsActualInser
     bool
     fromFile ( string const & filename )
     {
-      fromFile( filename.c_str() );
+      return fromFile( filename.c_str() );
     } // fromFile( string )
 
     /**
@@ -4407,9 +4409,9 @@ template <typename ResidueType, typename ProbabilityType, typename IsActualInser
       // Do nothing else.
     } // <init>()
 
-    ProfileTreeInternalNode ( ProfileTreeInternalNode<ResidueType, ProbabilityType> const * const parent ) :
+    ProfileTreeInternalNode ( ProfileTreeInternalNode<ResidueType, ProbabilityType> const * parent ) :
       m_parent_when_parent_is_internal_node( parent ),
-      m_root( parent->getProfileTreeRoot() ),
+      m_root( ((ProfileTreeRoot<ResidueType,ProbabilityType> * const)parent)->getProfileTreeRoot() ),
       m_length( 0 ),
       m_parentPositionVariations(),
       m_profileTreeVertex( 0 )
