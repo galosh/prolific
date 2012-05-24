@@ -2850,19 +2850,19 @@ template <typename ResidueType, typename ProbabilityType, typename IsActualInser
     friend class ProfilePosition<ResidueType, ProbabilityType>;
 
     ProfileTreeRoot () :
-      GlobalParameters<ResidueType, ProbabilityType>()
+      GlobalParameters<ResidueType, ProbabilityType>(),
+      m_profileTreeVertex(0)   //TAH 5/12 dotting i's
       //,m_Loop_Distribution()
     {
       //cout << "ProfileTreeRoot () initializer called: this is " << this << endl;
       //this->reinitialize( 0, 0 );
+
     } // <init>()
 
 //    ProfileTreeRoot ( uint32_t length ) :
 //      GlobalParameters<ResidueType, ProbabilityType>(),
 //      vector<Position>()
 //    {
-//      // TODO: REMOVE
-//      //cout << "ProfileTreeRoot ( uint32_t ) initializer called: this is " << this << endl;
 //      this->reinitialize( length, 0 );
 //    } // <init>( uint32_t )
 
@@ -2870,11 +2870,9 @@ template <typename ResidueType, typename ProbabilityType, typename IsActualInser
       uint32_t length
     ) :
       GlobalParameters<ResidueType, ProbabilityType>(),
-      vector<Position>()
+      vector<Position>(),
+      m_profileTreeVertex(0)   //TAH 5/12
     {
-      // TODO: REMOVE
-      //cout << "ProfileTreeRoot ( uint32_t ) initializer called: this is " << this << endl;
-
       this->reinitialize( length );
     } // <init>( uint32_t )
 
@@ -2882,11 +2880,9 @@ template <typename ResidueType, typename ProbabilityType, typename IsActualInser
       ProfileTreeRoot<ResidueType, ProbabilityType> const & copy_from
     ) :
       GlobalParameters<ResidueType, ProbabilityType>(),
-      vector<Position>()
+      vector<Position>(),
+      m_profileTreeVertex(0)
     {
-      // TODO: REMOVE
-      //cout << "ProfileTreeRoot ( ProfileTreeRoot const& ) initializer called: this is " << this << endl;
-
       this->copyFrom( copy_from );
     } // <init>( ProfileTreeRoot const& )
 
@@ -2895,11 +2891,9 @@ template <typename ResidueType, typename ProbabilityType, typename IsActualInser
       ProfileTreeRoot<ResidueType, AnyProbabilityType> const & copy_from
     ) :
       GlobalParameters<ResidueType, ProbabilityType>(),
-      vector<Position>()
+      vector<Position>(),
+      m_profileTreeVertex(0)
     {
-      // TODO: REMOVE
-      //cout << "ProfileTreeRoot ( ProfileTreeRoot<ResidueType, AnyProbabilityType> const& ) initializer called: this is " << this << endl;
-
       this->copyFrom( copy_from );
     } // <init>( ProfileTreeRoot<ResidueType, AnyProbabilityType> const& )
 
@@ -2909,7 +2903,7 @@ template <typename ResidueType, typename ProbabilityType, typename IsActualInser
     ProfileTreeRoot ( 
       AnyInternalNodeOrRoot const * copy_length_from,
       vector<int> const & unused_variations
-    )
+    ) : m_profileTreeVertex(0)
     {
       reinitialize( *copy_length_from );
     } // <init>( AnyInternalNodeOrRoot const *, vector<int> const & )
@@ -6004,6 +5998,11 @@ template <typename ResidueType, typename ProbabilityType, typename IsActualInser
       // Do nothing else.
     } // <init>()
   
+    virtual ~ScalableParameterCollection ()
+    {
+    	// TAH 5/12 correct destructor will be called.
+    }
+
     template <typename AnyParameterCollectionType>
     ScalableParameterCollection ( ScalableParameterCollection<ScoreType, AnyParameterCollectionType> const & copy_from ) :
       ParameterCollectionType( copy_from ),

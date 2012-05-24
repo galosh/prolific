@@ -29,7 +29,7 @@ ALGEBRA_LIBS	= -lHMMoC-BFloat-Algebra
 ## For Boost support (required):
 BOOST_CFLAGS 	= -I./boost-include
 BOOST_LDFLAGS 	= -L./boost-lib
-BOOST_LIBS	= -lboost_serialization -lboost_graph -lboost_filesystem -lboost_system
+BOOST_LIBS	= -lboost_serialization -lboost_graph -lboost_filesystem -lboost_system -lboost_regex
 
 ###==============================================
 
