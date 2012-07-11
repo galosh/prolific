@@ -1113,7 +1113,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
        * This can be used to calculate the (possibly weighted) (self-)entropy by
        * calling this->crossEntropy( *this, weights ).  It can also be used to
        * calculate the KL divergence by taking the difference of the
-       * cross-entropy and the self-entropy, or the symmeterized KL divergence by
+       * cross-entropy and the self-entropy, or the symmetrized KL divergence by
        * summing the KL divergences computed both ways.  Note, though, that
        * weights should all be the same within any Multinomial distribution if
        * this is to be used to calculate weighted entropies or KL divergences.

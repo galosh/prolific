@@ -6992,7 +6992,7 @@ template <typename ResidueType, typename ProbabilityType, typename IsActualInser
 
 
     /**
-     * Divide each contained distrubution value by denominator.  Note that
+     * Divide each contained distribution value by denominator.  Note that
      * this violates the rule that the probabilities sum to 1.
      */
   template <typename ResidueType, typename ProbabilityType, typename IsActualInsertionEmissionParametersType>

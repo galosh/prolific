@@ -79,13 +79,13 @@ template <class ResidueType,
 
         ar & BOOST_SERIALIZATION_NVP( useDeletionsForInsertionsParameters );
 //        ar & BOOST_SERIALIZATION_NVP( expectedDeletionsCounts );   /// TAH 4/2012 macro has problems with pointer types
-        ar & boost::serialization::make_nvp<vector<double> >("expectedDeletionsCounts",(*expectedDeletionsCounts));
+        ar & boost::serialization::make_nvp<vector<double> *>("expectedDeletionsCounts",(expectedDeletionsCounts));
 //        ar & BOOST_SERIALIZATION_NVP( expectedInsertionsCounts );
-        ar & boost::serialization::make_nvp<vector<double> >("expectedInsertionsCounts",(*expectedInsertionsCounts));
+        ar & boost::serialization::make_nvp<vector<double> *>("expectedInsertionsCounts",(expectedInsertionsCounts));
 //        ar & BOOST_SERIALIZATION_NVP( expectedDeletionLengthAsProfileLengthFractions );
-        ar & boost::serialization::make_nvp<vector<double> >("expectedDeletionLengthAsProfileLengthFractions",(*expectedDeletionLengthAsProfileLengthFractions));
+        ar & boost::serialization::make_nvp<vector<double> *>("expectedDeletionLengthAsProfileLengthFractions",(expectedDeletionLengthAsProfileLengthFractions));
 //        ar & BOOST_SERIALIZATION_NVP( expectedInsertionLengthAsProfileLengthFractions );
-        ar & boost::serialization::make_nvp<vector<double> >("expectedInsertionLengthAsProfileLengthFractions",(*expectedInsertionLengthAsProfileLengthFractions));
+        ar & boost::serialization::make_nvp<vector<double> *>("expectedInsertionLengthAsProfileLengthFractions",(expectedInsertionLengthAsProfileLengthFractions));
         ar & BOOST_SERIALIZATION_NVP( minExpectedDeletionLength );
         ar & BOOST_SERIALIZATION_NVP( minExpectedInsertionLength );
         ar & BOOST_SERIALIZATION_NVP( preAlignInsertion );
