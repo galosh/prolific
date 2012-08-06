@@ -1,21 +1,25 @@
-/**
- * \file Parameters.hpp
- * \author  D'Oleris Paul Thatcher Edlefsen   paul@galosh.org
- * \par Library:
- *      galosh::prolific
- * \brief
- *      Class definition for the Galosh Parameters class.
- * \par Overview:
- *    This file is part of prolific, a library of useful C++ classes for
- *    working with genomic sequence data and Profile HMMs.  Please see the
- *    document CITING, which should have been included with this file.  You may
- *    use at will, subject to the license (Apache v2.0), but *please cite the
- *    relevant papers* in your documentation and publications associated with
- *    uses of this library.  Thank you!
- *
- *  \copyright &copy; 2006, 2008, 2011 by Paul T. Edlefsen, Fred Hutchinson Cancer
- *    Research Center.
- *  \par License: 
+/*---------------------------------------------------------------------------##
+##  Library:
+##      galosh::prolific
+##  File:
+##      Parameters.hpp
+##  Author:
+##      D'Oleris Paul Thatcher Edlefsen   paul@galosh.org
+##  Description:
+##      Class definition for the Galosh Parameters class.
+##
+#******************************************************************************
+#*
+#*    This file is part of prolific, a library of useful C++ classes for
+#*    working with genomic sequence data and Profile HMMs.  Please see the
+#*    document CITING, which should have been included with this file.  You may
+#*    use at will, subject to the license (Apache v2.0), but *please cite the
+#*    relevant papers* in your documentation and publications associated with
+#*    uses of this library.  Thank you!
+#*
+#*    Copyright (C) 2006, 2008, 2011 by Paul T. Edlefsen, Fred Hutchinson Cancer
+#*    Research Center.
+#*
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
@@ -27,7 +31,7 @@
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
- *****************************************************************************/
+#*****************************************************************************/
 
 #if     _MSC_VER > 1000
 #pragma once
@@ -51,6 +55,8 @@ using namespace std;
 #include <boost/serialization/utility.hpp>
 #include <boost/serialization/list.hpp>
 #include <boost/serialization/version.hpp>
+#include "boost/program_options.hpp"
+#include "boost/program_options/variables_map.hpp"
 
 namespace galosh {
 
@@ -62,13 +68,15 @@ namespace galosh {
   };
 
   enum VerbosityLevel {
-    VERBOSITY_None = 0,
-    VERBOSITY_Meta = 5, // lower than low: show only info exterior to training
-    VERBOSITY_Low = 10,
-    VERBOSITY_Medium = 50,
-    VERBOSITY_High = 100,
-    VERBOSITY_All = 1000
+    VERBOSITY_None =     0,
+    VERBOSITY_Meta =     5, // lower than low: show only info exterior to training
+    VERBOSITY_Low =     10,
+    VERBOSITY_Medium =  50,
+    VERBOSITY_High =   100,
+    VERBOSITY_All =   1000
   };
+
+namespace po = boost::program_options;
   
   class Parameters {
     // Boost serialization
@@ -79,11 +87,13 @@ namespace galosh {
     {
       ar & BOOST_SERIALIZATION_NVP( debug );
       ar & BOOST_SERIALIZATION_NVP( verbosity );
+      /** \todo should serialize m_options_map when we learn how */
+
     } // serialize( Archive &, const unsigned int )
 
   public:
-  
-    DebugLevel debug;
+      po::variables_map m_options_map;
+      DebugLevel debug;
 #define DEFAULT_debug DEBUG_None
 
     VerbosityLevel verbosity;

@@ -65,7 +65,7 @@ template <class ResidueType,
     public:
 
     class Parameters :
-    public DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::Parameters
+       public DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::Parameters
     {
       // Boost serialization
     private:
