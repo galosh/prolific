@@ -62,7 +62,8 @@ using std::numeric_limits;
 #include <boost/lexical_cast.hpp>   ///TAH 2/12
 
 #include <seqan/basic.h>
-#include "Algebra.hpp"
+//#include "Algebra.hpp"
+//#include <seqan/sequence.h>
 using seqan::ordValue;
 
 namespace galosh {

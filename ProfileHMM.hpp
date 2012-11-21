@@ -70,23 +70,23 @@ typedef seqan::SimpleType<unsigned char,_StateLabel> StateLabel;
 /* ///////////////////////////////////////////////////////////////////////////// */
 
 template <typename T = void>
-struct _Translate_Table_StateLabel_2_Ascii
+struct TranslateTableStateLabelToAscii_
 {
   static char const VALUE[ 12 ];
 };
 template <typename T>
-char const _Translate_Table_StateLabel_2_Ascii<T>::VALUE[ 12 ] =
+char const TranslateTableStateLabelToAscii_<T>::VALUE[ 12 ] =
   {'S', 'N', 'B', 'M', 'I', 'D', 'E', 'J', 'C', 'T', 'Z', 'W'};
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Ascii_2_StateLabel
+struct TranslateTableAsciiToStateLabel_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Ascii_2_StateLabel<T>::VALUE[ 256 ] = 
+char const TranslateTableAsciiToStateLabel_<T>::VALUE[ 256 ] = 
 {
 	9,   9,   9,   9,   9,   9,   9,   9,   9,   9,   9,   9,   9,   9,   9,   9, //0
 	9,   9,   9,   9,   9,   9,   9,   9,   9,   9,   9,   9,   9,   9,   9,   9, //1
@@ -118,12 +118,12 @@ char const _Translate_Table_Ascii_2_StateLabel<T>::VALUE[ 256 ] =
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Byte_2_StateLabel
+struct TranslateTableByteToStateLabel_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Byte_2_StateLabel<T>::VALUE[ 256 ] = 
+char const TranslateTableByteToStateLabel_<T>::VALUE[ 256 ] = 
 {
 	0,   1,   2,   3,   4,   5,   6,   7,   8,   9,   10,  11,  9,   9,   9,   9, //0
 	9,   9,   9,   9,   9,   9,   9,   9,   9,   9,   9,   9,   9,   9,   9,   9, //1
@@ -160,21 +160,21 @@ inline void assign ( Ascii & c_target, galosh::StateLabel const & source )
 {
 SEQAN_CHECKPOINT
   c_target =
-    galosh::_Translate_Table_StateLabel_2_Ascii<>::VALUE[ source.value ];
+    galosh::TranslateTableStateLabelToAscii_<>::VALUE[ source.value ];
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //StateLabel (10 labels)
 
 template <>
-struct CompareType<galosh::StateLabel, Byte> {
+struct CompareType<galosh::StateLabel, __uint8> {
   typedef galosh::StateLabel Type;
 };
-inline void assign ( galosh::StateLabel & target, Byte c_source )
+inline void assign ( galosh::StateLabel & target, __uint8 c_source )
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Byte_2_StateLabel<>::VALUE[ c_source ];
+    galosh::TranslateTableByteToStateLabel_<>::VALUE[ c_source ];
 }
 //____________________________________________________________________________
 
@@ -186,7 +186,7 @@ inline void assign ( galosh::StateLabel & target, Ascii c_source )
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_StateLabel<>::VALUE[
+    galosh::TranslateTableAsciiToStateLabel_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -200,7 +200,7 @@ inline void assign ( galosh::StateLabel & target, Unicode c_source )
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_StateLabel<>::VALUE[
+    galosh::TranslateTableAsciiToStateLabel_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -413,45 +413,45 @@ struct StateLabelTransitionTargets<StartStateLabel, TSpec> {
 //////////////////////////////////////////////////////////////////////////////
 
 template <typename T = void>
-struct _Translate_Table_StartStateTransitionTargets_2_Ascii
+struct TranslateTableStartStateTransitionTargetsToAscii_
 {
   static char const VALUE[ 1 ];
 };
 template <typename T>
-char const _Translate_Table_StartStateTransitionTargets_2_Ascii<T>::VALUE[ 1 ] =
+char const TranslateTableStartStateTransitionTargetsToAscii_<T>::VALUE[ 1 ] =
   { 'N' };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_StateLabel_2_StartStateTransitionTargets
+struct TranslateTableStateLabelToStartStateTransitionTargets_
 {
   static char const VALUE[ 12 ];
 };
 template <typename T>
-char const _Translate_Table_StateLabel_2_StartStateTransitionTargets<T>::VALUE[ 12 ] =
+char const TranslateTableStateLabelToStartStateTransitionTargets_<T>::VALUE[ 12 ] =
   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_StartStateTransitionTargets_2_StateLabel
+struct TranslateTableStartStateTransitionTargetsToStateLabel_
 {
   static char const VALUE[ 1 ];
 };
 template <typename T>
-char const _Translate_Table_StartStateTransitionTargets_2_StateLabel<T>::VALUE[ 1 ] =
+char const TranslateTableStartStateTransitionTargetsToStateLabel_<T>::VALUE[ 1 ] =
   { 1 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Ascii_2_StartStateTransitionTargets
+struct TranslateTableAsciiToStartStateTransitionTargets_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Ascii_2_StartStateTransitionTargets<T>::VALUE[ 256 ] = 
+char const TranslateTableAsciiToStartStateTransitionTargets_<T>::VALUE[ 256 ] = 
 {
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -483,12 +483,12 @@ char const _Translate_Table_Ascii_2_StartStateTransitionTargets<T>::VALUE[ 256 ]
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Byte_2_StartStateTransitionTargets
+struct TranslateTableByteToStartStateTransitionTargets_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Byte_2_StartStateTransitionTargets<T>::VALUE[ 256 ] = 
+char const TranslateTableByteToStartStateTransitionTargets_<T>::VALUE[ 256 ] = 
 {
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -525,21 +525,21 @@ inline void assign ( Ascii & c_target, galosh::StartStateTransitionTargets const
 {
 SEQAN_CHECKPOINT
   c_target =
-    galosh::_Translate_Table_StartStateTransitionTargets_2_Ascii<>::VALUE[ source.value ];
+    galosh::TranslateTableStartStateTransitionTargetsToAscii_<>::VALUE[ source.value ];
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //StartStateTransitionTargets
 
 template <>
-struct CompareType<galosh::StartStateTransitionTargets, Byte> {
+struct CompareType<galosh::StartStateTransitionTargets, __uint8> {
   typedef galosh::StartStateTransitionTargets Type;
 };
-inline void assign ( galosh::StartStateTransitionTargets & target, Byte c_source )
+inline void assign ( galosh::StartStateTransitionTargets & target, __uint8 c_source )
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Byte_2_StartStateTransitionTargets<>::VALUE[ c_source ];
+    galosh::TranslateTableByteToStartStateTransitionTargets_<>::VALUE[ c_source ];
 }
 //____________________________________________________________________________
 
@@ -551,7 +551,7 @@ inline void assign ( galosh::StartStateTransitionTargets & target, Ascii c_sourc
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_StartStateTransitionTargets<>::VALUE[
+    galosh::TranslateTableAsciiToStartStateTransitionTargets_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -565,7 +565,7 @@ inline void assign ( galosh::StartStateTransitionTargets & target, Unicode c_sou
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_StartStateTransitionTargets<>::VALUE[
+    galosh::TranslateTableAsciiToStartStateTransitionTargets_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -653,45 +653,45 @@ struct StateLabelTransitionTargets<PreAlignStateLabel, TSpec> {
 //////////////////////////////////////////////////////////////////////////////
 
 template <typename T = void>
-struct _Translate_Table_PreAlignStateTransitionTargets_2_Ascii
+struct TranslateTablePreAlignStateTransitionTargetsToAscii_
 {
   static char const VALUE[ 2 ];
 };
 template <typename T>
-char const _Translate_Table_PreAlignStateTransitionTargets_2_Ascii<T>::VALUE[ 2 ] =
+char const TranslateTablePreAlignStateTransitionTargetsToAscii_<T>::VALUE[ 2 ] =
   { 'N', 'B' };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_StateLabel_2_PreAlignStateTransitionTargets
+struct TranslateTableStateLabelToPreAlignStateTransitionTargets_
 {
   static char const VALUE[ 12 ];
 };
 template <typename T>
-char const _Translate_Table_StateLabel_2_PreAlignStateTransitionTargets<T>::VALUE[ 12 ] =
+char const TranslateTableStateLabelToPreAlignStateTransitionTargets_<T>::VALUE[ 12 ] =
   { 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_PreAlignStateTransitionTargets_2_StateLabel
+struct TranslateTablePreAlignStateTransitionTargetsToStateLabel_
 {
   static char const VALUE[ 2 ];
 };
 template <typename T>
-char const _Translate_Table_PreAlignStateTransitionTargets_2_StateLabel<T>::VALUE[ 2 ] =
+char const TranslateTablePreAlignStateTransitionTargetsToStateLabel_<T>::VALUE[ 2 ] =
   { 1, 2 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Ascii_2_PreAlignStateTransitionTargets
+struct TranslateTableAsciiToPreAlignStateTransitionTargets_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Ascii_2_PreAlignStateTransitionTargets<T>::VALUE[ 256 ] = 
+char const TranslateTableAsciiToPreAlignStateTransitionTargets_<T>::VALUE[ 256 ] = 
 {
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -723,12 +723,12 @@ char const _Translate_Table_Ascii_2_PreAlignStateTransitionTargets<T>::VALUE[ 25
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Byte_2_PreAlignStateTransitionTargets
+struct TranslateTableByteToPreAlignStateTransitionTargets_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Byte_2_PreAlignStateTransitionTargets<T>::VALUE[ 256 ] = 
+char const TranslateTableByteToPreAlignStateTransitionTargets_<T>::VALUE[ 256 ] = 
 {
 	0,   1,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -765,21 +765,21 @@ inline void assign ( Ascii & c_target, galosh::PreAlignStateTransitionTargets co
 {
 SEQAN_CHECKPOINT
   c_target =
-    galosh::_Translate_Table_PreAlignStateTransitionTargets_2_Ascii<>::VALUE[ source.value ];
+    galosh::TranslateTablePreAlignStateTransitionTargetsToAscii_<>::VALUE[ source.value ];
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //PreAlignStateTransitionTargets
 
 template <>
-struct CompareType<galosh::PreAlignStateTransitionTargets, Byte> {
+struct CompareType<galosh::PreAlignStateTransitionTargets, __uint8> {
   typedef galosh::PreAlignStateTransitionTargets Type;
 };
-inline void assign ( galosh::PreAlignStateTransitionTargets & target, Byte c_source )
+inline void assign ( galosh::PreAlignStateTransitionTargets & target, __uint8 c_source )
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Byte_2_PreAlignStateTransitionTargets<>::VALUE[ c_source ];
+    galosh::TranslateTableByteToPreAlignStateTransitionTargets_<>::VALUE[ c_source ];
 }
 //____________________________________________________________________________
 
@@ -791,7 +791,7 @@ inline void assign ( galosh::PreAlignStateTransitionTargets & target, Ascii c_so
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_PreAlignStateTransitionTargets<>::VALUE[
+    galosh::TranslateTableAsciiToPreAlignStateTransitionTargets_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -805,7 +805,7 @@ inline void assign ( galosh::PreAlignStateTransitionTargets & target, Unicode c_
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_PreAlignStateTransitionTargets<>::VALUE[
+    galosh::TranslateTableAsciiToPreAlignStateTransitionTargets_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -896,45 +896,45 @@ struct StateLabelTransitionTargets<BeginStateLabel, TSpec> {
 //////////////////////////////////////////////////////////////////////////////
 
 template <typename T = void>
-struct _Translate_Table_BeginStateTransitionTargets_2_Ascii
+struct TranslateTableBeginStateTransitionTargetsToAscii_
 {
   static char const VALUE[ 3 ];
 };
 template <typename T>
-char const _Translate_Table_BeginStateTransitionTargets_2_Ascii<T>::VALUE[ 3 ] =
+char const TranslateTableBeginStateTransitionTargetsToAscii_<T>::VALUE[ 3 ] =
   { 'M', 'D', 'Z' };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_StateLabel_2_BeginStateTransitionTargets
+struct TranslateTableStateLabelToBeginStateTransitionTargets_
 {
   static char const VALUE[ 12 ];
 };
 template <typename T>
-char const _Translate_Table_StateLabel_2_BeginStateTransitionTargets<T>::VALUE[ 12 ] =
+char const TranslateTableStateLabelToBeginStateTransitionTargets_<T>::VALUE[ 12 ] =
   { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 2, 0 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_BeginStateTransitionTargets_2_StateLabel
+struct TranslateTableBeginStateTransitionTargetsToStateLabel_
 {
   static char const VALUE[ 3 ];
 };
 template <typename T>
-char const _Translate_Table_BeginStateTransitionTargets_2_StateLabel<T>::VALUE[ 3 ] =
+char const TranslateTableBeginStateTransitionTargetsToStateLabel_<T>::VALUE[ 3 ] =
   { 3, 5, 10 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Ascii_2_BeginStateTransitionTargets
+struct TranslateTableAsciiToBeginStateTransitionTargets_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Ascii_2_BeginStateTransitionTargets<T>::VALUE[ 256 ] = 
+char const TranslateTableAsciiToBeginStateTransitionTargets_<T>::VALUE[ 256 ] = 
 {
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -966,12 +966,12 @@ char const _Translate_Table_Ascii_2_BeginStateTransitionTargets<T>::VALUE[ 256 ]
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Byte_2_BeginStateTransitionTargets
+struct TranslateTableByteToBeginStateTransitionTargets_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Byte_2_BeginStateTransitionTargets<T>::VALUE[ 256 ] = 
+char const TranslateTableByteToBeginStateTransitionTargets_<T>::VALUE[ 256 ] = 
 {
 	0,   1,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -1008,21 +1008,21 @@ inline void assign ( Ascii & c_target, galosh::BeginStateTransitionTargets const
 {
 SEQAN_CHECKPOINT
   c_target =
-    galosh::_Translate_Table_BeginStateTransitionTargets_2_Ascii<>::VALUE[ source.value ];
+    galosh::TranslateTableBeginStateTransitionTargetsToAscii_<>::VALUE[ source.value ];
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //BeginStateTransitionTargets
 
 template <>
-struct CompareType<galosh::BeginStateTransitionTargets, Byte> {
+struct CompareType<galosh::BeginStateTransitionTargets, __uint8> {
   typedef galosh::BeginStateTransitionTargets Type;
 };
-inline void assign ( galosh::BeginStateTransitionTargets & target, Byte c_source )
+inline void assign ( galosh::BeginStateTransitionTargets & target, __uint8 c_source )
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Byte_2_BeginStateTransitionTargets<>::VALUE[ c_source ];
+    galosh::TranslateTableByteToBeginStateTransitionTargets_<>::VALUE[ c_source ];
 }
 //____________________________________________________________________________
 
@@ -1034,7 +1034,7 @@ inline void assign ( galosh::BeginStateTransitionTargets & target, Ascii c_sourc
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_BeginStateTransitionTargets<>::VALUE[
+    galosh::TranslateTableAsciiToBeginStateTransitionTargets_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -1048,7 +1048,7 @@ inline void assign ( galosh::BeginStateTransitionTargets & target, Unicode c_sou
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_BeginStateTransitionTargets<>::VALUE[
+    galosh::TranslateTableAsciiToBeginStateTransitionTargets_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -1091,45 +1091,45 @@ struct StateLabelTransitionTargets<BeginStateLabel, TSpec> {
 //////////////////////////////////////////////////////////////////////////////
 
 template <typename T = void>
-struct _Translate_Table_BeginStateTransitionTargetsOld_2_Ascii
+struct TranslateTableBeginStateTransitionTargetsOldToAscii_
 {
   static char const VALUE[ 2 ];
 };
 template <typename T>
-char const _Translate_Table_BeginStateTransitionTargetsOld_2_Ascii<T>::VALUE[ 2 ] =
+char const TranslateTableBeginStateTransitionTargetsOldToAscii_<T>::VALUE[ 2 ] =
   { 'M', 'D' };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_StateLabel_2_BeginStateTransitionTargetsOld
+struct TranslateTableStateLabelToBeginStateTransitionTargetsOld_
 {
   static char const VALUE[ 12 ];
 };
 template <typename T>
-char const _Translate_Table_StateLabel_2_BeginStateTransitionTargetsOld<T>::VALUE[ 12 ] =
+char const TranslateTableStateLabelToBeginStateTransitionTargetsOld_<T>::VALUE[ 12 ] =
   { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_BeginStateTransitionTargetsOld_2_StateLabel
+struct TranslateTableBeginStateTransitionTargetsOldToStateLabel_
 {
   static char const VALUE[ 2 ];
 };
 template <typename T>
-char const _Translate_Table_BeginStateTransitionTargetsOld_2_StateLabel<T>::VALUE[ 2 ] =
+char const TranslateTableBeginStateTransitionTargetsOldToStateLabel_<T>::VALUE[ 2 ] =
   { 3, 5 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Ascii_2_BeginStateTransitionTargetsOld
+struct TranslateTableAsciiToBeginStateTransitionTargetsOld_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Ascii_2_BeginStateTransitionTargetsOld<T>::VALUE[ 256 ] = 
+char const TranslateTableAsciiToBeginStateTransitionTargetsOld_<T>::VALUE[ 256 ] = 
 {
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -1161,12 +1161,12 @@ char const _Translate_Table_Ascii_2_BeginStateTransitionTargetsOld<T>::VALUE[ 25
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Byte_2_BeginStateTransitionTargetsOld
+struct TranslateTableByteToBeginStateTransitionTargetsOld_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Byte_2_BeginStateTransitionTargetsOld<T>::VALUE[ 256 ] = 
+char const TranslateTableByteToBeginStateTransitionTargetsOld_<T>::VALUE[ 256 ] = 
 {
 	0,   1,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -1203,21 +1203,21 @@ inline void assign ( Ascii & c_target, galosh::BeginStateTransitionTargetsOld co
 {
 SEQAN_CHECKPOINT
   c_target =
-    galosh::_Translate_Table_BeginStateTransitionTargetsOld_2_Ascii<>::VALUE[ source.value ];
+    galosh::TranslateTableBeginStateTransitionTargetsOldToAscii_<>::VALUE[ source.value ];
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //BeginStateTransitionTargetsOld
 
 template <>
-struct CompareType<galosh::BeginStateTransitionTargetsOld, Byte> {
+struct CompareType<galosh::BeginStateTransitionTargetsOld, __uint8> {
   typedef galosh::BeginStateTransitionTargetsOld Type;
 };
-inline void assign ( galosh::BeginStateTransitionTargetsOld & target, Byte c_source )
+inline void assign ( galosh::BeginStateTransitionTargetsOld & target, __uint8 c_source )
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Byte_2_BeginStateTransitionTargetsOld<>::VALUE[ c_source ];
+    galosh::TranslateTableByteToBeginStateTransitionTargetsOld_<>::VALUE[ c_source ];
 }
 //____________________________________________________________________________
 
@@ -1229,7 +1229,7 @@ inline void assign ( galosh::BeginStateTransitionTargetsOld & target, Ascii c_so
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_BeginStateTransitionTargetsOld<>::VALUE[
+    galosh::TranslateTableAsciiToBeginStateTransitionTargetsOld_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -1243,7 +1243,7 @@ inline void assign ( galosh::BeginStateTransitionTargetsOld & target, Unicode c_
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_BeginStateTransitionTargetsOld<>::VALUE[
+    galosh::TranslateTableAsciiToBeginStateTransitionTargetsOld_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -1334,45 +1334,45 @@ struct StateLabelTransitionTargets<MatchStateLabel, TSpec> {
 //////////////////////////////////////////////////////////////////////////////
 
 template <typename T = void>
-struct _Translate_Table_MatchStateTransitionTargets_2_Ascii
+struct TranslateTableMatchStateTransitionTargetsToAscii_
 {
   static char const VALUE[ 4 ];
 };
 template <typename T>
-char const _Translate_Table_MatchStateTransitionTargets_2_Ascii<T>::VALUE[ 4 ] =
+char const TranslateTableMatchStateTransitionTargetsToAscii_<T>::VALUE[ 4 ] =
   { 'M', 'I', 'D', 'W' };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_StateLabel_2_MatchStateTransitionTargets
+struct TranslateTableStateLabelToMatchStateTransitionTargets_
 {
   static char const VALUE[ 12 ];
 };
 template <typename T>
-char const _Translate_Table_StateLabel_2_MatchStateTransitionTargets<T>::VALUE[ 12 ] =
+char const TranslateTableStateLabelToMatchStateTransitionTargets_<T>::VALUE[ 12 ] =
   { 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 3 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_MatchStateTransitionTargets_2_StateLabel
+struct TranslateTableMatchStateTransitionTargetsToStateLabel_
 {
   static char const VALUE[ 4 ];
 };
 template <typename T>
-char const _Translate_Table_MatchStateTransitionTargets_2_StateLabel<T>::VALUE[ 4 ] =
+char const TranslateTableMatchStateTransitionTargetsToStateLabel_<T>::VALUE[ 4 ] =
   { 3, 4, 5, 11 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Ascii_2_MatchStateTransitionTargets
+struct TranslateTableAsciiToMatchStateTransitionTargets_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Ascii_2_MatchStateTransitionTargets<T>::VALUE[ 256 ] = 
+char const TranslateTableAsciiToMatchStateTransitionTargets_<T>::VALUE[ 256 ] = 
 {
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -1404,12 +1404,12 @@ char const _Translate_Table_Ascii_2_MatchStateTransitionTargets<T>::VALUE[ 256 ]
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Byte_2_MatchStateTransitionTargets
+struct TranslateTableByteToMatchStateTransitionTargets_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Byte_2_MatchStateTransitionTargets<T>::VALUE[ 256 ] = 
+char const TranslateTableByteToMatchStateTransitionTargets_<T>::VALUE[ 256 ] = 
 {
 	0,   1,   2,   3,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -1446,21 +1446,21 @@ inline void assign ( Ascii & c_target, galosh::MatchStateTransitionTargets const
 {
 SEQAN_CHECKPOINT
   c_target =
-    galosh::_Translate_Table_MatchStateTransitionTargets_2_Ascii<>::VALUE[ source.value ];
+    galosh::TranslateTableMatchStateTransitionTargetsToAscii_<>::VALUE[ source.value ];
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //MatchStateTransitionTargets
 
 template <>
-struct CompareType<galosh::MatchStateTransitionTargets, Byte> {
+struct CompareType<galosh::MatchStateTransitionTargets, __uint8> {
   typedef galosh::MatchStateTransitionTargets Type;
 };
-inline void assign ( galosh::MatchStateTransitionTargets & target, Byte c_source )
+inline void assign ( galosh::MatchStateTransitionTargets & target, __uint8 c_source )
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Byte_2_MatchStateTransitionTargets<>::VALUE[ c_source ];
+    galosh::TranslateTableByteToMatchStateTransitionTargets_<>::VALUE[ c_source ];
 }
 //____________________________________________________________________________
 
@@ -1472,7 +1472,7 @@ inline void assign ( galosh::MatchStateTransitionTargets & target, Ascii c_sourc
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_MatchStateTransitionTargets<>::VALUE[
+    galosh::TranslateTableAsciiToMatchStateTransitionTargets_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -1486,7 +1486,7 @@ inline void assign ( galosh::MatchStateTransitionTargets & target, Unicode c_sou
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_MatchStateTransitionTargets<>::VALUE[
+    galosh::TranslateTableAsciiToMatchStateTransitionTargets_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -1528,45 +1528,45 @@ struct StateLabelTransitionTargets<MatchStateLabel, TSpec> {
 //////////////////////////////////////////////////////////////////////////////
 
 template <typename T = void>
-struct _Translate_Table_MatchStateTransitionTargetsOld_2_Ascii
+struct TranslateTableMatchStateTransitionTargetsOldToAscii_
 {
   static char const VALUE[ 3 ];
 };
 template <typename T>
-char const _Translate_Table_MatchStateTransitionTargetsOld_2_Ascii<T>::VALUE[ 3 ] =
+char const TranslateTableMatchStateTransitionTargetsOldToAscii_<T>::VALUE[ 3 ] =
   { 'M', 'I', 'D' };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_StateLabel_2_MatchStateTransitionTargetsOld
+struct TranslateTableStateLabelToMatchStateTransitionTargetsOld_
 {
   static char const VALUE[ 12 ];
 };
 template <typename T>
-char const _Translate_Table_StateLabel_2_MatchStateTransitionTargetsOld<T>::VALUE[ 12 ] =
+char const TranslateTableStateLabelToMatchStateTransitionTargetsOld_<T>::VALUE[ 12 ] =
   { 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_MatchStateTransitionTargetsOld_2_StateLabel
+struct TranslateTableMatchStateTransitionTargetsOldToStateLabel_
 {
   static char const VALUE[ 3 ];
 };
 template <typename T>
-char const _Translate_Table_MatchStateTransitionTargetsOld_2_StateLabel<T>::VALUE[ 3 ] =
+char const TranslateTableMatchStateTransitionTargetsOldToStateLabel_<T>::VALUE[ 3 ] =
   { 3, 4, 5 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Ascii_2_MatchStateTransitionTargetsOld
+struct TranslateTableAsciiToMatchStateTransitionTargetsOld_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Ascii_2_MatchStateTransitionTargetsOld<T>::VALUE[ 256 ] = 
+char const TranslateTableAsciiToMatchStateTransitionTargetsOld_<T>::VALUE[ 256 ] = 
 {
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -1598,12 +1598,12 @@ char const _Translate_Table_Ascii_2_MatchStateTransitionTargetsOld<T>::VALUE[ 25
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Byte_2_MatchStateTransitionTargetsOld
+struct TranslateTableByteToMatchStateTransitionTargetsOld_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Byte_2_MatchStateTransitionTargetsOld<T>::VALUE[ 256 ] = 
+char const TranslateTableByteToMatchStateTransitionTargetsOld_<T>::VALUE[ 256 ] = 
 {
 	0,   1,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -1640,21 +1640,21 @@ inline void assign ( Ascii & c_target, galosh::MatchStateTransitionTargetsOld co
 {
 SEQAN_CHECKPOINT
   c_target =
-    galosh::_Translate_Table_MatchStateTransitionTargetsOld_2_Ascii<>::VALUE[ source.value ];
+    galosh::TranslateTableMatchStateTransitionTargetsOldToAscii_<>::VALUE[ source.value ];
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //MatchStateTransitionTargetsOld
 
 template <>
-struct CompareType<galosh::MatchStateTransitionTargetsOld, Byte> {
+struct CompareType<galosh::MatchStateTransitionTargetsOld, __uint8> {
   typedef galosh::MatchStateTransitionTargetsOld Type;
 };
-inline void assign ( galosh::MatchStateTransitionTargetsOld & target, Byte c_source )
+inline void assign ( galosh::MatchStateTransitionTargetsOld & target, __uint8 c_source )
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Byte_2_MatchStateTransitionTargetsOld<>::VALUE[ c_source ];
+    galosh::TranslateTableByteToMatchStateTransitionTargetsOld_<>::VALUE[ c_source ];
 }
 //____________________________________________________________________________
 
@@ -1666,7 +1666,7 @@ inline void assign ( galosh::MatchStateTransitionTargetsOld & target, Ascii c_so
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_MatchStateTransitionTargetsOld<>::VALUE[
+    galosh::TranslateTableAsciiToMatchStateTransitionTargetsOld_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -1680,7 +1680,7 @@ inline void assign ( galosh::MatchStateTransitionTargetsOld & target, Unicode c_
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_MatchStateTransitionTargetsOld<>::VALUE[
+    galosh::TranslateTableAsciiToMatchStateTransitionTargetsOld_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -1769,45 +1769,45 @@ struct StateLabelTransitionTargets<InsertionStateLabel, Plan9> {
 //////////////////////////////////////////////////////////////////////////////
 
 template <typename T = void>
-struct _Translate_Table_InsertionStateTransitionTargetsPlan9_2_Ascii
+struct TranslateTableInsertionStateTransitionTargetsPlan9ToAscii_
 {
   static char const VALUE[ 3 ];
 };
 template <typename T>
-char const _Translate_Table_InsertionStateTransitionTargetsPlan9_2_Ascii<T>::VALUE[ 3 ] =
+char const TranslateTableInsertionStateTransitionTargetsPlan9ToAscii_<T>::VALUE[ 3 ] =
   { 'M', 'I', 'D' };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_StateLabel_2_InsertionStateTransitionTargetsPlan9
+struct TranslateTableStateLabelToInsertionStateTransitionTargetsPlan9_
 {
   static char const VALUE[ 12 ];
 };
 template <typename T>
-char const _Translate_Table_StateLabel_2_InsertionStateTransitionTargetsPlan9<T>::VALUE[ 12 ] =
+char const TranslateTableStateLabelToInsertionStateTransitionTargetsPlan9_<T>::VALUE[ 12 ] =
   { 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_InsertionStateTransitionTargetsPlan9_2_StateLabel
+struct TranslateTableInsertionStateTransitionTargetsPlan9ToStateLabel_
 {
   static char const VALUE[ 3 ];
 };
 template <typename T>
-char const _Translate_Table_InsertionStateTransitionTargetsPlan9_2_StateLabel<T>::VALUE[ 3 ] =
+char const TranslateTableInsertionStateTransitionTargetsPlan9ToStateLabel_<T>::VALUE[ 3 ] =
   { 3, 4, 5 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Ascii_2_InsertionStateTransitionTargetsPlan9
+struct TranslateTableAsciiToInsertionStateTransitionTargetsPlan9_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Ascii_2_InsertionStateTransitionTargetsPlan9<T>::VALUE[ 256 ] = 
+char const TranslateTableAsciiToInsertionStateTransitionTargetsPlan9_<T>::VALUE[ 256 ] = 
 {
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -1839,12 +1839,12 @@ char const _Translate_Table_Ascii_2_InsertionStateTransitionTargetsPlan9<T>::VAL
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Byte_2_InsertionStateTransitionTargetsPlan9
+struct TranslateTableByteToInsertionStateTransitionTargetsPlan9_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Byte_2_InsertionStateTransitionTargetsPlan9<T>::VALUE[ 256 ] = 
+char const TranslateTableByteToInsertionStateTransitionTargetsPlan9_<T>::VALUE[ 256 ] = 
 {
 	0,   1,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -1881,21 +1881,21 @@ inline void assign ( Ascii & c_target, galosh::InsertionStateTransitionTargetsPl
 {
 SEQAN_CHECKPOINT
   c_target =
-    galosh::_Translate_Table_InsertionStateTransitionTargetsPlan9_2_Ascii<>::VALUE[ source.value ];
+    galosh::TranslateTableInsertionStateTransitionTargetsPlan9ToAscii_<>::VALUE[ source.value ];
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //InsertionStateTransitionTargetsPlan9
 
 template <>
-struct CompareType<galosh::InsertionStateTransitionTargetsPlan9, Byte> {
+struct CompareType<galosh::InsertionStateTransitionTargetsPlan9, __uint8> {
   typedef galosh::InsertionStateTransitionTargetsPlan9 Type;
 };
-inline void assign ( galosh::InsertionStateTransitionTargetsPlan9 & target, Byte c_source )
+inline void assign ( galosh::InsertionStateTransitionTargetsPlan9 & target, __uint8 c_source )
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Byte_2_InsertionStateTransitionTargetsPlan9<>::VALUE[ c_source ];
+    galosh::TranslateTableByteToInsertionStateTransitionTargetsPlan9_<>::VALUE[ c_source ];
 }
 //____________________________________________________________________________
 
@@ -1907,7 +1907,7 @@ inline void assign ( galosh::InsertionStateTransitionTargetsPlan9 & target, Asci
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_InsertionStateTransitionTargetsPlan9<>::VALUE[
+    galosh::TranslateTableAsciiToInsertionStateTransitionTargetsPlan9_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -1921,7 +1921,7 @@ inline void assign ( galosh::InsertionStateTransitionTargetsPlan9 & target, Unic
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_InsertionStateTransitionTargetsPlan9<>::VALUE[
+    galosh::TranslateTableAsciiToInsertionStateTransitionTargetsPlan9_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -1960,45 +1960,45 @@ struct StateLabelTransitionTargets<InsertionStateLabel, Plan7> {
 //////////////////////////////////////////////////////////////////////////////
 
 template <typename T = void>
-struct _Translate_Table_InsertionStateTransitionTargetsPlan7_2_Ascii
+struct TranslateTableInsertionStateTransitionTargetsPlan7ToAscii_
 {
   static char const VALUE[ 2 ];
 };
 template <typename T>
-char const _Translate_Table_InsertionStateTransitionTargetsPlan7_2_Ascii<T>::VALUE[ 2 ] =
+char const TranslateTableInsertionStateTransitionTargetsPlan7ToAscii_<T>::VALUE[ 2 ] =
   { 'M', 'I' };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_StateLabel_2_InsertionStateTransitionTargetsPlan7
+struct TranslateTableStateLabelToInsertionStateTransitionTargetsPlan7_
 {
   static char const VALUE[ 12 ];
 };
 template <typename T>
-char const _Translate_Table_StateLabel_2_InsertionStateTransitionTargetsPlan7<T>::VALUE[ 12 ] =
+char const TranslateTableStateLabelToInsertionStateTransitionTargetsPlan7_<T>::VALUE[ 12 ] =
   { 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_InsertionStateTransitionTargetsPlan7_2_StateLabel
+struct TranslateTableInsertionStateTransitionTargetsPlan7ToStateLabel_
 {
   static char const VALUE[ 2 ];
 };
 template <typename T>
-char const _Translate_Table_InsertionStateTransitionTargetsPlan7_2_StateLabel<T>::VALUE[ 2 ] =
+char const TranslateTableInsertionStateTransitionTargetsPlan7ToStateLabel_<T>::VALUE[ 2 ] =
   { 3, 4 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Ascii_2_InsertionStateTransitionTargetsPlan7
+struct TranslateTableAsciiToInsertionStateTransitionTargetsPlan7_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Ascii_2_InsertionStateTransitionTargetsPlan7<T>::VALUE[ 256 ] = 
+char const TranslateTableAsciiToInsertionStateTransitionTargetsPlan7_<T>::VALUE[ 256 ] = 
 {
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -2030,12 +2030,12 @@ char const _Translate_Table_Ascii_2_InsertionStateTransitionTargetsPlan7<T>::VAL
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Byte_2_InsertionStateTransitionTargetsPlan7
+struct TranslateTableByteToInsertionStateTransitionTargetsPlan7_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Byte_2_InsertionStateTransitionTargetsPlan7<T>::VALUE[ 256 ] = 
+char const TranslateTableByteToInsertionStateTransitionTargetsPlan7_<T>::VALUE[ 256 ] = 
 {
 	0,   1,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -2072,21 +2072,21 @@ inline void assign ( Ascii & c_target, galosh::InsertionStateTransitionTargetsPl
 {
 SEQAN_CHECKPOINT
   c_target =
-    galosh::_Translate_Table_InsertionStateTransitionTargetsPlan7_2_Ascii<>::VALUE[ source.value ];
+    galosh::TranslateTableInsertionStateTransitionTargetsPlan7ToAscii_<>::VALUE[ source.value ];
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //InsertionStateTransitionTargetsPlan7
 
 template <>
-struct CompareType<galosh::InsertionStateTransitionTargetsPlan7, Byte> {
+struct CompareType<galosh::InsertionStateTransitionTargetsPlan7, __uint8> {
   typedef galosh::InsertionStateTransitionTargetsPlan7 Type;
 };
-inline void assign ( galosh::InsertionStateTransitionTargetsPlan7 & target, Byte c_source )
+inline void assign ( galosh::InsertionStateTransitionTargetsPlan7 & target, __uint8 c_source )
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Byte_2_InsertionStateTransitionTargetsPlan7<>::VALUE[ c_source ];
+    galosh::TranslateTableByteToInsertionStateTransitionTargetsPlan7_<>::VALUE[ c_source ];
 }
 //____________________________________________________________________________
 
@@ -2098,7 +2098,7 @@ inline void assign ( galosh::InsertionStateTransitionTargetsPlan7 & target, Asci
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_InsertionStateTransitionTargetsPlan7<>::VALUE[
+    galosh::TranslateTableAsciiToInsertionStateTransitionTargetsPlan7_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -2112,7 +2112,7 @@ inline void assign ( galosh::InsertionStateTransitionTargetsPlan7 & target, Unic
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_InsertionStateTransitionTargetsPlan7<>::VALUE[
+    galosh::TranslateTableAsciiToInsertionStateTransitionTargetsPlan7_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -2201,45 +2201,45 @@ typedef seqan::SimpleType<unsigned char,_DeletionStateTransitionTargetsPlan9> De
 //////////////////////////////////////////////////////////////////////////////
 
 template <typename T = void>
-struct _Translate_Table_DeletionStateTransitionTargetsPlan9_2_Ascii
+struct TranslateTableDeletionStateTransitionTargetsPlan9ToAscii_
 {
   static char const VALUE[ 4 ];
 };
 template <typename T>
-char const _Translate_Table_DeletionStateTransitionTargetsPlan9_2_Ascii<T>::VALUE[ 4 ] =
+char const TranslateTableDeletionStateTransitionTargetsPlan9ToAscii_<T>::VALUE[ 4 ] =
   { 'M', 'I', 'D', 'E' };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_StateLabel_2_DeletionStateTransitionTargetsPlan9
+struct TranslateTableStateLabelToDeletionStateTransitionTargetsPlan9_
 {
   static char const VALUE[ 12 ];
 };
 template <typename T>
-char const _Translate_Table_StateLabel_2_DeletionStateTransitionTargetsPlan9<T>::VALUE[ 12 ] =
+char const TranslateTableStateLabelToDeletionStateTransitionTargetsPlan9_<T>::VALUE[ 12 ] =
   { 0, 0, 0, 0, 1, 2, 3, 0, 0, 0, 0, 0 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_DeletionStateTransitionTargetsPlan9_2_StateLabel
+struct TranslateTableDeletionStateTransitionTargetsPlan9ToStateLabel_
 {
   static char const VALUE[ 4 ];
 };
 template <typename T>
-char const _Translate_Table_DeletionStateTransitionTargetsPlan9_2_StateLabel<T>::VALUE[ 4 ] =
+char const TranslateTableDeletionStateTransitionTargetsPlan9ToStateLabel_<T>::VALUE[ 4 ] =
   { 3, 4, 5, 6 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Ascii_2_DeletionStateTransitionTargetsPlan9
+struct TranslateTableAsciiToDeletionStateTransitionTargetsPlan9_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Ascii_2_DeletionStateTransitionTargetsPlan9<T>::VALUE[ 256 ] = 
+char const TranslateTableAsciiToDeletionStateTransitionTargetsPlan9_<T>::VALUE[ 256 ] = 
 {
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -2271,12 +2271,12 @@ char const _Translate_Table_Ascii_2_DeletionStateTransitionTargetsPlan9<T>::VALU
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Byte_2_DeletionStateTransitionTargetsPlan9
+struct TranslateTableByteToDeletionStateTransitionTargetsPlan9_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Byte_2_DeletionStateTransitionTargetsPlan9<T>::VALUE[ 256 ] = 
+char const TranslateTableByteToDeletionStateTransitionTargetsPlan9_<T>::VALUE[ 256 ] = 
 {
 	0,   1,   2,   3,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -2313,21 +2313,21 @@ inline void assign ( Ascii & c_target, galosh::DeletionStateTransitionTargetsPla
 {
 SEQAN_CHECKPOINT
   c_target =
-    galosh::_Translate_Table_DeletionStateTransitionTargetsPlan9_2_Ascii<>::VALUE[ source.value ];
+    galosh::TranslateTableDeletionStateTransitionTargetsPlan9ToAscii_<>::VALUE[ source.value ];
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //DeletionStateTransitionTargetsPlan9
 
 template <>
-struct CompareType<galosh::DeletionStateTransitionTargetsPlan9, Byte> {
+struct CompareType<galosh::DeletionStateTransitionTargetsPlan9, __uint8> {
   typedef galosh::DeletionStateTransitionTargetsPlan9 Type;
 };
-inline void assign ( galosh::DeletionStateTransitionTargetsPlan9 & target, Byte c_source )
+inline void assign ( galosh::DeletionStateTransitionTargetsPlan9 & target, __uint8 c_source )
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Byte_2_DeletionStateTransitionTargetsPlan9<>::VALUE[ c_source ];
+    galosh::TranslateTableByteToDeletionStateTransitionTargetsPlan9_<>::VALUE[ c_source ];
 }
 //____________________________________________________________________________
 
@@ -2339,7 +2339,7 @@ inline void assign ( galosh::DeletionStateTransitionTargetsPlan9 & target, Ascii
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_DeletionStateTransitionTargetsPlan9<>::VALUE[
+    galosh::TranslateTableAsciiToDeletionStateTransitionTargetsPlan9_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -2353,7 +2353,7 @@ inline void assign ( galosh::DeletionStateTransitionTargetsPlan9 & target, Unico
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_DeletionStateTransitionTargetsPlan9<>::VALUE[
+    galosh::TranslateTableAsciiToDeletionStateTransitionTargetsPlan9_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -2393,45 +2393,45 @@ typedef seqan::SimpleType<unsigned char,_DeletionStateTransitionTargetsPlan7> De
 //////////////////////////////////////////////////////////////////////////////
 
 template <typename T = void>
-struct _Translate_Table_DeletionStateTransitionTargetsPlan7_2_Ascii
+struct TranslateTableDeletionStateTransitionTargetsPlan7ToAscii_
 {
   static char const VALUE[ 3 ];
 };
 template <typename T>
-char const _Translate_Table_DeletionStateTransitionTargetsPlan7_2_Ascii<T>::VALUE[ 3 ] =
+char const TranslateTableDeletionStateTransitionTargetsPlan7ToAscii_<T>::VALUE[ 3 ] =
   { 'M', 'D', 'E' };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_StateLabel_2_DeletionStateTransitionTargetsPlan7
+struct TranslateTableStateLabelToDeletionStateTransitionTargetsPlan7_
 {
   static char const VALUE[ 12 ];
 };
 template <typename T>
-char const _Translate_Table_StateLabel_2_DeletionStateTransitionTargetsPlan7<T>::VALUE[ 12 ] =
+char const TranslateTableStateLabelToDeletionStateTransitionTargetsPlan7_<T>::VALUE[ 12 ] =
   { 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_DeletionStateTransitionTargetsPlan7_2_StateLabel
+struct TranslateTableDeletionStateTransitionTargetsPlan7ToStateLabel_
 {
   static char const VALUE[ 3 ];
 };
 template <typename T>
-char const _Translate_Table_DeletionStateTransitionTargetsPlan7_2_StateLabel<T>::VALUE[ 3 ] =
+char const TranslateTableDeletionStateTransitionTargetsPlan7ToStateLabel_<T>::VALUE[ 3 ] =
   { 3, 5, 6 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Ascii_2_DeletionStateTransitionTargetsPlan7
+struct TranslateTableAsciiToDeletionStateTransitionTargetsPlan7_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Ascii_2_DeletionStateTransitionTargetsPlan7<T>::VALUE[ 256 ] = 
+char const TranslateTableAsciiToDeletionStateTransitionTargetsPlan7_<T>::VALUE[ 256 ] = 
 {
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -2463,12 +2463,12 @@ char const _Translate_Table_Ascii_2_DeletionStateTransitionTargetsPlan7<T>::VALU
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Byte_2_DeletionStateTransitionTargetsPlan7
+struct TranslateTableByteToDeletionStateTransitionTargetsPlan7_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Byte_2_DeletionStateTransitionTargetsPlan7<T>::VALUE[ 256 ] = 
+char const TranslateTableByteToDeletionStateTransitionTargetsPlan7_<T>::VALUE[ 256 ] = 
 {
 	0,   1,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -2505,21 +2505,21 @@ inline void assign ( Ascii & c_target, galosh::DeletionStateTransitionTargetsPla
 {
 SEQAN_CHECKPOINT
   c_target =
-    galosh::_Translate_Table_DeletionStateTransitionTargetsPlan7_2_Ascii<>::VALUE[ source.value ];
+    galosh::TranslateTableDeletionStateTransitionTargetsPlan7ToAscii_<>::VALUE[ source.value ];
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //DeletionStateTransitionTargetsPlan7
 
 template <>
-struct CompareType<galosh::DeletionStateTransitionTargetsPlan7, Byte> {
+struct CompareType<galosh::DeletionStateTransitionTargetsPlan7, __uint8> {
   typedef galosh::DeletionStateTransitionTargetsPlan7 Type;
 };
-inline void assign ( galosh::DeletionStateTransitionTargetsPlan7 & target, Byte c_source )
+inline void assign ( galosh::DeletionStateTransitionTargetsPlan7 & target, __uint8 c_source )
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Byte_2_DeletionStateTransitionTargetsPlan7<>::VALUE[ c_source ];
+    galosh::TranslateTableByteToDeletionStateTransitionTargetsPlan7_<>::VALUE[ c_source ];
 }
 //____________________________________________________________________________
 
@@ -2531,7 +2531,7 @@ inline void assign ( galosh::DeletionStateTransitionTargetsPlan7 & target, Ascii
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_DeletionStateTransitionTargetsPlan7<>::VALUE[
+    galosh::TranslateTableAsciiToDeletionStateTransitionTargetsPlan7_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -2545,7 +2545,7 @@ inline void assign ( galosh::DeletionStateTransitionTargetsPlan7 & target, Unico
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_DeletionStateTransitionTargetsPlan7<>::VALUE[
+    galosh::TranslateTableAsciiToDeletionStateTransitionTargetsPlan7_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -2585,45 +2585,45 @@ struct StateLabelTransitionTargets<DeletionStateLabel, Plan9> {
 //////////////////////////////////////////////////////////////////////////////
 
 template <typename T = void>
-struct _Translate_Table_DeletionStateTransitionTargetsPlan9Old_2_Ascii
+struct TranslateTableDeletionStateTransitionTargetsPlan9OldToAscii_
 {
   static char const VALUE[ 3 ];
 };
 template <typename T>
-char const _Translate_Table_DeletionStateTransitionTargetsPlan9Old_2_Ascii<T>::VALUE[ 3 ] =
+char const TranslateTableDeletionStateTransitionTargetsPlan9OldToAscii_<T>::VALUE[ 3 ] =
   { 'M', 'I', 'D' };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_StateLabel_2_DeletionStateTransitionTargetsPlan9Old
+struct TranslateTableStateLabelToDeletionStateTransitionTargetsPlan9Old_
 {
   static char const VALUE[ 12 ];
 };
 template <typename T>
-char const _Translate_Table_StateLabel_2_DeletionStateTransitionTargetsPlan9Old<T>::VALUE[ 12 ] =
+char const TranslateTableStateLabelToDeletionStateTransitionTargetsPlan9Old_<T>::VALUE[ 12 ] =
   { 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_DeletionStateTransitionTargetsPlan9Old_2_StateLabel
+struct TranslateTableDeletionStateTransitionTargetsPlan9OldToStateLabel_
 {
   static char const VALUE[ 3 ];
 };
 template <typename T>
-char const _Translate_Table_DeletionStateTransitionTargetsPlan9Old_2_StateLabel<T>::VALUE[ 3 ] =
+char const TranslateTableDeletionStateTransitionTargetsPlan9OldToStateLabel_<T>::VALUE[ 3 ] =
   { 3, 4, 5 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Ascii_2_DeletionStateTransitionTargetsPlan9Old
+struct TranslateTableAsciiToDeletionStateTransitionTargetsPlan9Old_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Ascii_2_DeletionStateTransitionTargetsPlan9Old<T>::VALUE[ 256 ] = 
+char const TranslateTableAsciiToDeletionStateTransitionTargetsPlan9Old_<T>::VALUE[ 256 ] = 
 {
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -2655,12 +2655,12 @@ char const _Translate_Table_Ascii_2_DeletionStateTransitionTargetsPlan9Old<T>::V
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Byte_2_DeletionStateTransitionTargetsPlan9Old
+struct TranslateTableByteToDeletionStateTransitionTargetsPlan9Old_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Byte_2_DeletionStateTransitionTargetsPlan9Old<T>::VALUE[ 256 ] = 
+char const TranslateTableByteToDeletionStateTransitionTargetsPlan9Old_<T>::VALUE[ 256 ] = 
 {
 	0,   1,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -2697,21 +2697,21 @@ inline void assign ( Ascii & c_target, galosh::DeletionStateTransitionTargetsPla
 {
 SEQAN_CHECKPOINT
   c_target =
-    galosh::_Translate_Table_DeletionStateTransitionTargetsPlan9Old_2_Ascii<>::VALUE[ source.value ];
+    galosh::TranslateTableDeletionStateTransitionTargetsPlan9OldToAscii_<>::VALUE[ source.value ];
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //DeletionStateTransitionTargetsPlan9Old
 
 template <>
-struct CompareType<galosh::DeletionStateTransitionTargetsPlan9Old, Byte> {
+struct CompareType<galosh::DeletionStateTransitionTargetsPlan9Old, __uint8> {
   typedef galosh::DeletionStateTransitionTargetsPlan9Old Type;
 };
-inline void assign ( galosh::DeletionStateTransitionTargetsPlan9Old & target, Byte c_source )
+inline void assign ( galosh::DeletionStateTransitionTargetsPlan9Old & target, __uint8 c_source )
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Byte_2_DeletionStateTransitionTargetsPlan9Old<>::VALUE[ c_source ];
+    galosh::TranslateTableByteToDeletionStateTransitionTargetsPlan9Old_<>::VALUE[ c_source ];
 }
 //____________________________________________________________________________
 
@@ -2723,7 +2723,7 @@ inline void assign ( galosh::DeletionStateTransitionTargetsPlan9Old & target, As
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_DeletionStateTransitionTargetsPlan9Old<>::VALUE[
+    galosh::TranslateTableAsciiToDeletionStateTransitionTargetsPlan9Old_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -2737,7 +2737,7 @@ inline void assign ( galosh::DeletionStateTransitionTargetsPlan9Old & target, Un
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_DeletionStateTransitionTargetsPlan9Old<>::VALUE[
+    galosh::TranslateTableAsciiToDeletionStateTransitionTargetsPlan9Old_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -2776,45 +2776,45 @@ struct StateLabelTransitionTargets<DeletionStateLabel, Plan7> {
 //////////////////////////////////////////////////////////////////////////////
 
 template <typename T = void>
-struct _Translate_Table_DeletionStateTransitionTargetsPlan7Old_2_Ascii
+struct TranslateTableDeletionStateTransitionTargetsPlan7OldToAscii_
 {
   static char const VALUE[ 2 ];
 };
 template <typename T>
-char const _Translate_Table_DeletionStateTransitionTargetsPlan7Old_2_Ascii<T>::VALUE[ 2 ] =
+char const TranslateTableDeletionStateTransitionTargetsPlan7OldToAscii_<T>::VALUE[ 2 ] =
   { 'M', 'D' };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_StateLabel_2_DeletionStateTransitionTargetsPlan7Old
+struct TranslateTableStateLabelToDeletionStateTransitionTargetsPlan7Old_
 {
   static char const VALUE[ 12 ];
 };
 template <typename T>
-char const _Translate_Table_StateLabel_2_DeletionStateTransitionTargetsPlan7Old<T>::VALUE[ 12 ] =
+char const TranslateTableStateLabelToDeletionStateTransitionTargetsPlan7Old_<T>::VALUE[ 12 ] =
   { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_DeletionStateTransitionTargetsPlan7Old_2_StateLabel
+struct TranslateTableDeletionStateTransitionTargetsPlan7OldToStateLabel_
 {
   static char const VALUE[ 2 ];
 };
 template <typename T>
-char const _Translate_Table_DeletionStateTransitionTargetsPlan7Old_2_StateLabel<T>::VALUE[ 2 ] =
+char const TranslateTableDeletionStateTransitionTargetsPlan7OldToStateLabel_<T>::VALUE[ 2 ] =
   { 3, 5 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Ascii_2_DeletionStateTransitionTargetsPlan7Old
+struct TranslateTableAsciiToDeletionStateTransitionTargetsPlan7Old_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Ascii_2_DeletionStateTransitionTargetsPlan7Old<T>::VALUE[ 256 ] = 
+char const TranslateTableAsciiToDeletionStateTransitionTargetsPlan7Old_<T>::VALUE[ 256 ] = 
 {
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -2846,12 +2846,12 @@ char const _Translate_Table_Ascii_2_DeletionStateTransitionTargetsPlan7Old<T>::V
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Byte_2_DeletionStateTransitionTargetsPlan7Old
+struct TranslateTableByteToDeletionStateTransitionTargetsPlan7Old_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Byte_2_DeletionStateTransitionTargetsPlan7Old<T>::VALUE[ 256 ] = 
+char const TranslateTableByteToDeletionStateTransitionTargetsPlan7Old_<T>::VALUE[ 256 ] = 
 {
 	0,   1,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -2888,21 +2888,21 @@ inline void assign ( Ascii & c_target, galosh::DeletionStateTransitionTargetsPla
 {
 SEQAN_CHECKPOINT
   c_target =
-    galosh::_Translate_Table_DeletionStateTransitionTargetsPlan7Old_2_Ascii<>::VALUE[ source.value ];
+    galosh::TranslateTableDeletionStateTransitionTargetsPlan7OldToAscii_<>::VALUE[ source.value ];
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //DeletionStateTransitionTargetsPlan7Old
 
 template <>
-struct CompareType<galosh::DeletionStateTransitionTargetsPlan7Old, Byte> {
+struct CompareType<galosh::DeletionStateTransitionTargetsPlan7Old, __uint8> {
   typedef galosh::DeletionStateTransitionTargetsPlan7Old Type;
 };
-inline void assign ( galosh::DeletionStateTransitionTargetsPlan7Old & target, Byte c_source )
+inline void assign ( galosh::DeletionStateTransitionTargetsPlan7Old & target, __uint8 c_source )
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Byte_2_DeletionStateTransitionTargetsPlan7Old<>::VALUE[ c_source ];
+    galosh::TranslateTableByteToDeletionStateTransitionTargetsPlan7Old_<>::VALUE[ c_source ];
 }
 //____________________________________________________________________________
 
@@ -2914,7 +2914,7 @@ inline void assign ( galosh::DeletionStateTransitionTargetsPlan7Old & target, As
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_DeletionStateTransitionTargetsPlan7Old<>::VALUE[
+    galosh::TranslateTableAsciiToDeletionStateTransitionTargetsPlan7Old_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -2928,7 +2928,7 @@ inline void assign ( galosh::DeletionStateTransitionTargetsPlan7Old & target, Un
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_DeletionStateTransitionTargetsPlan7Old<>::VALUE[
+    galosh::TranslateTableAsciiToDeletionStateTransitionTargetsPlan7Old_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -3017,45 +3017,45 @@ struct StateLabelTransitionTargets<EndStateLabel, TSpec> {
 //////////////////////////////////////////////////////////////////////////////
 
 template <typename T = void>
-struct _Translate_Table_EndStateTransitionTargets_2_Ascii
+struct TranslateTableEndStateTransitionTargetsToAscii_
 {
   static char const VALUE[ 2 ];
 };
 template <typename T>
-char const _Translate_Table_EndStateTransitionTargets_2_Ascii<T>::VALUE[ 2 ] =
+char const TranslateTableEndStateTransitionTargetsToAscii_<T>::VALUE[ 2 ] =
   { 'C', 'J' };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_StateLabel_2_EndStateTransitionTargets
+struct TranslateTableStateLabelToEndStateTransitionTargets_
 {
   static char const VALUE[ 12 ];
 };
 template <typename T>
-char const _Translate_Table_StateLabel_2_EndStateTransitionTargets<T>::VALUE[ 12 ] =
+char const TranslateTableStateLabelToEndStateTransitionTargets_<T>::VALUE[ 12 ] =
   { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_EndStateTransitionTargets_2_StateLabel
+struct TranslateTableEndStateTransitionTargetsToStateLabel_
 {
   static char const VALUE[ 2 ];
 };
 template <typename T>
-char const _Translate_Table_EndStateTransitionTargets_2_StateLabel<T>::VALUE[ 2 ] =
+char const TranslateTableEndStateTransitionTargetsToStateLabel_<T>::VALUE[ 2 ] =
   { 7, 8 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Ascii_2_EndStateTransitionTargets
+struct TranslateTableAsciiToEndStateTransitionTargets_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Ascii_2_EndStateTransitionTargets<T>::VALUE[ 256 ] = 
+char const TranslateTableAsciiToEndStateTransitionTargets_<T>::VALUE[ 256 ] = 
 {
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -3087,12 +3087,12 @@ char const _Translate_Table_Ascii_2_EndStateTransitionTargets<T>::VALUE[ 256 ] =
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Byte_2_EndStateTransitionTargets
+struct TranslateTableByteToEndStateTransitionTargets_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Byte_2_EndStateTransitionTargets<T>::VALUE[ 256 ] = 
+char const TranslateTableByteToEndStateTransitionTargets_<T>::VALUE[ 256 ] = 
 {
 	0,   1,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -3129,21 +3129,21 @@ inline void assign ( Ascii & c_target, galosh::EndStateTransitionTargets const &
 {
 SEQAN_CHECKPOINT
   c_target =
-    galosh::_Translate_Table_EndStateTransitionTargets_2_Ascii<>::VALUE[ source.value ];
+    galosh::TranslateTableEndStateTransitionTargetsToAscii_<>::VALUE[ source.value ];
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //EndStateTransitionTargets
 
 template <>
-struct CompareType<galosh::EndStateTransitionTargets, Byte> {
+struct CompareType<galosh::EndStateTransitionTargets, __uint8> {
   typedef galosh::EndStateTransitionTargets Type;
 };
-inline void assign ( galosh::EndStateTransitionTargets & target, Byte c_source )
+inline void assign ( galosh::EndStateTransitionTargets & target, __uint8 c_source )
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Byte_2_EndStateTransitionTargets<>::VALUE[ c_source ];
+    galosh::TranslateTableByteToEndStateTransitionTargets_<>::VALUE[ c_source ];
 }
 //____________________________________________________________________________
 
@@ -3155,7 +3155,7 @@ inline void assign ( galosh::EndStateTransitionTargets & target, Ascii c_source 
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_EndStateTransitionTargets<>::VALUE[
+    galosh::TranslateTableAsciiToEndStateTransitionTargets_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -3169,7 +3169,7 @@ inline void assign ( galosh::EndStateTransitionTargets & target, Unicode c_sourc
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_EndStateTransitionTargets<>::VALUE[
+    galosh::TranslateTableAsciiToEndStateTransitionTargets_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -3257,45 +3257,45 @@ struct StateLabelTransitionTargets<LoopStateLabel, TSpec> {
 //////////////////////////////////////////////////////////////////////////////
 
 template <typename T = void>
-struct _Translate_Table_LoopStateTransitionTargets_2_Ascii
+struct TranslateTableLoopStateTransitionTargetsToAscii_
 {
   static char const VALUE[ 2 ];
 };
 template <typename T>
-char const _Translate_Table_LoopStateTransitionTargets_2_Ascii<T>::VALUE[ 2 ] =
+char const TranslateTableLoopStateTransitionTargetsToAscii_<T>::VALUE[ 2 ] =
   { 'J', 'B' };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_StateLabel_2_LoopStateTransitionTargets
+struct TranslateTableStateLabelToLoopStateTransitionTargets_
 {
   static char const VALUE[ 12 ];
 };
 template <typename T>
-char const _Translate_Table_StateLabel_2_LoopStateTransitionTargets<T>::VALUE[ 12 ] =
+char const TranslateTableStateLabelToLoopStateTransitionTargets_<T>::VALUE[ 12 ] =
   { 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_LoopStateTransitionTargets_2_StateLabel
+struct TranslateTableLoopStateTransitionTargetsToStateLabel_
 {
   static char const VALUE[ 2 ];
 };
 template <typename T>
-char const _Translate_Table_LoopStateTransitionTargets_2_StateLabel<T>::VALUE[ 2 ] =
+char const TranslateTableLoopStateTransitionTargetsToStateLabel_<T>::VALUE[ 2 ] =
   { 7, 2 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Ascii_2_LoopStateTransitionTargets
+struct TranslateTableAsciiToLoopStateTransitionTargets_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Ascii_2_LoopStateTransitionTargets<T>::VALUE[ 256 ] = 
+char const TranslateTableAsciiToLoopStateTransitionTargets_<T>::VALUE[ 256 ] = 
 {
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -3327,12 +3327,12 @@ char const _Translate_Table_Ascii_2_LoopStateTransitionTargets<T>::VALUE[ 256 ] 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Byte_2_LoopStateTransitionTargets
+struct TranslateTableByteToLoopStateTransitionTargets_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Byte_2_LoopStateTransitionTargets<T>::VALUE[ 256 ] = 
+char const TranslateTableByteToLoopStateTransitionTargets_<T>::VALUE[ 256 ] = 
 {
 	0,   1,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -3369,21 +3369,21 @@ inline void assign ( Ascii & c_target, galosh::LoopStateTransitionTargets const 
 {
 SEQAN_CHECKPOINT
   c_target =
-    galosh::_Translate_Table_LoopStateTransitionTargets_2_Ascii<>::VALUE[ source.value ];
+    galosh::TranslateTableLoopStateTransitionTargetsToAscii_<>::VALUE[ source.value ];
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //LoopStateTransitionTargets
 
 template <>
-struct CompareType<galosh::LoopStateTransitionTargets, Byte> {
+struct CompareType<galosh::LoopStateTransitionTargets, __uint8> {
   typedef galosh::LoopStateTransitionTargets Type;
 };
-inline void assign ( galosh::LoopStateTransitionTargets & target, Byte c_source )
+inline void assign ( galosh::LoopStateTransitionTargets & target, __uint8 c_source )
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Byte_2_LoopStateTransitionTargets<>::VALUE[ c_source ];
+    galosh::TranslateTableByteToLoopStateTransitionTargets_<>::VALUE[ c_source ];
 }
 //____________________________________________________________________________
 
@@ -3395,7 +3395,7 @@ inline void assign ( galosh::LoopStateTransitionTargets & target, Ascii c_source
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_LoopStateTransitionTargets<>::VALUE[
+    galosh::TranslateTableAsciiToLoopStateTransitionTargets_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -3409,7 +3409,7 @@ inline void assign ( galosh::LoopStateTransitionTargets & target, Unicode c_sour
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_LoopStateTransitionTargets<>::VALUE[
+    galosh::TranslateTableAsciiToLoopStateTransitionTargets_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -3497,45 +3497,45 @@ struct StateLabelTransitionTargets<PostAlignStateLabel, TSpec> {
 //////////////////////////////////////////////////////////////////////////////
 
 template <typename T = void>
-struct _Translate_Table_PostAlignStateTransitionTargets_2_Ascii
+struct TranslateTablePostAlignStateTransitionTargetsToAscii_
 {
   static char const VALUE[ 2 ];
 };
 template <typename T>
-char const _Translate_Table_PostAlignStateTransitionTargets_2_Ascii<T>::VALUE[ 2 ] =
+char const TranslateTablePostAlignStateTransitionTargetsToAscii_<T>::VALUE[ 2 ] =
   { 'C', 'T' };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_StateLabel_2_PostAlignStateTransitionTargets
+struct TranslateTableStateLabelToPostAlignStateTransitionTargets_
 {
   static char const VALUE[ 12 ];
 };
 template <typename T>
-char const _Translate_Table_StateLabel_2_PostAlignStateTransitionTargets<T>::VALUE[ 12 ] =
+char const TranslateTableStateLabelToPostAlignStateTransitionTargets_<T>::VALUE[ 12 ] =
   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_PostAlignStateTransitionTargets_2_StateLabel
+struct TranslateTablePostAlignStateTransitionTargetsToStateLabel_
 {
   static char const VALUE[ 2 ];
 };
 template <typename T>
-char const _Translate_Table_PostAlignStateTransitionTargets_2_StateLabel<T>::VALUE[ 2 ] =
+char const TranslateTablePostAlignStateTransitionTargetsToStateLabel_<T>::VALUE[ 2 ] =
   { 8, 9 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Ascii_2_PostAlignStateTransitionTargets
+struct TranslateTableAsciiToPostAlignStateTransitionTargets_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Ascii_2_PostAlignStateTransitionTargets<T>::VALUE[ 256 ] = 
+char const TranslateTableAsciiToPostAlignStateTransitionTargets_<T>::VALUE[ 256 ] = 
 {
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -3567,12 +3567,12 @@ char const _Translate_Table_Ascii_2_PostAlignStateTransitionTargets<T>::VALUE[ 2
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Byte_2_PostAlignStateTransitionTargets
+struct TranslateTableByteToPostAlignStateTransitionTargets_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Byte_2_PostAlignStateTransitionTargets<T>::VALUE[ 256 ] = 
+char const TranslateTableByteToPostAlignStateTransitionTargets_<T>::VALUE[ 256 ] = 
 {
 	0,   1,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -3609,21 +3609,21 @@ inline void assign ( Ascii & c_target, galosh::PostAlignStateTransitionTargets c
 {
 SEQAN_CHECKPOINT
   c_target =
-    galosh::_Translate_Table_PostAlignStateTransitionTargets_2_Ascii<>::VALUE[ source.value ];
+    galosh::TranslateTablePostAlignStateTransitionTargetsToAscii_<>::VALUE[ source.value ];
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //PostAlignStateTransitionTargets
 
 template <>
-struct CompareType<galosh::PostAlignStateTransitionTargets, Byte> {
+struct CompareType<galosh::PostAlignStateTransitionTargets, __uint8> {
   typedef galosh::PostAlignStateTransitionTargets Type;
 };
-inline void assign ( galosh::PostAlignStateTransitionTargets & target, Byte c_source )
+inline void assign ( galosh::PostAlignStateTransitionTargets & target, __uint8 c_source )
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Byte_2_PostAlignStateTransitionTargets<>::VALUE[ c_source ];
+    galosh::TranslateTableByteToPostAlignStateTransitionTargets_<>::VALUE[ c_source ];
 }
 //____________________________________________________________________________
 
@@ -3635,7 +3635,7 @@ inline void assign ( galosh::PostAlignStateTransitionTargets & target, Ascii c_s
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_PostAlignStateTransitionTargets<>::VALUE[
+    galosh::TranslateTableAsciiToPostAlignStateTransitionTargets_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -3649,7 +3649,7 @@ inline void assign ( galosh::PostAlignStateTransitionTargets & target, Unicode c
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_PostAlignStateTransitionTargets<>::VALUE[
+    galosh::TranslateTableAsciiToPostAlignStateTransitionTargets_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -3786,45 +3786,45 @@ struct StateLabelTransitionTargets<DeletionInStateLabel, TSpec> {
 //////////////////////////////////////////////////////////////////////////////
 
 template <typename T = void>
-struct _Translate_Table_DeletionInStateTransitionTargets_2_Ascii
+struct TranslateTableDeletionInStateTransitionTargetsToAscii_
 {
   static char const VALUE[ 2 ];
 };
 template <typename T>
-char const _Translate_Table_DeletionInStateTransitionTargets_2_Ascii<T>::VALUE[ 2 ] =
+char const TranslateTableDeletionInStateTransitionTargetsToAscii_<T>::VALUE[ 2 ] =
   { 'Z', 'M' };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_StateLabel_2_DeletionInStateTransitionTargets
+struct TranslateTableStateLabelToDeletionInStateTransitionTargets_
 {
   static char const VALUE[ 12 ];
 };
 template <typename T>
-char const _Translate_Table_StateLabel_2_DeletionInStateTransitionTargets<T>::VALUE[ 12 ] =
+char const TranslateTableStateLabelToDeletionInStateTransitionTargets_<T>::VALUE[ 12 ] =
   { 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_DeletionInStateTransitionTargets_2_StateLabel
+struct TranslateTableDeletionInStateTransitionTargetsToStateLabel_
 {
   static char const VALUE[ 2 ];
 };
 template <typename T>
-char const _Translate_Table_DeletionInStateTransitionTargets_2_StateLabel<T>::VALUE[ 2 ] =
+char const TranslateTableDeletionInStateTransitionTargetsToStateLabel_<T>::VALUE[ 2 ] =
   { 10, 3 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Ascii_2_DeletionInStateTransitionTargets
+struct TranslateTableAsciiToDeletionInStateTransitionTargets_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Ascii_2_DeletionInStateTransitionTargets<T>::VALUE[ 256 ] = 
+char const TranslateTableAsciiToDeletionInStateTransitionTargets_<T>::VALUE[ 256 ] = 
 {
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -3856,12 +3856,12 @@ char const _Translate_Table_Ascii_2_DeletionInStateTransitionTargets<T>::VALUE[ 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Byte_2_DeletionInStateTransitionTargets
+struct TranslateTableByteToDeletionInStateTransitionTargets_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Byte_2_DeletionInStateTransitionTargets<T>::VALUE[ 256 ] = 
+char const TranslateTableByteToDeletionInStateTransitionTargets_<T>::VALUE[ 256 ] = 
 {
 	0,   1,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -3898,21 +3898,21 @@ inline void assign ( Ascii & c_target, galosh::DeletionInStateTransitionTargets 
 {
 SEQAN_CHECKPOINT
   c_target =
-    galosh::_Translate_Table_DeletionInStateTransitionTargets_2_Ascii<>::VALUE[ source.value ];
+    galosh::TranslateTableDeletionInStateTransitionTargetsToAscii_<>::VALUE[ source.value ];
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //DeletionInStateTransitionTargets
 
 template <>
-struct CompareType<galosh::DeletionInStateTransitionTargets, Byte> {
+struct CompareType<galosh::DeletionInStateTransitionTargets, __uint8> {
   typedef galosh::DeletionInStateTransitionTargets Type;
 };
-inline void assign ( galosh::DeletionInStateTransitionTargets & target, Byte c_source )
+inline void assign ( galosh::DeletionInStateTransitionTargets & target, __uint8 c_source )
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Byte_2_DeletionInStateTransitionTargets<>::VALUE[ c_source ];
+    galosh::TranslateTableByteToDeletionInStateTransitionTargets_<>::VALUE[ c_source ];
 }
 //____________________________________________________________________________
 
@@ -3924,7 +3924,7 @@ inline void assign ( galosh::DeletionInStateTransitionTargets & target, Ascii c_
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_DeletionInStateTransitionTargets<>::VALUE[
+    galosh::TranslateTableAsciiToDeletionInStateTransitionTargets_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -3938,7 +3938,7 @@ inline void assign ( galosh::DeletionInStateTransitionTargets & target, Unicode 
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_DeletionInStateTransitionTargets<>::VALUE[
+    galosh::TranslateTableAsciiToDeletionInStateTransitionTargets_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -4026,45 +4026,45 @@ struct StateLabelTransitionTargets<DeletionOutStateLabel, TSpec> {
 //////////////////////////////////////////////////////////////////////////////
 
 template <typename T = void>
-struct _Translate_Table_DeletionOutStateTransitionTargets_2_Ascii
+struct TranslateTableDeletionOutStateTransitionTargetsToAscii_
 {
   static char const VALUE[ 2 ];
 };
 template <typename T>
-char const _Translate_Table_DeletionOutStateTransitionTargets_2_Ascii<T>::VALUE[ 2 ] =
+char const TranslateTableDeletionOutStateTransitionTargetsToAscii_<T>::VALUE[ 2 ] =
   { 'W', 'E' };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_StateLabel_2_DeletionOutStateTransitionTargets
+struct TranslateTableStateLabelToDeletionOutStateTransitionTargets_
 {
   static char const VALUE[ 12 ];
 };
 template <typename T>
-char const _Translate_Table_StateLabel_2_DeletionOutStateTransitionTargets<T>::VALUE[ 12 ] =
+char const TranslateTableStateLabelToDeletionOutStateTransitionTargets_<T>::VALUE[ 12 ] =
   { 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_DeletionOutStateTransitionTargets_2_StateLabel
+struct TranslateTableDeletionOutStateTransitionTargetsToStateLabel_
 {
   static char const VALUE[ 2 ];
 };
 template <typename T>
-char const _Translate_Table_DeletionOutStateTransitionTargets_2_StateLabel<T>::VALUE[ 2 ] =
+char const TranslateTableDeletionOutStateTransitionTargetsToStateLabel_<T>::VALUE[ 2 ] =
   { 11, 6 };
 
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Ascii_2_DeletionOutStateTransitionTargets
+struct TranslateTableAsciiToDeletionOutStateTransitionTargets_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Ascii_2_DeletionOutStateTransitionTargets<T>::VALUE[ 256 ] = 
+char const TranslateTableAsciiToDeletionOutStateTransitionTargets_<T>::VALUE[ 256 ] = 
 {
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -4096,12 +4096,12 @@ char const _Translate_Table_Ascii_2_DeletionOutStateTransitionTargets<T>::VALUE[
 //____________________________________________________________________________
 
 template <typename T = void>
-struct _Translate_Table_Byte_2_DeletionOutStateTransitionTargets
+struct TranslateTableByteToDeletionOutStateTransitionTargets_
 {
   static char const VALUE[ 256 ];
 };
 template <typename T>
-char const _Translate_Table_Byte_2_DeletionOutStateTransitionTargets<T>::VALUE[ 256 ] = 
+char const TranslateTableByteToDeletionOutStateTransitionTargets_<T>::VALUE[ 256 ] = 
 {
 	0,   1,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //0
 	0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, //1
@@ -4138,21 +4138,21 @@ inline void assign ( Ascii & c_target, galosh::DeletionOutStateTransitionTargets
 {
 SEQAN_CHECKPOINT
   c_target =
-    galosh::_Translate_Table_DeletionOutStateTransitionTargets_2_Ascii<>::VALUE[ source.value ];
+    galosh::TranslateTableDeletionOutStateTransitionTargetsToAscii_<>::VALUE[ source.value ];
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //DeletionOutStateTransitionTargets
 
 template <>
-struct CompareType<galosh::DeletionOutStateTransitionTargets, Byte> {
+struct CompareType<galosh::DeletionOutStateTransitionTargets, __uint8> {
   typedef galosh::DeletionOutStateTransitionTargets Type;
 };
-inline void assign ( galosh::DeletionOutStateTransitionTargets & target, Byte c_source )
+inline void assign ( galosh::DeletionOutStateTransitionTargets & target, __uint8 c_source )
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Byte_2_DeletionOutStateTransitionTargets<>::VALUE[ c_source ];
+    galosh::TranslateTableByteToDeletionOutStateTransitionTargets_<>::VALUE[ c_source ];
 }
 //____________________________________________________________________________
 
@@ -4164,7 +4164,7 @@ inline void assign ( galosh::DeletionOutStateTransitionTargets & target, Ascii c
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_DeletionOutStateTransitionTargets<>::VALUE[
+    galosh::TranslateTableAsciiToDeletionOutStateTransitionTargets_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }
@@ -4178,7 +4178,7 @@ inline void assign ( galosh::DeletionOutStateTransitionTargets & target, Unicode
 {
 SEQAN_CHECKPOINT
   target.value =
-    galosh::_Translate_Table_Ascii_2_DeletionOutStateTransitionTargets<>::VALUE[
+    galosh::TranslateTableAsciiToDeletionOutStateTransitionTargets_<>::VALUE[
       ( unsigned char ) c_source
     ];
 }

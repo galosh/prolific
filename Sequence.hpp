@@ -125,7 +125,7 @@ namespace galosh {
     reinitialize ( uint32_t const length )
     {
       seqan::clear( *this );
-      seqan::resize( *this, length );
+      seqan::resize( *this, length, ResidueType() );
     } // reinitialize( uint32_t )
 
     void

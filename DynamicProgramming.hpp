@@ -23030,7 +23030,8 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         sequence_advances[ 0 ] += 1;
         // Emit from the preAlignInsertion distribution
         residue = profile[ Emission::PreAlignInsertion ].draw( random );
-        seqan::fill( sequence, ( sequence.length() + 1 ), residue );
+        //seqan::fill( sequence, ( sequence.length() + 1 ), residue );
+        seqan::append( sequence, residue );
         current_transition =
           profile[ Transition::fromPreAlign ].draw( random );
       } // End while we continue to insert from the preAlign distribution
@@ -23097,7 +23098,8 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           // Count one for the pos.
           sequence_advances[ seq_adv_i ] = 1;
           residue = profile[ pos_i ][ Emission::Match ].draw( random );
-          seqan::fill( sequence, ( sequence.length() + 1 ), residue );
+          //seqan::fill( sequence, ( sequence.length() + 1 ), residue );
+          seqan::append( sequence, residue );
           if( pos_i < ( profile_length - 1 ) ) {
             // Now see about transitioning..
 #if defined( USE_DEL_IN_DEL_OUT ) && !defined( USE_SWENTRY_SWEXIT )
@@ -23158,7 +23160,8 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               sequence_advances[ seq_adv_i ]++;
               // Emit from the insertion distribution
               residue = profile[ pos_i ][ Emission::Insertion ].draw( random );
-              seqan::fill( sequence, ( sequence.length() + 1 ), residue );
+              //seqan::fill( sequence, ( sequence.length() + 1 ), residue );
+              seqan::append( sequence, residue );
               current_transition =
                 profile[ pos_i ][ Transition::fromInsertion ].draw( random );
               if( current_transition == TransitionFromInsertion::toMatch ) {
@@ -23223,7 +23226,8 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         sequence_advances[ last_seq_adv_i ]++;
         // Emit from the postAlignInsertion distribution
         residue = profile[ Emission::PostAlignInsertion ].draw( random );
-        seqan::fill( sequence, ( sequence.length() + 1 ), residue );
+        //seqan::fill( sequence, ( sequence.length() + 1 ), residue );
+        seqan::append( sequence, residue );
         current_transition =
           profile[ Transition::fromPostAlign ].draw( random );
       } // End while we continue to insert from the postAlign distribution
