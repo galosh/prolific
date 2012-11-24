@@ -120,8 +120,7 @@ using std::copy;
 #include "muscle/msa.h"
 #endif //__HAVE_MUSCLE
 
-// TODO: REMOVE.  TESTING.
-//#include "Algebra.hpp"
+#include "Algebra.hpp"
 
 namespace galosh {
 
