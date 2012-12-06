@@ -58,6 +58,8 @@ using namespace std;
 #include "boost/program_options.hpp"
 #include "boost/program_options/variables_map.hpp"
 
+namespace po = boost::program_options;
+  
 namespace galosh {
 
   enum DebugLevel {
@@ -76,8 +78,6 @@ namespace galosh {
     VERBOSITY_All =   1000
   };
 
-namespace po = boost::program_options;
-  
   class Parameters {
     // Boost serialization
   private:
