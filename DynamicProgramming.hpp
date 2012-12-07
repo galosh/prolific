@@ -5473,6 +5473,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           // ?!
           cerr << "ERROR: Unrecognized subcell value!" << endl;
           assert( false );
+          exit( 1 );
           return m_deletion; // I have to return *something*..
         }
       } // operator[] ( Subcell const & )
@@ -5495,7 +5496,8 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         } else {
           // ?!
           cerr << "ERROR: Unrecognized subcell value!" << endl;
-          assert( false );  //TAH 2/12 copied from Paul's earlier code
+          assert( false );
+          exit( 1 );
           return m_deletion; // I have to return *something*..
 
         }
@@ -11239,7 +11241,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       } // End if ( row_i >= 1 ) && ( row_i != last_row )
 
       return
-        backward_calculateRow (
+        backward_calculateRow(
           parameters,
           use_viterbi,
           profile,
@@ -13164,9 +13166,10 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           subcell = Deletion;
         } else {
           // TODO: REMOVE?
-          cout << "uh-oh: matrix[ " << row_i << " ][ " << col_i << " ].m_matchFrom* false for * in (Match,Insertion,Deletion), yet subcell is Match!" << endl;
+          cerr << "uh-oh: matrix[ " << row_i << " ][ " << col_i << " ].m_matchFrom* false for * in (Match,Insertion,Deletion), yet subcell is Match!" << endl;
           // Uh-oh!
           assert( false );
+          exit( 1 );
         }
         row_i -= 1;
         col_i -= 1;
@@ -13181,7 +13184,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         //  assert( false );
         } else {
           // Uh-oh!
+          cerr << "ERROR, oops" << endl;
           assert( false );
+          exit( 1 );
         }
         col_i -= 1;
       } else { // subcell == Deletion
@@ -13190,12 +13195,16 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           subcell = Match;
         } else if( matrix[ row_i ][ col_i ].m_deletionFromInsertion ) {
           // Hrm? We don't allow I->D or D->I transitions..
+          cerr << "ERROR, darn." << endl;
           assert( false );
+          exit( 1 );
         } else if( matrix[ row_i ][ col_i ].m_deletionFromDeletion ) {
           // Still a deletion
         } else {
           // Uh-oh!
+          cerr << "ERROR, shoot." << endl;
           assert( false );
+          exit( 1 );
         }
         row_i -= 1;
       } // End switch current subcell
@@ -13418,7 +13427,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
     } // End foreach row_i
 
     // We should never reach here, since we return at the post-align state.
+    cerr << "ERROR, yow!" << endl;
     assert( false );
+    exit( 1 );
     return 0;
   } // calculatePathCooccurrenceProbability( Parameters const&, ProfileTypeA const&, ProfileTypeB const& ) const
 
@@ -15092,8 +15103,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       // TODO: Add support for 0-length sequences!  We should be learning
       // something about the deletion rate, at least.
       if( last_col == 0 ) {
-        cout << "WARNING: 0-length sequences currently are not supported by updateGEFS(..)." << endl;
+        cerr << "WARNING: 0-length sequences currently are not supported by updateGEFS(..)." << endl;
         assert( false );
+        exit( 1 );
         return 0;
       }
 
@@ -16667,9 +16679,13 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       // OUT OF row_i.
 
       static const bool do_extra_debugging = false;
+      //bool do_extra_debugging = ( (row_i == 53) && (sequence.length() == 98) && isnan( backward_row[ 0 ][ Match ] ) );
 
       // TODO: REMOVE
-      //cout << "hi 0" << endl;
+      if( do_extra_debugging ) {
+        cout << "hi 0" << endl;
+        cout << "parameters.useRabinerScaling is " << parameters.useRabinerScaling << endl;
+      }
 
       // TODO: REMOVE
       //cout << "hi 1" << endl;
@@ -16767,26 +16783,26 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
 //      }
 
       // TODO: REMOVE
-//      if( false ) {
-//        cout << "calculateAlignmentProfilePosition: prev_forward_row is " << prev_forward_row << endl;
-//        cout << "calculateAlignmentProfilePosition: forward_row is " << forward_row << endl;
-//        cout << "calculateAlignmentProfilePosition: backward_row is " << backward_row << endl;
-//        cout << "calculateAlignmentProfilePosition: next_backward_row is " << next_backward_row << endl;
-//        //typename Matrix::Row unscaled_row = forward_row;
-//        //if( parameters.useRabinerScaling ) {
-//        //  unscaled_row *= forward_row.m_rabinerCumulativeInverseScalar;
-//        //  cout << "calculateAlignmentProfilePosition: rabiner-unscaled forward_row is " << unscaled_row << endl;  
-//        //}
-//        //unscaled_row /= parameters.matrixRowScaleFactor;
-//        //cout << "calculateAlignmentProfilePosition: unscaled forward_row is " << unscaled_row << endl;  
-//        //unscaled_row = backward_row;
-//        //if( parameters.useRabinerScaling ) {
-//        //  unscaled_row *= backward_row.m_rabinerCumulativeInverseScalar;
-//        //  cout << "calculateAlignmentProfilePosition: rabiner-unscaled backward_row is " << unscaled_row << endl;
-//        //}
-//        //unscaled_row /= parameters.matrixRowScaleFactor;
-//        //cout << "calculateAlignmentProfilePosition: unscaled forward_row is " << unscaled_row << endl;  
-//      } // End if( false ) (DEBUGGING)
+      if( do_extra_debugging ) {
+        cout << "calculateAlignmentProfilePosition: prev_forward_row is " << prev_forward_row << endl;
+        cout << "calculateAlignmentProfilePosition: forward_row is " << forward_row << endl;
+        cout << "calculateAlignmentProfilePosition: backward_row is " << backward_row << endl;
+        cout << "calculateAlignmentProfilePosition: next_backward_row is " << next_backward_row << endl;
+        //typename Matrix::Row unscaled_row = forward_row;
+        //if( parameters.useRabinerScaling ) {
+        //  unscaled_row *= forward_row.m_rabinerCumulativeInverseScalar;
+        //  cout << "calculateAlignmentProfilePosition: rabiner-unscaled forward_row is " << unscaled_row << endl;  
+        //}
+        //unscaled_row /= parameters.matrixRowScaleFactor;
+        //cout << "calculateAlignmentProfilePosition: unscaled forward_row is " << unscaled_row << endl;  
+        //unscaled_row = backward_row;
+        //if( parameters.useRabinerScaling ) {
+        //  unscaled_row *= backward_row.m_rabinerCumulativeInverseScalar;
+        //  cout << "calculateAlignmentProfilePosition: rabiner-unscaled backward_row is " << unscaled_row << endl;
+        //}
+        //unscaled_row /= parameters.matrixRowScaleFactor;
+        //cout << "calculateAlignmentProfilePosition: unscaled forward_row is " << unscaled_row << endl;  
+      } // End if( do_extra_debugging )
 
       // TODO: REMOVE
       //cout << "calculateAlignmentProfilePosition(..): sequence is " << sequence << endl;
@@ -21272,7 +21288,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
     {
 #if defined( USE_DEL_IN_DEL_OUT) && !defined( DISALLOW_FLANKING_TRANSITIONS )
       // Not implemented!
+      cerr << "ERROR: forward_reverseCalculateRow(..) is not implemented for teh case of USE_DEL_IN_DEL_OUT but not DISALLOW_FLANKING_TRANSITIONS" << endl;
       assert( false && "forward_reverseCalculateRow(..) is not implemented for teh case of USE_DEL_IN_DEL_OUT but not DISALLOW_FLANKING_TRANSITIONS" );
+      exit( 1 );
 #endif // USE_DEL_IN_DEL_OUT && !DISALLOW_FLANKING_TRANSITIONS
 
       static const bool do_extra_debugging = false;
@@ -21998,6 +22016,11 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
     ) const
     {
       static const bool do_extra_debugging = false;
+      //bool do_extra_debugging = ( ( row_i == 53 ) && ( sequence == seqan::String<seqan::Dna>( "GGGCCAGAATACACGTTATTTTCTTAGTCTGGCACGCTCACTGTCCCACAGCCGTTCCCCTAAGCATGTATAACCAGGCTGAAATCAGGCTTCAAGGT" ) ) );
+      if( do_extra_debugging ) {
+        cout << "yo from backward_calculateRow()!!!" << endl;
+        cout << "profile[ row_i ] is " << profile[ row_i ] << endl;
+      }
       static const bool be_extra_verbose = false;
       // Note we would normally use the rabinerInverseScalar from the
       // corresponding forward row, set ahead of time, but since the actual
@@ -22054,7 +22077,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       MatrixValueType col_i_new, tmp_new;
       while( !done ) {
     
-        if( false && ( parameters.debug >= DEBUG_All ) ) {
+        if( do_extra_debugging || ( parameters.debug >= DEBUG_All ) ) {
           cout << "[backward] row " << row_i << ", col " << col_i << endl;
         }
 
@@ -22303,6 +22326,10 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                // the Insertion cell.
               backward_row[ col_i + 1 ][ Match ];
 
+           if( do_extra_debugging && isnan( tmp_new ) ) {
+             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Match will become nan! Match to Match, bottom row is nan" << endl;
+             exit( 1 );
+           }
             if( use_viterbi ) {
               if( tmp_new > col_i_new ) {
                 col_i_new = tmp_new;
@@ -22396,6 +22423,10 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                   // the Insertion cell.
                 backward_row[ col_i + 1 ][ Match ];
 
+           if( do_extra_debugging && isnan( tmp_new ) ) {
+             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Match will become nan! Match to Match, top row is nan" << endl;
+             exit( 1 );
+           }
               if( use_viterbi ) {
                 if( tmp_new > col_i_new ) {
                   col_i_new = tmp_new;
@@ -22412,12 +22443,20 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                 ][
                   TransitionFromPreAlign::toBegin
                 ];
+           if( do_extra_debugging && isnan( tmp_new ) ) {
+             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Match will become nan! Match to Match (-5) is nan" << endl;
+             exit( 1 );
+           }
               tmp_new *=
                 profile[
                   Transition::fromBegin
                 ][
                   TransitionFromBegin::toMatch
                 ];
+           if( do_extra_debugging && isnan( tmp_new ) ) {
+             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Match will become nan! Match to Match (-4) is nan" << endl;
+             exit( 1 );
+           }
             } else { // row_i > 0
 #if defined( USE_DEL_IN_DEL_OUT ) && !defined( USE_SWENTRY_SWEXIT )
               tmp_new =
@@ -22432,6 +22471,10 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                   TransitionFromMatch::toMatch
                 ];
 #endif // USE_DEL_IN_DEL_OUT && !USE_SWENTRY_SWEXIT .. else ..
+           if( do_extra_debugging && isnan( tmp_new ) ) {
+             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Match will become nan! Match to Match (-3) is nan" << endl;
+             exit( 1 );
+           }
             }
             tmp_new *=
               getEmissionProbability(
@@ -22439,6 +22482,17 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                 sequence,
                 col_i
               );
+           if( do_extra_debugging && isnan( tmp_new ) ) {
+             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Match will become nan! Match to Match (-2) is nan" << endl;
+             cout << "profile[ row_i ] is " << profile[ row_i ] << endl;
+             cout << "getEmissionProbability(..) returns  " << 
+              getEmissionProbability(
+                profile[ row_i ],
+                sequence,
+                col_i
+                                     ) << endl;
+             exit( 1 );
+           }
 #ifdef USE_END_DISTRIBUTION
             if( row_i == ( last_row - 1 ) ) {
               tmp_new *=
@@ -22447,11 +22501,19 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                 ][
                   TransitionFromEnd::toPostAlign
                 ];
+           if( do_extra_debugging && isnan( tmp_new ) ) {
+             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Match will become nan! Match to Match (-1) is nan" << endl;
+             exit( 1 );
+           }
             }
 #endif // USE_END_DISTRIBUTION
             tmp_new *=
               next_backward_row[ col_i + 1 ][ Match ];
 
+           if( do_extra_debugging && isnan( tmp_new ) ) {
+             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Match will become nan! Match to Match is nan" << endl;
+             exit( 1 );
+           }
             if( use_viterbi ) {
               if( tmp_new > col_i_new ) {
                 col_i_new = tmp_new;
@@ -22487,6 +22549,10 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           tmp_new *=
             backward_row[ col_i + 1 ][ Insertion ];
 
+           if( do_extra_debugging && isnan( tmp_new ) ) {
+             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Match will become nan! Match to Insertion is nan" << endl;
+             exit( 1 );
+           }
           if( use_viterbi ) {
             if( tmp_new > col_i_new ) {
               col_i_new = tmp_new;
@@ -22552,6 +22618,10 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                 next_backward_row[ col_i ][ Deletion ];
             }
 
+           if( do_extra_debugging && isnan( tmp_new ) ) {
+             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Match will become nan! Match to Deletion is nan" << endl;
+             exit( 1 );
+           }
             if( use_viterbi ) {
               if( tmp_new > col_i_new ) {
                 col_i_new = tmp_new;
@@ -22638,6 +22708,10 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           tmp_new *= next_backward_row[ col_i ][ DeletionOut ];
 #endif // DISALLOW_FLANKING_TRANSITIONS .. else ..
           
+           if( do_extra_debugging && isnan( tmp_new ) ) {
+             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Match will become nan! Match to deletionOut is nan" << endl;
+             exit( 1 );
+           }
           if( use_viterbi ) {
             if( tmp_new > col_i_new ) {
               col_i_new = tmp_new;
@@ -22650,6 +22724,10 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         // End from Match
         backward_row[ col_i ][ Match ] = col_i_new;
     
+           if( do_extra_debugging && isnan( col_i_new ) ) {
+             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Match is nan!" << endl;
+             exit( 1 );
+           }
         // from Insertion
         col_i_new = 0;
         tmp_new = 0;
@@ -22724,6 +22802,12 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         // End from insertion
         backward_row[ col_i ][ Insertion ] = col_i_new;
     
+           if( do_extra_debugging && isnan( col_i_new ) ) {
+             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Insertion is nan!" << endl;
+             cout << "\tMatch is " << backward_row[ col_i ][ Match ] << endl;
+             cout << "\tInsertion is " << backward_row[ col_i ][ Insertion ] << endl;
+             cout << "\tDeletion is " << backward_row[ col_i ][ Deletion ] << endl;
+           }
         // from Deletion
         col_i_new = 0;
         tmp_new = 0;
@@ -22801,6 +22885,13 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         // End from Deletion
         backward_row[ col_i ][ Deletion ] = col_i_new;
     
+           if( do_extra_debugging && isnan( col_i_new ) ) {
+             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Deletion is nan!" << endl;
+             cout << "\tMatch is " << backward_row[ col_i ][ Match ] << endl;
+             cout << "\tInsertion is " << backward_row[ col_i ][ Insertion ] << endl;
+             cout << "\tDeletion is " << backward_row[ col_i ][ Deletion ] << endl;
+           }
+
         if(
           use_rabiner_scaling &&
           calculate_rabiner_inverse_scalar_here
@@ -23062,6 +23153,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         // ?!
         cerr << "ERROR! current_transition is " << current_transition << ", which is unrecognized!" << endl;
         assert( false );
+        exit( 1 );
       }
 
       pos_i = 0;
@@ -23145,6 +23237,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               // ?!
               cerr << "ERROR! current_transition is " << current_transition << ", which is unrecognized!" << endl;
               assert( false );
+              exit( 1 );
             }
 #if defined( USE_DEL_IN_DEL_OUT ) && !defined( USE_SWENTRY_SWEXIT )
             if( current_substate.isDeletionOut() ) {
