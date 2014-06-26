@@ -54,6 +54,7 @@ using galosh::Sequence;
 #include <iostream>
 #include <sstream>
 #include <vector>
+using std::vector;
 #include <fstream>
 
 namespace galosh {
@@ -120,7 +121,7 @@ namespace galosh {
     {
       // TODO: Use a std::vector append operation instead?
       for( uint32_t i = 0; i < other_fasta.size(); i++ ) {
-        push_back( other_fasta[ i ] );
+        this->push_back( other_fasta[ i ] );
         m_descriptions.push_back( other_fasta.m_descriptions[ i ] );
       } // End foreach other fasta sequence
 

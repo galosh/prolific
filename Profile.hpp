@@ -7241,7 +7241,7 @@ template <typename ResidueType, typename ProbabilityType, typename IsActualInser
 
 
     /**
-     * Set all values such that each distrubution is randomly distributed.
+     * Set all values such that each distribution is randomly distributed.
      */
   template <typename ResidueType, typename ProbabilityType, typename IsActualInsertionEmissionParametersType>
   GALOSH_INLINE_PROFILE_ARITHMETIC

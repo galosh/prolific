@@ -42,6 +42,11 @@
 using boost::math::log1p;
 #endif
 
+///Solve a definition/version prob TAH 6/14 
+#ifndef __uint8
+#define __uint8 __uint8_t
+#endif
+
 ////// What shall we inline?
 #define GALOSH_INLINE_INIT inline
 #define GALOSH_INLINE_REINITIALIZE inline

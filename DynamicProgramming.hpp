@@ -1,6 +1,6 @@
 /**
  * \file DynamicProgramming.hpp
- * \author D'Oleris Paul Thatcher Edlefsen   paul@galosh.org with some additions
+ * \author Paul Thatcher Edlefsen   paul@galosh.org with some additions
  * by Ted Holzman
  * \par Library:
  * galosh::prolific
@@ -15,20 +15,23 @@
  *    relevant papers* in your documentation and publications associated with
  *    uses of this library.  Thank you!
  *
- * \copyright &copy; 2008, 2011 by Paul T. Edlefsen, Fred Hutchinson Cancer
+ * \copyright &copy; 2008, 2011, 2013 by Paul T. Edlefsen, Fred Hutchinson Cancer
  *    Research Center.
  * \par License:
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
- *    
+ *
  *        http://www.apache.org/licenses/LICENSE-2.0
- *    
+ *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
+ * \par History
+ * 9/13 TAH Modifications for boost::program_options to initialize parameters and centralize parameter/option manipulations
+ *
  *****************************************************************************/
 
 #if     _MSC_VER > 1000
@@ -120,7 +123,8 @@ using std::copy;
 #include "muscle/msa.h"
 #endif //__HAVE_MUSCLE
 
-#include "Algebra.hpp"
+// TODO: REMOVE.  TESTING.
+//#include "Algebra.hpp"
 
 namespace galosh {
 
@@ -452,7 +456,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           ( *this )[ Emission::Match ]
         );
       } // fromProfilePosition( PositionSpecificParameters<ResidueType, AnyProbabilityType> const& )
-      
+
       /**
        * Fill the given profile position with the non-BoltzmannGibbs equivalent
        * of this PositionBoltzmannGibbs.
@@ -563,7 +567,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         os << " ]";
         return os;
       } // friend operator<< ( basic_ostream &, AlignmentProfilePositionParameters const& )
-    
+
       /**
        * Change the probabilities of the contained Multinomials to values drawn
        * from dirichlet distributions with the given counts.  AnyCountType can be
@@ -607,14 +611,14 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       template <typename AnyValueType>
       AlignmentProfilePositionParameters &
       operator/= ( AnyValueType const& denominator );
-  
+
       /**
        * Multiply each contained distribution value by scalar.
        */
       template <typename AnyValueType>
       AlignmentProfilePositionParameters &
       operator*= ( AnyValueType const& scalar );
-  
+
       /**
        * Add to each contained distribution the values in the given other
        * AlignmentProfilePositionParameters.  Note that this may violate the rule that
@@ -622,25 +626,25 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
        */
       AlignmentProfilePositionParameters &
       operator+= ( AlignmentProfilePositionParameters const& other_pos );
-  
+
       /**
        * Set all values such that each distrubution is randomly distributed.
        */
       void
       uniform ( Random & random );
-  
+
       /**
        * Set all values such that each distrubution is evenly distributed.
        */
       void
       even ();
-  
+
       /**
        * Return the largest value in the contained distributions.
        */
       ParameterType
       maximumValue () const;
-  
+
       /**
        * Calculate and return the Euclidean distance between this position and
        * another position (treating every probability as an orthogonal
@@ -959,7 +963,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
   {
     return sqrt( euclideanDistanceSquared( other_pos ) );
   } // euclideanDistance( AlignmentProfilePositionParameters const & )
-  
+
   /**
    * Calculate and return the square of the Euclidean distance between this
    * position and another position (treating every probability as an
@@ -1112,7 +1116,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
        * This can be used to calculate the (possibly weighted) (self-)entropy by
        * calling this->crossEntropy( *this, weights ).  It can also be used to
        * calculate the KL divergence by taking the difference of the
-       * cross-entropy and the self-entropy, or the symmetrized KL divergence by
+       * cross-entropy and the self-entropy, or the symmeterized KL divergence by
        * summing the KL divergences computed both ways.  Note, though, that
        * weights should all be the same within any Multinomial distribution if
        * this is to be used to calculate weighted entropies or KL divergences.
@@ -1157,233 +1161,176 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             typename MatrixValueType>
   class DynamicProgramming
   {
-  public:
-    class Parameters :
-      public galosh::Parameters
-    {
-      // Boost serialization
-    private:
-      typedef galosh::Parameters galosh_parameters_t;
-      friend class boost::serialization::access;
-      template<class Archive>
-      void serialize ( Archive & ar, const unsigned int /* file_version */ )
-      {
-        // save/load base class information
-        ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP( galosh_parameters_t );
+     public:
+       class Parameters :
+          public galosh::Parameters
+       {
+       private:
+          typedef galosh::Parameters galosh_parameters_t;
 
-        ar & BOOST_SERIALIZATION_NVP( useRabinerScaling );
-        ar & BOOST_SERIALIZATION_NVP( rabinerScaling_useMaximumValue );
-        ar & BOOST_SERIALIZATION_NVP( matrixRowScaleFactor );
-      } // serialize( Archive &, const unsigned int )
+          // Boost serialization
+          friend class boost::serialization::access;
 
-    public:
-  
-      /// PARAMETERS
-      /**
-       * Use (our rotated, state-specific) Rabiner-style scaling to keep
-       * forward matrix values from underflowing?  Note that if this is false,
-       * you should use a log type for the ScoreType (unless the profile and
-       * sequences are very short and there are few sequences, in which case
-       * you might not encounter underflow).
-       */
-      bool useRabinerScaling;
-      /// NOTE THAT RIGHT NOW, RABINER SCALING SEEMS TO BE BROKEN.  \todo FIX!
-  #define DEFAULT_useRabinerScaling false
+          template<class Archive>
+          void serialize ( Archive & ar, const unsigned int /* file_version */ )
+          {
+             // save/load base class information
+             ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP( galosh_parameters_t );
+             /**
+              * DynamicProgramming Members to be serialized
+              *   TAH 9/13
+              **/
+             #undef GALOSH_DEF_OPT
+             #define GALOSH_DEF_OPT(NAME,TYPE,DEFAULTVAL,HELP) ar & BOOST_SERIALIZATION_NVP( NAME )
+             #include "DynamicProgrammingOptions.hpp"  /// serialize DynamicProgramming parameters
 
-      /**
-       * It turns out that rabinerScaling can use any scale.  Rabiner
-       * suggested scaling each time separately, by the total of the matrix
-       * values.  We rotate, so we scale each state separately (not each time)
-       * -- but actually we group together the states in each position, so we
-       * scale the positions.  We can either scale them by the total of the
-       * values there (or by the total of just the Match and Deletion values)
-       * or by the maximum value, which lets us use more of the range of the
-       * MatrixValueType.  We use the total of all values in the position
-       * unless rabinerScaling_useMaximumValue is true.
-       */
-      bool rabinerScaling_useMaximumValue;
-      /// \todo Make this depend on the MatrixValueType?  If using bfloats or logs, we don't need to do this.  We can avoid a few calculations if we have this false.
-//#define DEFAULT_rabinerScaling_useMaximumValue true
-/// \todo put back true.  Testing.
-#define DEFAULT_rabinerScaling_useMaximumValue false
+          } // serialize( Archive &, const unsigned int )
 
-      /**
-       * Vanilla rabiner scaling would divide all matrix row values by the
-       * total of all values in that row, but when there is a wide discrepency
-       * between the largest and smallest values, the smallest ones will
-       * underflow (with a non-log MatrixValueType).  So we can multiply
-       * everything in the row by this scale factor to use more of the range of
-       * the MatrixValueType.
-       */
-      double matrixRowScaleFactor;
-      /// \todo Make this depend on the MatrixValueType?  If using bfloats or logs, we don't need to scale it.
-//#define DEFAULT_matrixRowScaleFactor ( pow( numeric_limits<float>::max(), .25f ) - 1.0f )
-//#define DEFAULT_matrixRowScaleFactor ( pow( numeric_limits<double>::max(), .0625 ) - 1.0 )
-#define DEFAULT_matrixRowScaleFactor 1
+       public:
+          /// PARAMETERS are now defined in DynamicProgrammingOptions.hpp
+          /**
+           * Define DynamicProgramming::Parameters "members".  These are tightly tied to the options.
+           *    TAH 9/13
+           **/
+           #undef GALOSH_DEF_OPT
+           #define GALOSH_DEF_OPT(NAME,TYPE,DEFAULTVAL,HELP) TYPE NAME
+           #include "DynamicProgrammingOptions.hpp"  /// declare Parameters members specific to DynamicProgramming
 
-      Parameters ();
-      virtual ~Parameters () {};
-    
-      // Copy constructor
-      template <class AnyParameters>
-      Parameters ( const AnyParameters & copy_from );
-    
-      // Copy constructor/operator
-      template <class AnyParameters>
-      Parameters & operator= (
-        const AnyParameters & copy_from
-      );
-    
-      template <class AnyParameters>
-      void
-      copyFromNonVirtual (
-        AnyParameters const & copy_from
-      );
+           Parameters ();
 
-      template <class AnyParameters>
-      void
-      copyFromNonVirtualDontDelegate (
-        AnyParameters const & copy_from
-      );
+           virtual ~Parameters () {};
 
-      virtual void
-      copyFrom ( const Parameters & copy_from );
-    
-      virtual void
-      resetToDefaults ();
+           // Copy constructor
+           template <class AnyParameters>
+           Parameters ( const AnyParameters & copy_from );
 
-      template<class CharT, class Traits>
-      friend std::basic_ostream<CharT,Traits>&
-      operator<< (
-        std::basic_ostream<CharT,Traits>& os,
-        Parameters const& parameters
-      )
-      {
-        parameters.writeParameters( os );
-        return os;
-      } // friend operator<< ( basic_ostream &, Parameters const& )
+           // Copy constructor/operator
+           template <class AnyParameters>
+           Parameters & operator= (
+              const AnyParameters & copy_from
+           );
 
-      template<class CharT, class Traits>
-      void
-      writeParameters (
-        std::basic_ostream<CharT,Traits>& os
-      ) const;
+           template <class AnyParameters>
+           void
+           copyFromNonVirtual (
+              AnyParameters const & copy_from
+           );
 
-    }; // End inner class Parameters
+           template <class AnyParameters>
+           void
+           copyFromNonVirtualDontDelegate (
+              AnyParameters const & copy_from
+           );
 
-    template <class ParametersType>
-    class ParametersModifierTemplate :
-      public galosh::ParametersModifierTemplate<ParametersType>
-    {
-      typedef typename galosh::ParametersModifierTemplate<ParametersType> base_parameters_modifier_t;
+           virtual void
+           copyFrom ( const Parameters & copy_from );
 
-      // Boost serialization
-    private:
-      friend class boost::serialization::access;
-      template<class Archive>
-      void serialize ( Archive & ar, const unsigned int /* file_version */ )
-      {
-        // save/load base class information.  This will serialize the
-        // parameters too.
-        ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP( base_parameters_modifier_t );
+           virtual void
+           resetToDefaults ();
 
-        // Serialize the new isModified_ stuff
-        ar & BOOST_SERIALIZATION_NVP( isModified_useRabinerScaling );
-        ar & BOOST_SERIALIZATION_NVP( isModified_rabinerScaling_useMaximumValue );
-        ar & BOOST_SERIALIZATION_NVP( isModified_matrixRowScaleFactor );
-      } // serialize( Archive &, const unsigned int )
+           template<class CharT, class Traits>
+           friend ostream&
+           operator<< (
+              std::ostream& os,
+              Parameters const& parameters
+           )
+           {
+              parameters.writeParameters( os );
+              return os;
+           } // friend operator<< ( ostream &, Parameters const& )
 
-    public:
-  
-      /// isModified flags for Parameters
-      /**
-       * Use (our rotated, state-specific) Rabiner-style scaling to keep
-       * forward matrix values from underflowing?  Note that if this is false,
-       * you should use a log type for the ScoreType (unless the profile and
-       * sequences are very short and there are few sequences, in which case
-       * you might not encounter underflow).
-       */
-      bool isModified_useRabinerScaling;
+           template<class CharT, class Traits>
+           void
+           writeParameters (
+              std::ostream& os
+           ) const;
 
-      /**
-       * It turns out that rabinerScaling can use any scale.  Rabiner
-       * suggested scaling each time separately, by the total of the matrix
-       * values.  We rotate, so we scale each state separately (not each time)
-       * -- but actually we group together the states in each position, so we
-       * scale the positions.  We can either scale them by the total of the
-       * values there (or by the total of just the Match and Deletion values)
-       * or by the maximum value, which lets us use more of the range of the
-       * MatrixValueType.  We use the total of all values in the position
-       * unless rabinerScaling_useMaximumValue is true.
-       */
-      bool isModified_rabinerScaling_useMaximumValue;
+       }; // End inner class Parameters
 
-      /**
-       * Vanilla rabiner scaling would divide all matrix row values by the
-       * total of all values in that row, but when there is a wide discrepency
-       * between the largest and smallest values, the smallest ones will
-       * underflow (with a non-log MatrixValueType).  So we can multiply
-       * everything in the row by this scale factor to use more of the range of
-       * the MatrixValueType.
-       */
-      bool isModified_matrixRowScaleFactor;
+       template <class ParametersType>
+       class ParametersModifierTemplate :
+          public galosh::ParametersModifierTemplate<ParametersType>
+       {
+           typedef typename galosh::ParametersModifierTemplate<ParametersType> base_parameters_modifier_t;
 
-      //using galosh::ParametersModifierTemplate<ParametersType>::parameters;
-      //using base_parameters_modifier_t::parameters;
+       private:
+          // Boost serialization
+          friend class boost::serialization::access;
+          template<class Archive>
+          void serialize ( Archive & ar, const unsigned int /* file_version */ )
+          {
+             // save/load base class information.  This will serialize the
+             // parameters too.
+             ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP( base_parameters_modifier_t );
+             // Serialize the DynamicProgramming::ParametersModifierTemplate specific isModified_ stuff  TAH 9/13
+             #undef GALOSH_DEF_OPT
+             #define GALOSH_DEF_OPT(NAME,TYPE,DEFAULTVAL,HELP) ar & BOOST_SERIALIZATION_NVP(isModified_##NAME)
+             #include "DynamicProgrammingOptions.hpp"  // archive DynamicProgramming::ParametersModifierTemplate isModifier_<member>s
 
-      ParametersModifierTemplate ();
-    
-      // Copy constructor
-      template <class AnyParametersModifierTemplate>
-      ParametersModifierTemplate ( const AnyParametersModifierTemplate & copy_from );
-    
-      // Copy constructor/operator
-      template <class AnyParametersModifierTemplate>
-      ParametersModifierTemplate & operator= (
-        const AnyParametersModifierTemplate & copy_from
-      );
-    
-      template <class AnyParametersModifierTemplate>
-      void
-      copyFromNonVirtual (
-        AnyParametersModifierTemplate const & copy_from
-      );
+          } // serialize( Archive &, const unsigned int )
 
-      template <class AnyParametersModifierTemplate>
-      void
-      isModified_copyFromNonVirtual (
-        AnyParametersModifierTemplate const & copy_from
-      );
+       public:
+          /**
+           * Declare isModified_<member> for all members of DynamicProgramming parameters
+           * TAH 9/13
+           */
+          #undef GALOSH_DEF_OPT
+          #define GALOSH_DEF_OPT(NAME,TYPE,DEFAULTVAL,HELP) bool isModified_##NAME
+          #include "DynamicProgrammingOptions.hpp"  // Declare isModified members for DynamicProgramming
 
-      void
-      reset ();
+          // Base constructor
+          ParametersModifierTemplate ();
 
-      void
-      isModified_reset ();
+          // Copy constructor
+          template <class AnyParametersModifierTemplate>
+          ParametersModifierTemplate ( const AnyParametersModifierTemplate & copy_from );
 
-      template<class CharT, class Traits>
-      friend std::basic_ostream<CharT,Traits>&
-      operator<< (
-        std::basic_ostream<CharT,Traits>& os,
-        ParametersModifierTemplate const& parameters_modifier
-      )
-      {
-        parameters_modifier.writeParametersModifier( os );
+          // Copy constructor/operator
+          template <class AnyParametersModifierTemplate>
+          ParametersModifierTemplate & operator= (
+             const AnyParametersModifierTemplate & copy_from
+          );
 
-        return os;
-      } // friend operator<< ( basic_ostream &, ParametersModifierTemplate const& )
+          template <class AnyParametersModifierTemplate>
+          void
+          copyFromNonVirtual (
+             AnyParametersModifierTemplate const & copy_from
+          );
 
-      template<class CharT, class Traits>
-      void
-      writeParametersModifier (
-        std::basic_ostream<CharT,Traits>& os
-      ) const;
+          template <class AnyParametersModifierTemplate>
+          void
+          isModified_copyFromNonVirtual (
+             AnyParametersModifierTemplate const & copy_from
+          );
 
-      template<class AnyParameters>
-      void
-      applyModifications ( AnyParameters & target_parameters ) const;
+          void
+          reset ();
 
-    }; // End inner class ParametersModifierTemplate
+          void
+          isModified_reset ();
+
+          template<class CharT, class Traits>
+          friend std::ostream&
+          operator<< (
+             std::ostream & os,
+             ParametersModifierTemplate const& parameters_modifier
+          )
+          {
+             parameters_modifier.writeParametersModifier( os );
+             return os;
+          } // friend operator<< ( ostream &, ParametersModifierTemplate const& )
+
+          template<class CharT, class Traits>
+          void
+          writeParametersModifier (
+             std::ostream & os
+          ) const;
+
+          template<class AnyParameters>
+          void
+             applyModifications ( AnyParameters & target_parameters ) const;
+
+       }; // End inner class ParametersModifierTemplate
 
     typedef ParametersModifierTemplate<typename DynamicProgramming::Parameters> ParametersModifier;
 
@@ -1564,7 +1511,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         if( length != this->size() ) {
           this->resize( length );
         }
-      
+
         // Serialize positions
         if( length > 0 ) {
          uint32_t last_pos = length - 1;
@@ -1663,7 +1610,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       template <typename AnyValueType>
       AlignmentProfile &
       operator/= ( AnyValueType const& denominator );
-  
+
       /**
        * Add to each contained distribution the values in the given other
        * AlignmentProfile.  Note that this may violate the rule that
@@ -1671,19 +1618,19 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
        */
       AlignmentProfile &
       operator+= ( AlignmentProfile const& other_profile );
-  
+
       /**
        * Set all values such that each distrubution is randomly distributed.
        */
       void
       uniform ( Random & random );
-  
+
       /**
        * Return the largest value in the contained distributions.
        */
       MatrixValueType
       maximumValue () const;
-  
+
       /**
        * Calculate and return the Euclidean distance between this alignment
        * profile and another one (treating every probability as an orthogonal
@@ -1852,7 +1799,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         //   Protect against x=0. We see this in Dirichlet code,
         //   for terms alpha = 0. This is a severe hack but it is effective
         //   and (we think?) safe. (due to GJM)
-        // if (x <= 0.0) return 999999.; 
+        // if (x <= 0.0) return 999999.;
         assert( x > 0 ); // Paul's replacement for now.
 
         static double cof[ 11 ] = {
@@ -1868,7 +1815,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           -2.319827630494973e-04,
           1.251639670050933e-10
         };
-      
+
         double xx = toDouble( x ) - 1.0;
         double tx, tmp;
         tx = tmp = xx + 11.0;
@@ -1932,18 +1879,18 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
     public:
       // \todo  Protect access, ensure it sums to 1 (and is non-negative), etc.
       vector<ProbabilityType> m_mixingProbs;
-    
+
       DirichletMixtureMatchEmissionPrior () :
         m_mixingProbs()
       {
         // Do nothing else.
       }; // <init>()
-    
+
       DirichletMixtureMatchEmissionPrior ( DirichletMixtureMatchEmissionPrior const & copy_from )
       {
         *this = copy_from;
       }; // <init>( DirichletMixtureMatchEmissionPrior const & )
-    
+
       DirichletMixtureMatchEmissionPrior ( uint32_t length ) :
         vector<MatchEmissionParameters<ResidueType, DirichletParameterType> >( length ),
         m_mixingProbs( length )
@@ -1951,7 +1898,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         // Do nothing else.
         reinitialize( length );
       } // <init>( uint32_t )
-    
+
       void
       reinitialize ()
       {
@@ -1972,7 +1919,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         if( m_mixingProbs.size() != length ) {
           m_mixingProbs.resize( length );
         }
-    
+
         if( length > 0 ) {
           uint32_t last_pos = length - 1;
           uint32_t pos_i;
@@ -1982,7 +1929,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           }
         }
       } // reinitialize( uint32_t )
-    
+
       /**
        * Reinitialize with size 1 and set all counts to 1.0.
        */
@@ -1991,7 +1938,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       {
         reinitializeToEven( 1.0 );
       } // reinitializeToLaplace()
-    
+
       /**
        * Reinitialize with size 1 and set all counts to count.
        */
@@ -2003,10 +1950,16 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         reinitialize( 1 );
         ( *this )[ 0 ][ Emission::Match ] = count;
       } // reinitializeToEven( DirichletParameterType )
-    
+
       DirichletMixtureMatchEmissionPrior &
       operator= ( DirichletMixtureMatchEmissionPrior const& other_prior )
-      {
+      { 
+        #ifdef DEBUG
+        std::cerr << "In DirichletMixtureMatchEmissionPrior operator=" << endl;
+        std::cerr << vector<MatchEmissionParameters<ResidueType, DirichletParameterType> >::size() << endl;
+        std::cerr << other_prior.size() << endl;
+        std::cerr.flush();
+        #endif 
         if( vector<MatchEmissionParameters<ResidueType, DirichletParameterType> >::size() != other_prior.size() ) {
           vector<MatchEmissionParameters<ResidueType, DirichletParameterType> >::resize( other_prior.size() );
           m_mixingProbs.resize( other_prior.size() );
@@ -2054,7 +2007,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         if( mixing_posteriors.size() != num_mixing_components ) {
           mixing_posteriors.resize( num_mixing_components );
         }
-    
+
         uint32_t mixing_component_i;
         if( num_mixing_components == 1 ) {
           mixing_posteriors[ 0 ] = 1.0;
@@ -2088,9 +2041,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           //  cout << "calculateMixingPosteriors: mixing_posteriors[ " << mixing_component_i << " ] is " << mixing_posteriors[ mixing_component_i ] << endl;
           //} // End foreach mixing_component_i
         } // End if num_mixing_components == 1 .. else ..
-    
+
       } // calculateMixingPosteriors( MatchEmissionParametersType const &, vector<ProbabilityType> & )
-    
+
       /**
        * Add prior pseudocounts to an observed emission count vector (an
        * Entente).  Modified from hmmer's P7PriorifyEmissionVector in prior.c.
@@ -2103,7 +2056,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       {
         // Note that as a side effect, the entente will be normalized (if/when
         // unscaled), unless there is only 1 mixing component.
-  
+
         uint32_t num_mixing_components = this->size();
         if( num_mixing_components == 1 ) {
           // Then we don't have to mix, we just have to add in the prior
@@ -2122,20 +2075,20 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           //cout << "In incorporatePrior(..): unscaled entente before is " << entente << endl;
           entente += prior_counts;
           //cout << "In incorporatePrior(..): unscaled entente after is " << entente << endl;
-    
+
           return;
         } // End if num_mixing_components == 1
-    
+
         // \todo  We could further speed this up by doing everything in
         // ProbabilityType type, and instead of dividing the entente by the scalar,
         // multiply the prior by the scalar.  If it ends up being 0, then just
         // return.  Also, why *is* the entente scalar in scoretype anyway?
-    
+
         // We first need posterior probs P( q | entente ) for each mixture
         // component q.
         vector<ProbabilityType> mixing_posteriors( this->size() );
         calculateMixingPosteriors( entente, mixing_posteriors );
-    
+
         // Incorporate the priors into the entente counts.
         // Sean Eddy's code says "following Sjolander (1996)"
         MatrixValueType xi, tmp_mvt;
@@ -2200,7 +2153,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             tmp_mvt /= tot;
             tmp_mvt *=
               mixing_posteriors[ mixing_component_i ];
-                
+
             xi += tmp_mvt;
 
             // \todo  REMOVE
@@ -2215,7 +2168,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           //cout << "[" << i << "] new entente value is " << entente[ Emission::Match ][ i ] << endl;
         } // End foreach residue i
       } // incorporatePrior( MatchEmissionParametersType & ) const
-    
+
       /**
        * Calculate and return ln( P( entente | dirichlet ) ) for component
        * mixing_component_i.  Sums up over the different alphabet types.
@@ -2238,9 +2191,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
 
         // Note that we directly access the m_probs members of the
         // MultinomialDistributions, which are public.
-        return calculateLogProbability( entente[ Emission::Match ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Emission::Match ].m_probs, ( *this )[ mixing_component_i ][ Emission::Match ].size() );
+        return DirichletStuff::calculateLogProbability( entente[ Emission::Match ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Emission::Match ].m_probs, ( *this )[ mixing_component_i ][ Emission::Match ].size() );
       } // calculateLogPosterior( MatchEmissionParametersType const &, uint32_t ) const
-    
+
     }; // End inner class DynamicProgramming::DirichletMixtureMatchEmissionPrior
 
     // Note that I could have made this subclass all of the (below) sub-priors,
@@ -2255,25 +2208,25 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
     public:
       // \todo  Protect access, ensure it sums to 1 (and is non-negative), etc.
       vector<ProbabilityType> m_mixingProbs;
-    
+
       DirichletMixtureGlobalPrior () :
         m_mixingProbs()
       {
         // Do nothing else.
       }; // <init>()
-    
+
       DirichletMixtureGlobalPrior ( uint32_t length ) :
         vector<GlobalParameters<ResidueType, DirichletParameterType> >( length ),
         m_mixingProbs( length )
       {
         reinitialize( length );
       } // <init>( uint32_t )
-    
+
       DirichletMixtureGlobalPrior ( DirichletMixtureGlobalPrior const & copy_from )
       {
         *this = copy_from;
       }; // <init>( DirichletMixtureGlobalPrior const & )
-    
+
       void
       reinitialize ()
       {
@@ -2294,7 +2247,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         if( m_mixingProbs.size() != length ) {
           m_mixingProbs.resize( length );
         }
-    
+
         if( length > 0 ) {
           uint32_t last_pos = length - 1;
           uint32_t pos_i;
@@ -2305,7 +2258,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           }
         }
       } // reinitialize( uint32_t )
-    
+
       /**
        * Reinitialize with size 1 and set all counts to 1.0.
        */
@@ -2314,7 +2267,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       {
         reinitializeToEven( 1.0 );
       } // reinitializeToLaplace()
-    
+
       /**
        * Reinitialize with size 1 and set all counts to count.
        */
@@ -2346,7 +2299,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
 #endif // USE_DEL_IN_DEL_OUT && !USE_SWENTRY_SWEXIT
         ( *this )[ 0 ][ Emission::PostAlignInsertion ] = count;
       } // reinitializeToEven( DirichletParameterType )
-    
+
       DirichletMixtureGlobalPrior &
       operator= ( DirichletMixtureGlobalPrior const& other_prior )
       {
@@ -2397,7 +2350,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         if( mixing_posteriors.size() != num_mixing_components ) {
           mixing_posteriors.resize( num_mixing_components );
         }
-    
+
         uint32_t mixing_component_i;
         if( num_mixing_components == 1 ) {
           mixing_posteriors[ 0 ] = 1.0;
@@ -2431,9 +2384,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           //  cout << "calculateMixingPosteriors: mixing_posteriors[ " << mixing_component_i << " ] is " << mixing_posteriors[ mixing_component_i ] << endl;
           //} // End foreach mixing_component_i
         } // End if num_mixing_components == 1 .. else ..
-    
+
       } // calculateMixingPosteriors( GlobalParametersType const &, vector<ProbabilityType> & )
-    
+
       /**
        * Add prior pseudocounts to an observed emission count vector (an
        * Entente).  Modified from hmmer's P7PriorifyEmissionVector in prior.c.
@@ -2446,7 +2399,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       {
         // Note that as a side effect, the entente will be normalized (if/when
         // unscaled), unless there is only 1 mixing component.
-  
+
         uint32_t num_mixing_components = this->size();
         if( num_mixing_components == 1 ) {
           // Then we don't have to mix, we just have to add in the prior
@@ -2467,20 +2420,20 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           //cout << "In incorporatePrior(..): unscaled entente before is " << entente << endl;
           entente += prior_counts;
           //cout << "In incorporatePrior(..): unscaled entente after is " << entente << endl;
-    
+
           return;
         } // End if num_mixing_components == 1
-    
+
         // \todo  We could further speed this up by doing everything in
         // ProbabilityType type, and instead of dividing the entente by the scalar,
         // multiply the prior by the scalar.  If it ends up being 0, then just
         // return.  Also, why *is* the entente scalar in scoretype anyway?
-    
+
         // We first need posterior probs P( q | entente ) for each mixture
         // component q.
         vector<ProbabilityType> mixing_posteriors( this->size() );
         calculateMixingPosteriors( entente, mixing_posteriors );
-    
+
         // Incorporate the priors into the entente counts.
         // Sean Eddy's code says "following Sjolander (1996)"
         MatrixValueType xi, tmp_mvt;
@@ -2545,7 +2498,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             tmp_mvt /= tot;
             tmp_mvt *=
               mixing_posteriors[ mixing_component_i ];
-                
+
             xi += tmp_mvt;
 
             // \todo  REMOVE
@@ -2559,7 +2512,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           // \todo  REMOVE
           //cout << "[" << i << "] new entente value is " << entente[ Emission::Insertion ][ i ] << endl;
         } // End foreach residue i
-    
+
         ////////
         // Match
         totc =
@@ -2604,7 +2557,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             tmp_mvt /= tot;
             tmp_mvt *=
               mixing_posteriors[ mixing_component_i ];
-            
+
             xi += tmp_mvt;
 
             // \todo  REMOVE
@@ -2662,7 +2615,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             tmp_mvt /= tot;
             tmp_mvt *=
               mixing_posteriors[ mixing_component_i ];
-            
+
             xi += tmp_mvt;
 
             // \todo  REMOVE
@@ -2720,7 +2673,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             tmp_mvt /= tot;
             tmp_mvt *=
               mixing_posteriors[ mixing_component_i ];
-            
+
             xi += tmp_mvt;
 
             // \todo  REMOVE
@@ -2778,7 +2731,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             tmp_mvt /= tot;
             tmp_mvt *=
               mixing_posteriors[ mixing_component_i ];
-            
+
             xi += tmp_mvt;
 
             // \todo  REMOVE
@@ -2838,9 +2791,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             tmp_mvt /= tot;
             tmp_mvt *=
               mixing_posteriors[ mixing_component_i ];
-                
+
             xi += tmp_mvt;
-        
+
             // \todo  REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] Just added to xi " << mixing_posteriors[ mixing_component_i ] << " * " << "( ( " << toDouble( unscaled_entente_value ) << " + " << toDouble( ( *this )[ mixing_component_i ][ Emission::PreAlignInsertion ][ i ] ) << " ) / " << toDouble( tot ) << " )" << endl;
             //cout << "[" << i << ", " << mixing_component_i << "] xi is now " << xi << endl;
@@ -2848,7 +2801,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           tmp_st = xi;
           tmp_st *= entente_scalar;
           entente[ Emission::PreAlignInsertion ][ i ] = tmp_st;
-        
+
           // \todo  REMOVE
           //cout << "[" << i << "] new entente value is " << entente[ Emission::PreAlignInsertion ][ i ] << endl;
         } // End foreach residue i
@@ -2899,7 +2852,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             tmp_mvt /= tot;
             tmp_mvt *=
               mixing_posteriors[ mixing_component_i ];
-            
+
             xi += tmp_mvt;
 
             // \todo  REMOVE
@@ -2958,7 +2911,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             tmp_mvt /= tot;
             tmp_mvt *=
               mixing_posteriors[ mixing_component_i ];
-            
+
             xi += tmp_mvt;
 
             // TODO: REMOVE
@@ -3020,7 +2973,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         //    tmp_mvt /= tot;
         //    tmp_mvt *=
         //      mixing_posteriors[ mixing_component_i ];
-        //    
+        //
         //    xi += tmp_mvt;
         //
         //    // TODO: REMOVE
@@ -3079,7 +3032,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             tmp_mvt /= tot;
             tmp_mvt *=
               mixing_posteriors[ mixing_component_i ];
-            
+
             xi += tmp_mvt;
 
             // TODO: REMOVE
@@ -3138,7 +3091,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             tmp_mvt /= tot;
             tmp_mvt *=
               mixing_posteriors[ mixing_component_i ];
-            
+
             xi += tmp_mvt;
 
             // TODO: REMOVE
@@ -3199,9 +3152,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             tmp_mvt /= tot;
             tmp_mvt *=
               mixing_posteriors[ mixing_component_i ];
-                
+
             xi += tmp_mvt;
-        
+
             // TODO: REMOVE
             //cout << "[" << i << ", " << mixing_component_i << "] Just added to xi " << mixing_posteriors[ mixing_component_i ] << " * " << "( ( " << toDouble( unscaled_entente_value ) << " + " << toDouble( ( *this )[ mixing_component_i ][ Emission::PostAlignInsertion ][ i ] ) << " ) / " << toDouble( tot ) << " )" << endl;
             //cout << "[" << i << ", " << mixing_component_i << "] xi is now " << xi << endl;
@@ -3209,13 +3162,13 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           tmp_st = xi;
           tmp_st *= entente_scalar;
           entente[ Emission::PostAlignInsertion ][ i ] = tmp_st;
-        
+
           // TODO: REMOVE
           //cout << "[" << i << "] new entente value is " << entente[ Emission::PostAlignInsertion ][ i ] << endl;
         } // End foreach residue i
 #endif // USE_FLANKING_EMISSION_DISTRIBUTIONS
       } // incorporatePrior( GlobalParametersType & ) const
-    
+
       /**
        * Calculate and return ln( P( entente | dirichlet ) ) for component
        * mixing_component_i.  Sums up over the different alphabet types.
@@ -3239,33 +3192,33 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         // Note that we directly access the m_probs members of the
         // MultinomialDistributions, which are public.
         double prod = 0.0; // log( 1.0 );
-        prod += calculateLogProbability( entente[ Emission::Insertion ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Emission::Insertion ].m_probs, ( *this )[ mixing_component_i ][ Emission::Insertion ].size() );
-        prod += calculateLogProbability( entente[ Transition::fromMatch ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromMatch ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromMatch ].size() );
-        prod += calculateLogProbability( entente[ Transition::fromInsertion ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromInsertion ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromInsertion ].size() );
-        prod += calculateLogProbability( entente[ Transition::fromDeletion ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromDeletion ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromDeletion ].size() );
-        prod += calculateLogProbability( entente[ Transition::fromPreAlign ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromPreAlign ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromPreAlign ].size() );
-        prod += calculateLogProbability( entente[ Transition::fromBegin ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromBegin ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromBegin ].size() );
+        prod += DirichletStuff::calculateLogProbability( entente[ Emission::Insertion ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Emission::Insertion ].m_probs, ( *this )[ mixing_component_i ][ Emission::Insertion ].size() );
+        prod += DirichletStuff::calculateLogProbability( entente[ Transition::fromMatch ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromMatch ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromMatch ].size() );
+        prod += DirichletStuff::calculateLogProbability( entente[ Transition::fromInsertion ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromInsertion ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromInsertion ].size() );
+        prod += DirichletStuff::calculateLogProbability( entente[ Transition::fromDeletion ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromDeletion ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromDeletion ].size() );
+        prod += DirichletStuff::calculateLogProbability( entente[ Transition::fromPreAlign ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromPreAlign ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromPreAlign ].size() );
+        prod += DirichletStuff::calculateLogProbability( entente[ Transition::fromBegin ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromBegin ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromBegin ].size() );
 #if defined( USE_DEL_IN_DEL_OUT ) && !defined( USE_SWENTRY_SWEXIT )
-        prod += calculateLogProbability( entente[ Transition::fromDeletionIn ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromDeletionIn ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromDeletionIn ].size() );
+        prod += DirichletStuff::calculateLogProbability( entente[ Transition::fromDeletionIn ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromDeletionIn ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromDeletionIn ].size() );
 #endif // USE_DEL_IN_DEL_OUT && !USE_SWENTRY_SWEXIT
 #ifdef USE_FLANKING_EMISSION_DISTRIBUTIONS
-        prod += calculateLogProbability( entente[ Emission::PreAlignInsertion ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Emission::PreAlignInsertion ].m_probs, ( *this )[ mixing_component_i ][ Emission::PreAlignInsertion ].size() );
+        prod += DirichletStuff::calculateLogProbability( entente[ Emission::PreAlignInsertion ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Emission::PreAlignInsertion ].m_probs, ( *this )[ mixing_component_i ][ Emission::PreAlignInsertion ].size() );
 #endif // USE_FLANKING_EMISSION_DISTRIBUTIONS
 #ifdef USE_END_DISTRIBUTION
          // For now we we never allow loops, so the End distribution is constant.
-         //prod += calculateLogProbability( entente[ Transition::fromEnd ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromEnd ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromEnd ].size() );
+         //prod += DirichletStuff::calculateLogProbability( entente[ Transition::fromEnd ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromEnd ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromEnd ].size() );
 #endif // USE_END_DISTRIBUTION
-        prod += calculateLogProbability( entente[ Transition::fromPostAlign ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromPostAlign ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromPostAlign ].size() );
+        prod += DirichletStuff::calculateLogProbability( entente[ Transition::fromPostAlign ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromPostAlign ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromPostAlign ].size() );
 #if defined( USE_DEL_IN_DEL_OUT ) && !defined( USE_SWENTRY_SWEXIT )
-        prod += calculateLogProbability( entente[ Transition::fromDeletionOut ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromDeletionOut ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromDeletionOut ].size() );
+        prod += DirichletStuff::calculateLogProbability( entente[ Transition::fromDeletionOut ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromDeletionOut ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromDeletionOut ].size() );
 #endif // USE_DEL_IN_DEL_OUT && !USE_SWENTRY_SWEXIT
 #ifdef USE_FLANKING_EMISSION_DISTRIBUTIONS
-        prod += calculateLogProbability( entente[ Emission::PostAlignInsertion ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Emission::PostAlignInsertion ].m_probs, ( *this )[ mixing_component_i ][ Emission::PostAlignInsertion ].size() );
+        prod += DirichletStuff::calculateLogProbability( entente[ Emission::PostAlignInsertion ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Emission::PostAlignInsertion ].m_probs, ( *this )[ mixing_component_i ][ Emission::PostAlignInsertion ].size() );
 #endif // USE_FLANKING_EMISSION_DISTRIBUTIONS
 
         return prod;
       } // calculateLogPosterior( GlobalParametersType const &, uint32_t ) const
-    
+
     }; // End inner class DynamicProgramming::DirichletMixtureGlobalPrior
 
     template <typename DirichletParameterType>
@@ -3276,13 +3229,13 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
     public:
       // TODO: Protect access, ensure it sums to 1 (and is non-negative), etc.
       vector<ProbabilityType> m_mixingProbs;
-    
+
       DirichletMixtureInsertionEmissionPrior () :
         m_mixingProbs()
       {
         // Do nothing else.
       }; // <init>()
-    
+
       DirichletMixtureInsertionEmissionPrior (
         uint32_t length
       ) :
@@ -3291,7 +3244,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       {
         reinitialize( length );
       } // <init>( uint32_t )
-    
+
       /**
        * Reset all to their defaults, and mixing probs to 1/length.
        */
@@ -3306,7 +3259,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         if( m_mixingProbs.size() != length ) {
           m_mixingProbs.resize( length );
         }
-    
+
         if( length > 0 ) {
           uint32_t last_pos = length - 1;
           uint32_t pos_i;
@@ -3316,7 +3269,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           }
         }
       } // reinitialize( uint32_t )
-    
+
       /**
        * Reinitialize with size 1 and set all counts to 1.0.
        */
@@ -3325,7 +3278,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       {
         reinitializeToEven( 1.0 );
       } // reinitializeToLaplace()
-    
+
       /**
        * Reinitialize with size 1 and set all counts to count.
        */
@@ -3337,7 +3290,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         reinitialize( 1 );
         ( *this )[ 0 ][ Emission::Insertion ] = count;
       } // reinitializeToEven( DirichletParameterType )
-    
+
       /**
        * Calculate the posterior probabilities of the mixing components, given
        * the observed expected counts for one sequence (at one position).
@@ -3353,7 +3306,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         if( mixing_posteriors.size() != num_mixing_components ) {
           mixing_posteriors.resize( num_mixing_components );
         }
-    
+
         uint32_t mixing_component_i;
         if( num_mixing_components == 1 ) {
           mixing_posteriors[ 0 ] = 1.0;
@@ -3388,9 +3341,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           //  cout << "calculateMixingPosteriors: mixing_posteriors[ " << mixing_component_i << " ] is " << mixing_posteriors[ mixing_component_i ] << endl;
           //} // End foreach mixing_component_i
         } // End if num_mixing_components == 1 .. else ..
-    
+
       } // calculateMixingPosteriors( InsertionEmissionParametersType const &, vector<ProbabilityType> & )
-    
+
       /**
        * Add prior pseudocounts to an observed emission count vector (an
        * Entente).  Modified from hmmer's P7PriorifyEmissionVector in prior.c.
@@ -3403,7 +3356,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       {
         // Note that as a side effect, the entente will be normalized (if/when
         // unscaled), unless there is only 1 mixing component.
-  
+
         uint32_t num_mixing_components = this->size();
         if( num_mixing_components == 1 ) {
           // Then we don't have to mix, we just have to add in the prior
@@ -3424,20 +3377,20 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           //cout << "In incorporatePrior(..): unscaled entente before is " << entente << endl;
           entente += prior_counts;
           //cout << "In incorporatePrior(..): unscaled entente after is " << entente << endl;
-    
+
           return;
         } // End if num_mixing_components == 1
-    
+
         // TODO: We could further speed this up by doing everything in
         // ProbabilityType type, and instead of dividing the entente by the scalar,
         // multiply the prior by the scalar.  If it ends up being 0, then just
         // return.  Also, why *is* the entente scalar in scoretype anyway?
-    
+
         // We first need posterior probs P( q | entente ) for each mixture
         // component q.
         vector<ProbabilityType> mixing_posteriors( this->size() );
         calculateMixingPosteriors( entente, mixing_posteriors );
-    
+
         // Incorporate the priors into the entente counts.
         // Sean Eddy's code says "following Sjolander (1996)"
         MatrixValueType xi;
@@ -3506,9 +3459,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           // TODO: REMOVE
           //cout << "[" << i << "] new entente value is " << entente[ Emission::Insertion ][ i ] << endl;
         } // End foreach residue i
-    
+
       } // incorporatePrior( InsertionEmissionParametersType & ) const
-    
+
       /**
        * Calculate and return ln( P( entente | dirichlet ) ) for component
        * mixing_component_i.  Sums up over the different alphabet types.
@@ -3531,9 +3484,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
 
         // Note that we directly access the m_probs members of the
         // MultinomialDistributions, which are public.
-        return calculateLogProbability( entente[ Emission::Insertion ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Emission::Insertion ].m_probs, ( *this )[ mixing_component_i ][ Emission::Insertion ].size() );
+        return DirichletStuff::calculateLogProbability( entente[ Emission::Insertion ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Emission::Insertion ].m_probs, ( *this )[ mixing_component_i ][ Emission::Insertion ].size() );
       } // calculateLogPosterior( InsertionEmissionParametersType const &, uint32_t ) const
-    
+
     }; // End inner class DynamicProgramming::DirichletMixtureInsertionEmissionPrior
 
     template <typename DirichletParameterType>
@@ -3544,20 +3497,20 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
     public:
       /// \todo  Protect access, ensure it sums to 1 (and is non-negative), etc.
       vector<ProbabilityType> m_mixingProbs;
-    
+
       DirichletMixturePositionTransitionPrior () :
         m_mixingProbs()
       {
         // Do nothing else.
       }; // <init>()
-    
+
       DirichletMixturePositionTransitionPrior ( uint32_t length ) :
         vector<PositionTransitionParameters<ResidueType, DirichletParameterType> >( length ),
         m_mixingProbs( length )
       {
         reinitialize( length );
       } // <init>( uint32_t )
-    
+
       /**
        * Reset all to their defaults, and mixing probs to 1/length.
        */
@@ -3572,7 +3525,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         if( m_mixingProbs.size() != length ) {
           m_mixingProbs.resize( length );
         }
-    
+
         if( length > 0 ) {
           uint32_t last_pos = length - 1;
           uint32_t pos_i;
@@ -3582,7 +3535,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           }
         }
       } // reinitialize( uint32_t )
-    
+
       /**
        * Reinitialize with size 1 and set all counts to 1.0.
        */
@@ -3591,7 +3544,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       {
         reinitializeToEven( 1.0 );
       } // reinitializeToLaplace()
-    
+
       /**
        * Reinitialize with size 1 and set all counts to count.
        */
@@ -3612,7 +3565,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           ( *this )[ 0 ][ Transition::fromDeletion ][ i ] = count;
         } // End foreach transition i
       } // reinitializeToEven( DirichletParameterType )
-    
+
       /**
        * Calculate the posterior probabilities of the mixing components, given
        * the observed expected counts for one sequence.
@@ -3628,7 +3581,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         if( mixing_posteriors.size() != num_mixing_components ) {
           mixing_posteriors.resize( num_mixing_components );
         }
-    
+
         uint32_t mixing_component_i;
         if( num_mixing_components == 1 ) {
           mixing_posteriors[ 0 ] = 1.0;
@@ -3644,7 +3597,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               continue; // Don't try to get posterior prob if prior prob is 0.
             }
             log_mixing_posteriors[ mixing_component_i ] =
-              ( 
+              (
                 log( m_mixingProbs[ mixing_component_i ] ) +
                 calculateLogPosterior( entente, mixing_component_i )
               );
@@ -3663,9 +3616,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           //  cout << "calculateMixingPosteriors: mixing_posteriors[ " << mixing_component_i << " ] is " << mixing_posteriors[ mixing_component_i ] << endl;
           //} // End foreach mixing_component_i
         } // End if num_mixing_components == 1 .. else ..
-    
+
       } // calculateMixingPosteriors( PositionTransitionParametersType const &, vector<ProbabilityType> & )
-    
+
       /**
        * Add prior pseudocounts to an observed Position transition count vector
        * (an Entente).  Modified from hmmer's P7PriorifyTransitionVector in
@@ -3697,20 +3650,20 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           //cout << "In incorporatePrior(..): unscaled entente before is " << entente << endl;
           entente += prior_counts;
           //cout << "In incorporatePrior(..): unscaled entente after is " << entente << endl;
-    
+
           return;
         } // End if num_mixing_components == 1
-    
+
         // TODO: We could further speed this up by doing everything in
         // ProbabilityType type, and instead of dividing the entente by the scalar,
         // multiply the prior by the scalar.  If it ends up being 0, then just
         // return.  Also, why *is* the entente scalar in scoretype anyway?
-    
+
         // We first need posterior probs P( q | entente ) for each mixture
         // component q.
         vector<ProbabilityType> mixing_posteriors( this->size() );
         calculateMixingPosteriors( entente, mixing_posteriors );
-    
+
         // Incorporate the priors into the entente counts.
         // Sean Eddy's code says "following Sjolander (1996)"
         MatrixValueType xi;
@@ -3879,9 +3832,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           //cout << "[" << i << "] new Deletion entente value is " << entente[ Transition::fromDeletion ][ i ] << endl;
 
         } // End foreach Deletion transition target i
-    
+
       } // incorporatePrior( PositionTransitionParametersType & ) const
-    
+
       /**
        * Calculate and return ln( P( entente | dirichlet ) ) for component
        * mixing_component_i
@@ -3904,12 +3857,12 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         // Note that we directly access the m_probs members of the
         // MultinomialDistributions, which are public.
         double prod = 0.0; // log( 1.0 );
-        prod += calculateLogProbability( entente[ Transition::fromMatch ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromMatch ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromMatch ].size() );
-        prod += calculateLogProbability( entente[ Transition::fromInsertion ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromInsertion ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromInsertion ].size() );
-        prod += calculateLogProbability( entente[ Transition::fromDeletion ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromDeletion ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromDeletion ].size() );
+        prod += DirichletStuff::calculateLogProbability( entente[ Transition::fromMatch ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromMatch ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromMatch ].size() );
+        prod += DirichletStuff::calculateLogProbability( entente[ Transition::fromInsertion ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromInsertion ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromInsertion ].size() );
+        prod += DirichletStuff::calculateLogProbability( entente[ Transition::fromDeletion ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromDeletion ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromDeletion ].size() );
         return prod;
       } // calculateLogPosterior( PositionTransitionParametersType const &, uint32_t ) const
-    
+
     }; // End inner class DynamicProgramming::DirichletMixturePositionTransitionPrior
 
     template <typename DirichletParameterType>
@@ -3920,13 +3873,13 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
     public:
       // TODO: Protect access, ensure it sums to 1 (and is non-negative), etc.
       vector<ProbabilityType> m_mixingProbs;
-    
+
       DirichletMixturePreAlignPrior () :
         m_mixingProbs()
       {
         // Do nothing else.
       }; // <init>()
-    
+
       DirichletMixturePreAlignPrior (
         uint32_t length
       ) :
@@ -3935,7 +3888,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       {
         reinitialize( length );
       } // <init>( uint32_t )
-    
+
       /**
        * Reset all to their defaults, and mixing probs to 1/length.
        */
@@ -3950,7 +3903,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         if( m_mixingProbs.size() != length ) {
           m_mixingProbs.resize( length );
         }
-    
+
         if( length > 0 ) {
           uint32_t last_pos = length - 1;
           uint32_t pos_i;
@@ -3960,7 +3913,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           }
         }
       } // reinitialize( uint32_t )
-    
+
       /**
        * Reinitialize with size 1 and set all counts to 1.0.
        */
@@ -3969,7 +3922,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       {
         reinitializeToEven( 1.0 );
       } // reinitializeToLaplace()
-    
+
       /**
        * Reinitialize with size 1 and set all counts to count.
        */
@@ -3986,7 +3939,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
 #endif // USE_DEL_IN_DEL_OUT && !USE_SWENTRY_SWEXIT
         ( *this )[ 0 ][ Emission::PreAlignInsertion ] = count;
       } // reinitializeToEven( DirichletParameterType )
-    
+
       /**
        * Calculate the posterior probabilities of the mixing components, given
        * the observed expected counts for one sequence (at one position).
@@ -4002,7 +3955,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         if( mixing_posteriors.size() != num_mixing_components ) {
           mixing_posteriors.resize( num_mixing_components );
         }
-    
+
         uint32_t mixing_component_i;
         if( num_mixing_components == 1 ) {
           mixing_posteriors[ 0 ] = 1.0;
@@ -4037,9 +3990,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           //  cout << "calculateMixingPosteriors: mixing_posteriors[ " << mixing_component_i << " ] is " << mixing_posteriors[ mixing_component_i ] << endl;
           //} // End foreach mixing_component_i
         } // End if num_mixing_components == 1 .. else ..
-    
+
       } // calculateMixingPosteriors( PreAlignParametersType const &, vector<ProbabilityType> & )
-    
+
       /**
        * Add prior pseudocounts to an observed emission count vector (an
        * Entente).  Modified from hmmer's P7PriorifyEmissionVector in prior.c.
@@ -4050,7 +4003,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       {
         // Note that as a side effect, the entente will be normalized (if/when
         // unscaled), unless there is only 1 mixing component.
-  
+
         uint32_t num_mixing_components = this->size();
         if( num_mixing_components == 1 ) {
           // Then we don't have to mix, we just have to add in the prior
@@ -4071,15 +4024,15 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           //cout << "In incorporatePrior(..): unscaled entente before is " << entente << endl;
           entente += prior_counts;
           //cout << "In incorporatePrior(..): unscaled entente after is " << entente << endl;
-    
+
           return;
         } // End if num_mixing_components == 1
-    
+
         // We first need posterior probs P( q | entente ) for each mixture
         // component q.
         vector<ProbabilityType> mixing_posteriors( this->size() );
         calculateMixingPosteriors( entente, mixing_posteriors );
-    
+
         // Incorporate the priors into the entente counts.
         // Sean Eddy's code says "following Sjolander (1996)"
         MatrixValueType xi;
@@ -4306,7 +4259,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         } // End foreach residue i
 #endif // USE_FLANKING_EMISSION_DISTRIBUTIONS
       } // incorporatePrior( PreAlignParametersType & ) const
-    
+
       /**
        * Calculate and return ln( P( entente | dirichlet ) ) for component
        * mixing_component_i.  Sums up over the different alphabet types.
@@ -4330,17 +4283,17 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         // Note that we directly access the m_probs members of the
         // MultinomialDistributions, which are public.
         double prod = 0.0; // log( 1.0 );
-        prod += calculateLogProbability( entente[ Transition::fromPreAlign ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromPreAlign ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromPreAlign ].size() );
-        prod += calculateLogProbability( entente[ Transition::fromBegin ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromBegin ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromBegin ].size() );
+        prod += DirichletStuff::calculateLogProbability( entente[ Transition::fromPreAlign ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromPreAlign ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromPreAlign ].size() );
+        prod += DirichletStuff::calculateLogProbability( entente[ Transition::fromBegin ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromBegin ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromBegin ].size() );
 #if defined( USE_DEL_IN_DEL_OUT ) && !defined( USE_SWENTRY_SWEXIT )
-        prod += calculateLogProbability( entente[ Transition::fromDeletionIn ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromDeletionIn ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromDeletionIn ].size() );
+        prod += DirichletStuff::calculateLogProbability( entente[ Transition::fromDeletionIn ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromDeletionIn ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromDeletionIn ].size() );
 #endif // USE_DEL_IN_DEL_OUT && !USE_SWENTRY_SWEXIT
 #ifdef USE_FLANKING_EMISSION_DISTRIBUTIONS
-        prod += calculateLogProbability( entente[ Emission::PreAlignInsertion ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Emission::PreAlignInsertion ].m_probs, ( *this )[ mixing_component_i ][ Emission::PreAlignInsertion ].size() );
+        prod += DirichletStuff::calculateLogProbability( entente[ Emission::PreAlignInsertion ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Emission::PreAlignInsertion ].m_probs, ( *this )[ mixing_component_i ][ Emission::PreAlignInsertion ].size() );
 #endif // USE_FLANKING_EMISSION_DISTRIBUTIONS
         return prod;
       } // calculateLogPosterior( PreAlignParametersType const &, uint32_t ) const
-    
+
     }; // End inner class DynamicProgramming::DirichletMixturePreAlignPrior
 
     template <typename DirichletParameterType>
@@ -4351,13 +4304,13 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
     public:
       // TODO: Protect access, ensure it sums to 1 (and is non-negative), etc.
       vector<ProbabilityType> m_mixingProbs;
-    
+
       DirichletMixturePostAlignPrior () :
         m_mixingProbs()
       {
         // Do nothing else.
       }; // <init>()
-    
+
       DirichletMixturePostAlignPrior (
         uint32_t length
       ) :
@@ -4366,7 +4319,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       {
         reinitialize( length );
       } // <init>( uint32_t )
-    
+
       /**
        * Reset all to their defaults, and mixing probs to 1/length.
        */
@@ -4381,7 +4334,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         if( m_mixingProbs.size() != length ) {
           m_mixingProbs.resize( length );
         }
-    
+
         if( length > 0 ) {
           uint32_t last_pos = length - 1;
           uint32_t pos_i;
@@ -4391,7 +4344,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           }
         }
       } // reinitialize( uint32_t )
-    
+
       /**
        * Reinitialize with size 1 and set all counts to 1.0.
        */
@@ -4400,7 +4353,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       {
         reinitializeToEven( 1.0 );
       } // reinitializeToLaplace()
-    
+
       /**
        * Reinitialize with size 1 and set all counts to count.
        */
@@ -4420,7 +4373,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
 #endif // USE_DEL_IN_DEL_OUT && !USE_SWENTRY_SWEXIT
         ( *this )[ 0 ][ Emission::PostAlignInsertion ] = count;
       } // reinitializeToEven( DirichletParameterType )
-    
+
       /**
        * Calculate the posterior probabilities of the mixing components, given
        * the observed expected counts for one sequence (at one position).
@@ -4436,7 +4389,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         if( mixing_posteriors.size() != num_mixing_components ) {
           mixing_posteriors.resize( num_mixing_components );
         }
-    
+
         uint32_t mixing_component_i;
         if( num_mixing_components == 1 ) {
           mixing_posteriors[ 0 ] = 1.0;
@@ -4471,9 +4424,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           //  cout << "calculateMixingPosteriors: mixing_posteriors[ " << mixing_component_i << " ] is " << mixing_posteriors[ mixing_component_i ] << endl;
           //} // End foreach mixing_component_i
         } // End if num_mixing_components == 1 .. else ..
-    
+
       } // calculateMixingPosteriors( PostAlignParametersType const &, vector<ProbabilityType> & )
-    
+
       /**
        * Add prior pseudocounts to an observed emission count vector (an
        * Entente).  Modified from hmmer's P7PriorifyEmissionVector in prior.c.
@@ -4486,7 +4439,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       {
         // Note that as a side effect, the entente will be normalized (if/when
         // unscaled), unless there is only 1 mixing component.
-  
+
         uint32_t num_mixing_components = this->size();
         if( num_mixing_components == 1 ) {
           // Then we don't have to mix, we just have to add in the prior
@@ -4507,10 +4460,10 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           //cout << "In incorporatePrior(..): unscaled entente before is " << entente << endl;
           entente += prior_counts;
           //cout << "In incorporatePrior(..): unscaled entente after is " << entente << endl;
-    
+
           return;
         } // End if num_mixing_components == 1
-    
+
         // We first need posterior probs P( q | entente ) for each mixture
         // component q.
         vector<ProbabilityType> mixing_posteriors( this->size() );
@@ -4746,7 +4699,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         } // End foreach residue i
 #endif // USE_FLANKING_EMISSION_DISTRIBUTIONS
       } // incorporatePrior( PostAlignParametersType & ) const
-    
+
       /**
        * Calculate and return ln( P( entente | dirichlet ) ) for component
        * mixing_component_i.  Sums up over the different alphabet types.
@@ -4772,18 +4725,18 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         double prod = 0.0; // log( 1.0 );
 #ifdef USE_END_DISTRIBUTION
         // For now we we never allow loops, so the End distribution is constant.
-        //prod += calculateLogProbability( entente[ Transition::fromEnd ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromEnd ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromEnd ].size() );
+        //prod += DirichletStuff::calculateLogProbability( entente[ Transition::fromEnd ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromEnd ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromEnd ].size() );
 #endif // USE_END_DISTRIBUTION
-        prod += calculateLogProbability( entente[ Transition::fromPostAlign ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromPostAlign ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromPostAlign ].size() );
+        prod += DirichletStuff::calculateLogProbability( entente[ Transition::fromPostAlign ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromPostAlign ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromPostAlign ].size() );
 #if defined( USE_DEL_IN_DEL_OUT ) && !defined( USE_SWENTRY_SWEXIT )
-        prod += calculateLogProbability( entente[ Transition::fromDeletionOut ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromDeletionOut ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromDeletionOut ].size() );
+        prod += DirichletStuff::calculateLogProbability( entente[ Transition::fromDeletionOut ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Transition::fromDeletionOut ].m_probs, ( *this )[ mixing_component_i ][ Transition::fromDeletionOut ].size() );
 #endif // USE_DEL_IN_DEL_OUT && !USE_SWENTRY_SWEXIT
 #ifdef USE_FLANKING_EMISSION_DISTRIBUTIONS
-        prod += calculateLogProbability( entente[ Emission::PostAlignInsertion ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Emission::PostAlignInsertion ].m_probs, ( *this )[ mixing_component_i ][ Emission::PostAlignInsertion ].size() );
+        prod += DirichletStuff::calculateLogProbability( entente[ Emission::PostAlignInsertion ].m_probs, entente_scalar, ( *this )[ mixing_component_i ][ Emission::PostAlignInsertion ].m_probs, ( *this )[ mixing_component_i ][ Emission::PostAlignInsertion ].size() );
 #endif // USE_FLANKING_EMISSION_DISTRIBUTIONS
         return prod;
       } // calculateLogPosterior( PostAlignParametersType const &, uint32_t ) const
-    
+
     }; // End inner class DynamicProgramming::DirichletMixturePostAlignPrior
 
     /**
@@ -5139,7 +5092,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           expected_emission_counts->m_scalar =
             1.0 / products.maximumValue();
           products *= expected_emission_counts->m_scalar;
-            
+
           ( *expected_emission_counts )[ Emission::Match ] =
             products;
           // TODO: REMOVE
@@ -5194,10 +5147,10 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         PositionSpecificParameters<ResidueType, CoefficientsType>::operator=( other_pos );
         m_constant = other_pos.m_constant;
         m_inverseScalar = other_pos.m_inverseScalar;
-  
+
         return *this;
       } // operator=( PositionSpecificSequenceScoreCoefficientsTemplate<AnyCoefficientsType> const& )
-  
+
       /**
        * Multiply each contained "distrubution" value by scalar.
        */
@@ -5206,10 +5159,10 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       {
         PositionSpecificParameters<ResidueType, CoefficientsType>::operator*=( scalar );
         m_constant *= scalar;
-  
+
         return *this;
       } // operator*=( CoefficientsType& )
-  
+
       /**
        * Divide each contained "distrubution" value by denominator.
        */
@@ -5218,10 +5171,10 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       {
         PositionSpecificParameters<ResidueType, CoefficientsType>::operator/=( denominator );
         m_constant /= denominator;
-  
+
         return *this;
       } // operator/=( CoefficientsType& )
-  
+
       /**
        * Calculate and return the Euclidean distance between these coefficients
        * and another vector of coefficients (treating every coefficient as an
@@ -5233,7 +5186,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       ) const {
         return sqrt( euclideanDistanceSquared( other_pos ) );
       } // euclideanDistance( PositionSpecificSequenceScoreCoefficientsTemplate const& other_pos )
-  
+
       /**
        * Calculate and return the square of the Euclidean distance between
        * these coefficients and another vector of coefficients (treating every
@@ -5255,10 +5208,10 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         squared_euclidean_distance +=
           ( ( m_constant - other_pos.m_constant ) *
             ( m_constant - other_pos.m_constant ) );
-            
+
         return squared_euclidean_distance;
       } // euclideanDistanceSquared( PositionSpecificSequenceScoreCoefficientsTemplate const& )
-  
+
       /**
        * Set all values to 0, and the inverseScalar to 1.
        */
@@ -5300,7 +5253,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       } // reinitialize()
 
       void
-      reinitialize ( 
+      reinitialize (
         const uint32_t size
       )
       {
@@ -5331,7 +5284,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       ValueType m_deletionIn;
       ValueType m_deletionOut;
 #endif // ( USE_DEL_IN_DEL_OUT && DISALLOW_FLANKING_TRANSITIONS )
-    
+
     public:
       MatrixCell () :
         m_match( 0 ),
@@ -5345,7 +5298,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       {
         // Do nothing else.
       } // <init>()
-    
+
       MatrixCell ( MatrixCell const & other_cell ) :
         m_match( other_cell.m_match ),
         m_insertion( other_cell.m_insertion ),
@@ -5379,7 +5332,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         //cout << "Match subcell!" << endl;
         return m_match;
       } // operator[] ( dynamicprogramming_Match_subcell_tag const )
-    
+
       ValueType const&
       operator[] ( dynamicprogramming_Match_subcell_tag const ) const
       {
@@ -5387,7 +5340,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         //cout << "Match subcell!" << endl;
         return m_match;
       } // operator[] ( dynamicprogramming_Match_subcell_tag const ) const
-    
+
       ValueType &
       operator[] ( dynamicprogramming_Insertion_subcell_tag const )
       {
@@ -5395,7 +5348,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         //cout << "Insertion subcell!" << endl;
         return m_insertion;
       } // operator[] ( dynamicprogramming_Deletion_subcell_tag const )
-    
+
       ValueType const&
       operator[] ( dynamicprogramming_Insertion_subcell_tag const ) const
       {
@@ -5403,7 +5356,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         //cout << "Insertion subcell!" << endl;
         return m_insertion;
       } // operator[] ( dynamicprogramming_Deletion_subcell_tag const ) const
-    
+
       ValueType &
       operator[] ( dynamicprogramming_Deletion_subcell_tag const )
       {
@@ -5411,7 +5364,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         //cout << "Deletion subcell!" << endl;
         return m_deletion;
       } // operator[] ( dynamicprogramming_Deletion_subcell_tag const )
-    
+
       ValueType const&
       operator[] ( dynamicprogramming_Deletion_subcell_tag const ) const
       {
@@ -5419,7 +5372,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         //cout << "Deletion subcell!" << endl;
         return m_deletion;
       } // operator[] ( dynamicprogramming_Deletion_subcell_tag const ) const
-    
+
 #if defined( USE_DEL_IN_DEL_OUT ) && !defined( DISALLOW_FLANKING_TRANSITIONS )
      ValueType &
      operator[] ( dynamicprogramming_DeletionIn_subcell_tag const )
@@ -5428,7 +5381,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
        //cout << "DeletionIn subcell!" << endl;
        return m_deletionIn;
      } // operator[] ( dynamicprogramming_DeletionIn_subcell_tag const )
-   
+
      ValueType const&
      operator[] ( dynamicprogramming_DeletionIn_subcell_tag const ) const
      {
@@ -5436,7 +5389,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
        //cout << "DeletionIn subcell!" << endl;
        return m_deletionIn;
      } // operator[] ( dynamicprogramming_DeletionIn_subcell_tag const ) const
-   
+
      ValueType &
      operator[] ( dynamicprogramming_DeletionOut_subcell_tag const )
      {
@@ -5444,7 +5397,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
        //cout << "DeletionOut subcell!" << endl;
        return m_deletionOut;
      } // operator[] ( dynamicprogramming_DeletionOut_subcell_tag const )
-   
+
      ValueType const&
      operator[] ( dynamicprogramming_DeletionOut_subcell_tag const ) const
      {
@@ -5473,11 +5426,10 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           // ?!
           cerr << "ERROR: Unrecognized subcell value!" << endl;
           assert( false );
-          exit( 1 );
           return m_deletion; // I have to return *something*..
         }
       } // operator[] ( Subcell const & )
-    
+
       ValueType const &
       operator[] ( Subcell const & subcell ) const
       {
@@ -5496,13 +5448,12 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         } else {
           // ?!
           cerr << "ERROR: Unrecognized subcell value!" << endl;
-          assert( false );
-          exit( 1 );
+          assert( false );  //TAH 2/12 copied from Paul's earlier code
           return m_deletion; // I have to return *something*..
 
         }
       } // operator[] ( Subcell const & ) const
-    
+
       MatrixCell &
       operator+= ( MatrixCell const& other_cell )
       {
@@ -5513,10 +5464,10 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         m_deletionIn += other_cell.m_deletionIn;
         m_deletionOut += other_cell.m_deletionOut;
 #endif // ( USE_DEL_IN_DEL_OUT && DISALLOW_FLANKING_TRANSITIONS )
-    
+
         return *this;
       } // operator+=( MatrixCell const& )
-    
+
       MatrixCell &
       operator*= ( ValueType const& scalar )
       {
@@ -5527,10 +5478,10 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         m_deletionIn *= scalar;
         m_deletionOut *= scalar;
 #endif // ( USE_DEL_IN_DEL_OUT && DISALLOW_FLANKING_TRANSITIONS )
-    
+
         return *this;
       } // operator*=( MatrixCell const& )
-    
+
       MatrixCell &
       operator/= ( ValueType const& denominator )
       {
@@ -5541,10 +5492,10 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         m_deletionIn /= denominator;
         m_deletionOut /= denominator;
 #endif // ( USE_DEL_IN_DEL_OUT && DISALLOW_FLANKING_TRANSITIONS )
-    
+
         return *this;
       } // operator/=( MatrixCell const& )
-    
+
       template<class CharT, class Traits>
       friend std::basic_ostream<CharT,Traits>&
       operator<< (
@@ -5564,7 +5515,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         os << " ]";
         return os;
       } // friend operator<< ( basic_ostream, MatrixCell const & )
-    
+
     }; // End inner class MatrixCell
 
     /**
@@ -5591,7 +5542,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
 //        m_deletionOutFromDeletionOut( false ),
 //        m_deletionOutFromMatch( false )
 //#endif // USE_DEL_IN_DEL_OUT && !USE_SWENTRY_SWEXIT
-    
+
     public:
       BacktraceablePPMatrixCell () :
         MatrixCell<ValueType>(),
@@ -5607,7 +5558,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       {
         // Do nothing else.
       } // <init>()
-    
+
       BacktraceablePPMatrixCell ( BacktraceablePPMatrixCell const & other_cell ) :
         MatrixCell<ValueType>( other_cell ),
         m_matchFromMatch( other_cell.m_matchFromMatch ),
@@ -5670,7 +5621,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         return os;
       } // friend operator<< ( basic_ostream, BacktraceablePPMatrixCell const & )
 
-    }; // End inner class BacktraceablePPMatrixCell    
+    }; // End inner class BacktraceablePPMatrixCell
 
     /**
      * The RabinerScalableMatrix class defines a SequentialAccessContainer to
@@ -5749,7 +5700,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           m_deletionOut( other_row.m_deletionOut )
 #endif // ( USE_DEL_IN_DEL_OUT && DISALLOW_FLANKING_TRANSITIONS )
         {
-          assign( other_row.begin(), other_row.end() );
+          this->assign( other_row.begin(), other_row.end() );
         } // <init>( Row const & )
 
         // Note: this does not reset the Cells to 0...
@@ -5999,7 +5950,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           RowVector const& other_row_vector
         )
         {
-          assign( other_row_vector.begin(), other_row_vector.end() );
+          this->assign( other_row_vector.begin(), other_row_vector.end() );
         } // <init>( RowVector const& )
 
         //RowVector (
@@ -6018,7 +5969,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         //      sequences[ seq_i ].length() + 1
         //    );
         //  }
-        //  
+        //
         //} // <init>( vector<Sequence<SequenceResidueType> > const& )
 
         template <typename SequenceResidueType>
@@ -6042,7 +5993,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               sequences[ seq_i ].length() + 1
             );
           }
-          
+
         } // <init>( vector<Sequence<SequenceResidueType> > const&, uint32_t )
 
         template <typename SequenceResidueType>
@@ -6078,7 +6029,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               columns_needed
             );
           } // End foreach sequence...
-          
+
         } // <init>( vector<Sequence<SequenceResidueType> > const&, uint32_t, uint32_t const & )
 
         //template <typename SequenceResidueType>
@@ -6115,7 +6066,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           if( vector<Row>::size() != sequence_count ) {
             vector<Row>::resize( sequence_count );
           }
-          
+
           // TODO: REMOVE
           //cout << "reInitializing RowVector with " << sequence_count << " elements." << endl;
           uint32_t last_seq = sequence_count - 1;
@@ -6160,7 +6111,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           if( sequence_count == 0 ) {
             return;
           }
-          
+
           // TODO: REMOVE
           //cout << "reInitializing RowVector with " << sequence_count << " elements, all of length " << longest_sequence_length << endl;
           uint32_t last_seq = sequence_count - 1;
@@ -6409,7 +6360,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           ) {
             length = 0;
           }
-          
+
           if( list<RowVector>::size() != length ) {
             list<RowVector>::resize( length );
           }
@@ -6953,7 +6904,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       ) const
       {
         ScoreType score = 1.0;
-        
+
         for( uint32_t seq_i = 0; seq_i < m_sequence_count; seq_i++ ) {
           // TODO: REMOVE
           //cout << "calculateScore: seq_i is " << seq_i << ".  m_sequenceAdvances[ seq_i ] is\n( " << m_sequenceAdvances[ seq_i ][ 0 ];
@@ -7098,7 +7049,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           ) {
             // TODO: REMOVE
             //cout << "Truncating aligment length by the " << m_sequenceAdvances[ m_sequenceOrder[ seq_i ] ][ last_seq_adv_i - 1 ] << " del-outs." << endl;
-            alignment_length -= 
+            alignment_length -=
               m_sequenceAdvances[ m_sequenceOrder[ seq_i ] ][ last_seq_adv_i - 1 ];
             // Also count any other flanking deletions
             for( uint32_t tmp_i = last_seq_adv_i - 2 - m_sequenceAdvances[ m_sequenceOrder[ seq_i ] ][ last_seq_adv_i - 1 ]; tmp_i >= 2 ; tmp_i-- ) {
@@ -7154,7 +7105,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             os << " ";
             os << substring;
             os << endl;
-    
+
             // On bottom is the Sequence line.
             substring =
               instance_strings[ m_sequenceOrder[ seq_i ] ].substr(
@@ -7186,7 +7137,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             // An extra line between blocks:
             os << endl;
           } // End foreach block
-  
+
           os << endl;
           // An extra line between sequences:
           os << endl;
@@ -7328,7 +7279,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           }
         } // End foreach seq_i
         uint32_t max_label_width =
-          max( max_seq_label_width, ref_label_width ); 
+          max( max_seq_label_width, ref_label_width );
 
         uint32_t largest_last_inst_pos = 0;
         for( seq_i = 0; seq_i <= last_seq; seq_i++ ) {
@@ -7421,7 +7372,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                 alignment_i,
                 block_width
               );
-            os << 
+            os <<
               local_seq_labels[ m_sequenceOrder[ seq_i ] ];
             seq_label_width =
               local_seq_labels[ m_sequenceOrder[ seq_i ] ].length();
@@ -7460,7 +7411,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             // An extra line between blocks:
           os << endl;
         } // End foreach block
-  
+
         os << endl;
 
         return os;
@@ -7504,7 +7455,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           seq_adv_i = 0;
 
           while( seq_adv_i <= last_seq_adv_i ) {
-          
+
             // On top is the Profile line.
             os.str( "" ); // Empty the stringstream
             seq_adv_i = 0;
@@ -7552,7 +7503,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               } // End if it's a deletion .. else ..
             } // End foreach seq_adv_i
             reference_strings[ seq_i ] = os.str();
-          
+
             // In the middle is the Alignment line.
             os.str( "" ); // Empty the stringstream
             seq_adv_i = 0;
@@ -7577,10 +7528,10 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               } else {
                 if( seq_adv_i != last_seq_adv_i ) {
                   // A match, with maybe some insertions following.
-                  if(  
+                  if(
                          ( *m_sequences )[ seq_i ][ seq_pos_i ] ==
                          ( *m_profile )[ seq_adv_i - 2 ][ Emission::Match ].maximumValueType()
-                       
+
                   ) {
                     os << "|";
                   } else {
@@ -7598,7 +7549,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               } // End if it's a deletion .. else ..
             } // End foreach seq_adv_i
             alignment_strings[ seq_i ] = os.str();
-          
+
             // On bottom is the Sequence line.
             os.str( "" ); // Empty the stringstream
             seq_adv_i = 0;
@@ -7648,7 +7599,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               } // End if it's a deletion .. else ..
             } // End foreach seq_adv_i
             instance_strings[ seq_i ] = os.str();
-          
+
           } // End while( seq_adv_i < last_seq_adv_i )
 
           // TODO: REMOVE
@@ -7805,12 +7756,12 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             ) {
               os << ".";//" "; //".";
             }
-              
+
             pileup_pos_i += max_sequenceAdvances[ seq_adv_i ];
 
           } // End foreach seq_adv_i
           instance_strings[ seq_i ] = os.str();
-          
+
         } // End foreach sequence
 
         // the reference line.
@@ -7936,7 +7887,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         toGappedSequenceContainer( gsc, seq_labels_ptr );
       } // appendToMSA( MSA &, vector<string> * ) const
 #endif //__HAVE_MUSCLE
-    
+
       /**
        * For conversion between MultipleAlignment objects and anything
        * implementing the GappedSequenceContainer interface.
@@ -7969,10 +7920,12 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         gsc.setNumColumns( alignment_length );
 
         string seq_label_string;
+        std::ostringstream oss;
         for( seq_i = 0; seq_i <= last_seq; seq_i++ ) {
           // Now append it to the GSC.
           if( seq_labels_ptr == NULL ) {
-            seq_label_string = "Sequence " + seq_i;
+            oss << "Sequence " << seq_i;
+            seq_label_string =  oss.str();
           } else {
             seq_label_string = ( *seq_labels_ptr )[ seq_i ];
           }
@@ -7980,7 +7933,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         } // End foreach seq_i
 
       } // toGappedSequenceContainer( GappedSequenceContainer &, vector<string> * ) const
-    
+
     }; // End inner class DynamicProgramming::MultipleAlignment
 
     /**
@@ -8254,7 +8207,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             }
             os << " " << ( ref_i - 1 );
             os << endl;
-  
+
             // In the middle is the Alignment line.
             substring =
               alignment_strings[ m_sequenceOrder[ seq_i ] ].substr(
@@ -8268,7 +8221,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             os << " ";
             os << substring;
             os << endl;
-    
+
             // On bottom is the Sequence line.
             substring =
               instance_strings[ m_sequenceOrder[ seq_i ] ].substr(
@@ -8300,7 +8253,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             // An extra line between blocks:
             os << endl;
           } // End foreach block
-  
+
           os << endl;
 
           // An extra line between sequences:
@@ -8443,7 +8396,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           }
         } // End foreach seq_i
         uint32_t max_label_width =
-          max( max_seq_label_width, ref_label_width ); 
+          max( max_seq_label_width, ref_label_width );
 
         uint32_t largest_last_inst_pos = 0;
         for( seq_i = 0; seq_i <= last_seq; seq_i++ ) {
@@ -8531,7 +8484,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                 alignment_i,
                 block_width
               );
-            os << 
+            os <<
               local_seq_labels[ m_sequenceOrder[ seq_i ] ];
             seq_label_width =
               local_seq_labels[ m_sequenceOrder[ seq_i ] ].length();
@@ -8567,7 +8520,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             // An extra line between blocks:
           os << endl;
         } // End foreach block
-  
+
         os << endl;
 
         return os;
@@ -8613,7 +8566,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           ins_pos_i = 0;
 
           while( ins_pos_i <= last_ins_pos ) {
-          
+
             // On top is the Profile line.
             os.str( "" ); // Empty the stringstream
             ins_pos_i = 0;
@@ -8651,7 +8604,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               pairwise_pos_i += m_insertionsAfterPosition[ seq_i ][ ins_pos_i ];
             } // End foreach ins_pos_i
             reference_strings[ seq_i ] = os.str();
-          
+
             // In the middle is the Alignment line.
             os.str( "" ); // Empty the stringstream
             ins_pos_i = 0;
@@ -8670,7 +8623,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                 os << "v";
               } else {
                 // A match
-                if( 
+                if(
                   ( *m_sequences )[ seq_i ][ seq_pos_i ] ==
                   ( *m_profileTree->getProfileTreeRoot() )[ ins_pos_i - 1 ][ Emission::Match ].maximumValueType()
                 ) {
@@ -8689,7 +8642,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               pairwise_pos_i += m_insertionsAfterPosition[ seq_i ][ ins_pos_i ];
             } // End foreach ins_pos_i
             alignment_strings[ seq_i ] = os.str();
-          
+
             // On bottom is the Sequence line.
             os.str( "" ); // Empty the stringstream
             ins_pos_i = 0;
@@ -8724,7 +8677,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
 
             } // End foreach ins_pos_i
             instance_strings[ seq_i ] = os.str();
-          
+
           } // End while( ins_pos_i < last_ins_pos )
 
           // TODO: REMOVE
@@ -8853,7 +8806,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
 
           } // End foreach ins_pos_i
           instance_strings[ seq_i ] = os.str();
-          
+
         } // End foreach sequence
 
         // the reference line.
@@ -8974,7 +8927,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         toGappedSequenceContainer( gsc, seq_labels_ptr );
       } // appendToMSA( MSA &, vector<string> * ) const
 #endif //__HAVE_MUSCLE
-    
+
     }; // End inner class DynamicProgramming::TreeMultipleAlignment
 
     // Represents the current row, column, and subcell of a random walker
@@ -8987,14 +8940,14 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
 
       SamplerState () :
         column( 0 ),
-        subcell( Match ) 
+        subcell( Match )
       {
         // Do nothing else
       } // <init>()
 
       SamplerState ( SamplerState const & other_state ) :
         column( other_state.column ),
-        subcell( other_state.subcell ) 
+        subcell( other_state.subcell )
       {
         // Do nothing else
       } // <init>( SamplerState const & )
@@ -9500,7 +9453,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         }
         return total;
       } // totalOffDiagonal( uint32_t const &, uint32_t const & )
-      
+
       /**
        * Calculate and return the average of the off-diagonal values of the matrix.
        */
@@ -9845,7 +9798,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       MultipleAlignment<ProfileType, SequenceResidueType> * multiple_alignment
     ) const;
 
-    
+
     /**
      * Given the backward row for row row_i, and the forward row for row_i - 1,
      * calculate the PositionSpecificSequenceScoreCoefficients for position
@@ -10104,7 +10057,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
      * also true, then you *MUST* supply a value for inverse_scalar.  We can't
      * calculate it here.  Likewise when the backward_row is not up-to-date, as
      * happens in ProfileTrainer.hpp.
-     * 
+     *
      * NOTE: If row_i is 0, prev_forward_row is ignored.  If row_i == last_row,
      * next_backward_row is ignored.
      */
@@ -10202,7 +10155,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
      * return value is the (not scaled) sequence score.  Note that the learning
      * rate will *not* be incorporated; the caller is responsible for
      * multiplying the resulting PositionBoltzmannGibbs by the learning
-     * rate afterwards (or equivalently dividing its m_scalar by the learning rate). 
+     * rate afterwards (or equivalently dividing its m_scalar by the learning rate).
      *
      * Don't forget to zero() the PositionBoltzmannGibbs (before calling
      * this for all sequences).  If the inverse_scalar pointer is non-NULL but
@@ -11180,7 +11133,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           backward_row
         );
     } // backward_calculateRow( Parameters const&, Profile const&, Sequence<SequenceResidueType> const&, uint32_t, Row const&, Row & ) const
-        
+
     /**
      * Using the backward row (of the Backward algorithm matrix) for (row_i +
      * 1), calculate the backward row for row_i.  Return the given backward_row
@@ -11241,7 +11194,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       } // End if ( row_i >= 1 ) && ( row_i != last_row )
 
       return
-        backward_calculateRow(
+        backward_calculateRow (
           parameters,
           use_viterbi,
           profile,
@@ -11336,14 +11289,15 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
 //               typename DPProbabilityType,
 //               typename ScoreType,
 //               typename MatrixValueType>
-//   struct profile_traits<typename DynamicProgramming<ResidueType, DPProbabilityType, ScoreType, MatrixValueType>::AlignmentProfile > 
+//   struct profile_traits<typename DynamicProgramming<ResidueType, DPProbabilityType, ScoreType, MatrixValueType>::AlignmentProfile >
 //   {
 //     typedef DPProbabilityType ProbabilityType;
 //   }; // AlignmentProfile profile_traits
 
   //======//// potentially non-inline implementations ////========//
-
   ////// Class galosh::DynamicProgramming::Parameters ////
+
+  // Base Constructor
   template <typename ResidueType,
             typename ProbabilityType,
             typename ScoreType,
@@ -11352,10 +11306,23 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
   DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::Parameters::
       Parameters ()
       {
-        if( DEFAULT_debug >= DEBUG_All ) {
-          cout << "[debug] DynamicProgramming::Parameters::<init>()" << endl;
-        } // End if DEBUG_All
-        resetToDefaults();
+        #ifdef DEBUG
+        cout << "[debug] DynamicProgramming::Parameters::<init>()" << endl;
+        cout << "[debug] using DynamicProgrammingOptions.hpp" << endl;
+        #endif
+        /**
+         *  Describe all options/parameters to the options_description object.  In the main
+         *  routine (whatever it may be) these descriptions will be parsed from the commandline
+         *  and possibly other sources.
+         *    TAH 9/13
+         **/
+         #undef GALOSH_DEF_OPT
+         #define GALOSH_DEF_OPT(NAME,TYPE,DEFAULTVAL,HELP)          \
+         m_galosh_options_description.add_options()(#NAME,po::value<TYPE>(&NAME)->default_value(DEFAULTVAL) TMP_EXTRA_STUFF,HELP)
+         #include "DynamicProgrammingOptions.hpp"  /// define all the commandline options for DynamicProgramming
+
+         // TAH 9/13  This happens when m_galosh_options_map is populated when the main program starts up
+         //resetToDefaults();
       } // <init>()
 
   template <typename ResidueType,
@@ -11425,9 +11392,10 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         AnyParameters const & copy_from
       )
       {
-        useRabinerScaling = copy_from.useRabinerScaling;
-        rabinerScaling_useMaximumValue = copy_from.rabinerScaling_useMaximumValue;
-        matrixRowScaleFactor = copy_from.matrixRowScaleFactor;
+        /// TAH 9/13
+        #undef GALOSH_DEF_OPT
+        #define GALOSH_DEF_OPT(NAME,TYPE,DEFAULTVAL,HELP) NAME = copy_from. NAME
+        #include "DynamicProgrammingOptions.hpp"  /// copy all DynamicProgramming::Parameters members
       } // copyFromNonVirtualDontDelegate( AnyParameters const & )
 
   template <typename ResidueType,
@@ -11452,13 +11420,14 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       resetToDefaults ()
       {
         galosh::Parameters::resetToDefaults();
-        // TODO: Why isn't the compiler finding "debug" in galosh::Parameters?
-        //if( debug >= DEBUG_All ) {
-        //  cout << "[debug] DynamicProgramming::Parameters::resetToDefaults()" << endl;
-        //} // End if DEBUG_All
-        useRabinerScaling = DEFAULT_useRabinerScaling;
-        rabinerScaling_useMaximumValue = DEFAULT_rabinerScaling_useMaximumValue;
-        matrixRowScaleFactor = DEFAULT_matrixRowScaleFactor;
+        if( debug >= DEBUG_All ) {
+           cout << "[debug] DynamicProgramming::Parameters::resetToDefaults()" << endl;
+        } // End if DEBUG_All
+        /// TAH 9/13
+        #undef GALOSH_DEF_OPT
+        #define GALOSH_DEF_OPT(NAME,TYPE,DEFAULTVAL,HELP) NAME = m_galosh_options_map[#NAME].template as<TYPE>()
+        #include "DynamicProgrammingOptions.hpp"  /// reset all Parameters members
+                                                  /// (Dyn Prog and through inheritance tree)
       } // resetToDefaults()
 
   template <typename ResidueType,
@@ -11470,20 +11439,29 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
   void
   DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::Parameters::
       writeParameters (
-        std::basic_ostream<CharT,Traits>& os
+        std::ostream& os
       ) const
       {
         //os << static_cast<galosh::Parameters>( parameters ) << endl;
         galosh::Parameters::writeParameters( os );
         os << endl;
+        //Note: we must comment out [DynamicProgramming] because it means something special to
+        //in configuration files sensu program_options
+        os << "#[DynamicProgramming]" << endl;
+        /**
+         * write out all DynamicProgramming specific parameters in the style of a configuration
+         * file, so that program_options parsers can read it back in
+         *   TAH 9/13
+         **/
+        #undef GALOSH_DEF_OPT
+        #define GALOSH_DEF_OPT(NAME,TYPE,DEFAULTVAL,HELP) os << #NAME << " = " << lexical_cast<string>(NAME) << endl
+        #include "DynamicProgrammingOptions.hpp"  /// write all DynamicProgramming::Parameters members to os
 
-        os << "[DynamicProgramming]" << endl;
-        os << "useRabinerScaling = " << useRabinerScaling << endl;
-        os << "rabinerScaling_useMaximumValue = " << rabinerScaling_useMaximumValue << endl;
-        os << "matrixRowScaleFactor = " << matrixRowScaleFactor << endl;
-      } // writeParameters( basic_ostream & ) const
+      } // writeParameters( ostream & ) const
 
   ////// Class galosh::DynamicProgramming::ParametersModifierTemplate ////
+
+  /// TAH 9/13 \todo figure out if we have to initialize the parameters member to DynProg::Parameters()?
   template <typename ResidueType,
             typename ProbabilityType,
             typename ScoreType,
@@ -11493,9 +11471,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
   DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::ParametersModifierTemplate<ParametersType>::
       ParametersModifierTemplate ()
       {
-        if( DEFAULT_debug >= DEBUG_All ) {
-          cout << "[debug] DynamicProgramming::ParametersModifierTemplate::<init>()" << endl;
-        } // End if DEBUG_All
+        #ifdef DEBUG
+        cout << "[debug] DynamicProgramming::ParametersModifierTemplate::<init>()" << endl;
+        #endif
         isModified_reset();
       } // <init>()
 
@@ -11536,7 +11514,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         copyFromNonVirtual( copy_from );
         return *this;
       } // operator=( AnyParametersModifierTemplate const & )
-    
+
   template <typename ResidueType,
             typename ProbabilityType,
             typename ScoreType,
@@ -11554,7 +11532,6 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           cout << "[debug] DynamicProgramming::ParametersModifierTemplate::copyFromNonVirtual( copy_from )" << endl;
         } // End if DEBUG_All
         isModified_copyFromNonVirtual( copy_from );
-
         base_parameters_modifier_t::parameters.copyFromNonVirtual( copy_from.parameters );
       } // copyFromNonVirtual( AnyParametersModifierTemplate const & )
 
@@ -11571,10 +11548,13 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         AnyParametersModifierTemplate const & copy_from
       )
       {
+        /// Copy all parent isModified_<member>s
         galosh::ParametersModifierTemplate<ParametersType>::isModified_copyFromNonVirtual( copy_from );
-        isModified_useRabinerScaling = copy_from.isModified_useRabinerScaling;
-        isModified_rabinerScaling_useMaximumValue = copy_from.isModified_rabinerScaling_useMaximumValue;
-        isModified_matrixRowScaleFactor = copy_from.isModified_matrixRowScaleFactor;
+        /// TAH 9/13 copy all DynamicProgramming::ParametersModifierTemplate::isModified_<member>s
+        #undef GALOSH_DEF_OPT
+        #define GALOSH_DEF_OPT(NAME,TYPE,DEFAULTVAL,HELP) isModified_##NAME = copy_from.isModified_##NAME
+        #include "DynamicProgrammingOptions.hpp"  // Copy isModified_<member> members
+
       } // isModified_copyFromNonVirtual( AnyParametersModifierTemplate const & )
 
   template <typename ResidueType,
@@ -11602,9 +11582,11 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       isModified_reset ()
       {
         galosh::ParametersModifierTemplate<ParametersType>::isModified_reset();
-        isModified_useRabinerScaling = false;
-        isModified_rabinerScaling_useMaximumValue = false;
-        isModified_matrixRowScaleFactor = false;
+        /// TAH 9/13 set all DynamicProgramming::isModified_<member>s to false
+        #undef GALOSH_DEF_OPT
+        #define GALOSH_DEF_OPT(NAME,TYPE,DEFAULTVAL,HELP) isModified_##NAME = false;
+        #include "DynamicProgrammingOptions.hpp" // Reset DynamicProgramming::ParametersModifierTemplate::isModified_<member>s to false
+
       } // isModified_reset()
 
   template <typename ResidueType,
@@ -11617,24 +11599,23 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
   void
   DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::ParametersModifierTemplate<ParametersType>::
       writeParametersModifier (
-        std::basic_ostream<CharT,Traits>& os
+        std::ostream& os
       ) const
       {
         //galosh::ParametersModifierTemplate<ParametersType>::operator<<( os, parameters_modifier );
         galosh::ParametersModifierTemplate<ParametersType>::writeParametersModifier( os );
         os << endl;
+        /// TAH 9/13 must comment out tags in square braces for program_options config file parser
+        os << "#[DynamicProgramming]" << endl;
+        /**
+         * write out DynamicProgramming::parameters iff they've been modified
+         *   TAH 9/13
+         **/
+        #undef GALOSH_DEF_OPT
+        #define GALOSH_DEF_OPT(NAME,TYPE,DEFAULTVAL,HELP) if( isModified_##NAME ) os << #NAME << " = " << lexical_cast<string>(galosh::ParametersModifierTemplate<ParametersType>::parameters. NAME)
+        #include "DynamicProgrammingOptions.hpp" // write out changed DynamicProgramming parameters
 
-        os << "[DynamicProgramming]" << endl;
-        if( isModified_useRabinerScaling ) {
-          os << "useRabinerScaling = " << base_parameters_modifier_t::parameters.useRabinerScaling << endl;
-        }
-        if( isModified_rabinerScaling_useMaximumValue ) {
-          os << "rabinerScaling_useMaximumValue = " << base_parameters_modifier_t::parameters.rabinerScaling_useMaximumValue << endl;
-        }
-        if( isModified_matrixRowScaleFactor ) {
-          os << "matrixRowScaleFactor = " << base_parameters_modifier_t::parameters.matrixRowScaleFactor << endl;
-        }
-      } // writeParametersModifier ( basic_ostream & ) const
+      } // writeParametersModifier ( ostream & ) const
 
   template <typename ResidueType,
             typename ProbabilityType,
@@ -11648,19 +11629,15 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         applyModifications ( AnyParameters & target_parameters ) const
       {
         galosh::ParametersModifierTemplate<ParametersType>::applyModifications( target_parameters );
+        /**
+         * Set the parameters of a foreign Parameters object to this Parameter object's values
+         * iff they have changed.
+         *    TAH 9/13
+         **/
+        #undef GALOSH_DEF_OPT
+        #define GALOSH_DEF_OPT(NAME,TYPE,DEFAULTVAL,HELP) if( isModified_##NAME ) target_parameters. NAME = this->parameters. NAME
+        #include "DynamicProgrammingOptions.hpp" // copy changed parameters
 
-        if( isModified_useRabinerScaling ) {
-          target_parameters.useRabinerScaling =
-            base_parameters_modifier_t::parameters.useRabinerScaling;
-        }
-        if( isModified_rabinerScaling_useMaximumValue ) {
-          target_parameters.rabinerScaling_useMaximumValue =
-            base_parameters_modifier_t::parameters.rabinerScaling_useMaximumValue;
-        }
-        if( isModified_matrixRowScaleFactor ) {
-          target_parameters.matrixRowScaleFactor =
-            base_parameters_modifier_t::parameters.matrixRowScaleFactor;
-        }
       } // applyModifications( AnyParameters & ) const
 
   ////// Class galosh::DynamicProgramming::AlignmentProfile ////
@@ -12000,7 +11977,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
   {
     return sqrt( euclideanDistanceSquared( other_profile ) );
   } // euclideanDistance( AlignmentProfile const & )
-  
+
       /**
        * Calculate and return the square of the Euclidean distance between this
        * alignment profile and another one (treating every probability as an
@@ -12174,7 +12151,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             other_node[ pos_i ],
             ( weights ? &( *weights )[ pos_i ] : ( AlignmentProfilePosition const * )0 )
         );
-        //ce = 
+        //ce =
         //  vector<Position>::operator[]( pos_i ).crossEntropy(
         //    other_node[ pos_i ],
         //    ( weights ? &( *weights )[ pos_i ] : ( ProfilePosition<double> const * )0 )
@@ -12269,7 +12246,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         subcell = Match;
 #if defined( USE_DEL_IN_DEL_OUT ) && !defined( USE_SWENTRY_SWEXIT )
         // Then maybe we start in the DeletionOut cell.
-        if( 
+        if(
           ( *viterbi_matrices_rev_iter )[ seq_i ].m_deletionOut >
           ( *viterbi_matrices_rev_iter )[ seq_i ][ last_col ][ Match ]
         ) {
@@ -12409,7 +12386,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             // if USE_DEL_IN_DEL_OUT && DISALLOW_FLANKING_TRANSITIONS, then
             // there is an additional source in the previous row when col_i ==
             // 1.
-  
+
             if( col_i != 0 ) {
               highest_previous_subcell = Match;
               highest_previous_subcell_row_i = row_i - 1;
@@ -12780,7 +12757,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             highest_previous_subcell = Match;
             highest_previous_subcell_row_i = row_i - 1;
             highest_previous_subcell_col_i = col_i;
-            if( row_i == 1 ) { 
+            if( row_i == 1 ) {
               highest_previous_subcell_value =
                 profile[
                   Transition::fromPreAlign
@@ -12850,7 +12827,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             } // End if row_i > 1
             // End if subcell == Deletion
           } // End switch subcell...
-  
+
           if( col_i == highest_previous_subcell_col_i ) {
             // Then this was a deletion.
 
@@ -12887,7 +12864,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           row_i = highest_previous_subcell_row_i;
           seq_adv_i = ( row_i + 1 );
         } // End while row_i > 0
-        
+
         if( do_extra_debugging ) {
           cout << "viterbiAlign [seq " << seq_i << "]: " <<
             "row " << row_i << ", col " << col_i << ", seq_adv_i " << seq_adv_i << ", subcell " << subcell << endl;
@@ -13166,10 +13143,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           subcell = Deletion;
         } else {
           // TODO: REMOVE?
-          cerr << "uh-oh: matrix[ " << row_i << " ][ " << col_i << " ].m_matchFrom* false for * in (Match,Insertion,Deletion), yet subcell is Match!" << endl;
+          cout << "uh-oh: matrix[ " << row_i << " ][ " << col_i << " ].m_matchFrom* false for * in (Match,Insertion,Deletion), yet subcell is Match!" << endl;
           // Uh-oh!
           assert( false );
-          exit( 1 );
         }
         row_i -= 1;
         col_i -= 1;
@@ -13184,9 +13160,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         //  assert( false );
         } else {
           // Uh-oh!
-          cerr << "ERROR, oops" << endl;
           assert( false );
-          exit( 1 );
         }
         col_i -= 1;
       } else { // subcell == Deletion
@@ -13195,16 +13169,12 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           subcell = Match;
         } else if( matrix[ row_i ][ col_i ].m_deletionFromInsertion ) {
           // Hrm? We don't allow I->D or D->I transitions..
-          cerr << "ERROR, darn." << endl;
           assert( false );
-          exit( 1 );
         } else if( matrix[ row_i ][ col_i ].m_deletionFromDeletion ) {
           // Still a deletion
         } else {
           // Uh-oh!
-          cerr << "ERROR, shoot." << endl;
           assert( false );
-          exit( 1 );
         }
         row_i -= 1;
       } // End switch current subcell
@@ -13352,7 +13322,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
 
         // And we're done.
         return insertion;
-      } else { // if( row_i == last_row ) .. else 
+      } else { // if( row_i == last_row ) .. else
         // Insertion Opens follow matches.
         insertion = match;
         insertion *=
@@ -13396,9 +13366,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       // Ok, so now we deal with transitions from this state to the next one.
       tmp2 = match;
 
-      match *= 
+      match *=
         profile_a[ Transition::fromMatch ][ TransitionFromMatch::toMatch ];
-      match *= 
+      match *=
         profile_b[ Transition::fromMatch ][ TransitionFromMatch::toMatch ];
       tmp1 = deletion;
       tmp1 *=
@@ -13427,9 +13397,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
     } // End foreach row_i
 
     // We should never reach here, since we return at the post-align state.
-    cerr << "ERROR, yow!" << endl;
     assert( false );
-    exit( 1 );
     return 0;
   } // calculatePathCooccurrenceProbability( Parameters const&, ProfileTypeA const&, ProfileTypeB const& ) const
 
@@ -13690,7 +13658,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           if( sequence_advances != NULL ) {
             ( *sequence_advances )[ 0 ] += 1;
           } // End if sequence_advances != NULL
-        
+
           // We stay in the Match state, but decrement the column...
           target_sampler_state.column -= 1;
         } // End while( target_sampler_state.column > 0 )
@@ -13780,7 +13748,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       // which appears in all three.
       tmp_mvt_insertion_to_match =
         forward_row[ current_sampler_state.column - 1 ][ Insertion ];
-      tmp_mvt_insertion_to_match *= 
+      tmp_mvt_insertion_to_match *=
         profile[
           Transition::fromInsertion
         ][
@@ -14011,7 +13979,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       if( sequence_advances != NULL ) {
         ( *sequence_advances )[ row_i + 2 ] += 1;
       } // End if sequence_advances != NULL
-      
+
       ProbabilityType probability_of_match;
       // This is the prob that the *source* is a Match (we know that the target
       // is a Match).
@@ -14071,13 +14039,13 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       if( current_sampler_state.column == 1 ) {
         // Note that the prob of I->M from col 0 to col 1 is always 0.
         probability_of_insertion = 0;
-      } else { // if current_sampler_state.column == 1 .. else .. 
+      } else { // if current_sampler_state.column == 1 .. else ..
         probability_of_insertion =
           tmp_mvt_insertion_to_match;
         probability_of_insertion /=
           tmp_mvt_gap_to_match;
 
-      } // End if current_sampler_state.column == 1 .. else .. 
+      } // End if current_sampler_state.column == 1 .. else ..
       if( parameters.debug >= DEBUG_All ) {
         cout << "[debug] partialPath: probability_of_insertion (I->M) is " << probability_of_insertion << endl;
       }
@@ -14140,7 +14108,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           // (except in row 0, where it only has a value in the Match subcell),
           // so the prob of I->I from col 0 to col 1 is always 0.
           probability_of_insertion = 0;
-        } else { // if the probability is 0 .. else .. 
+        } else { // if the probability is 0 .. else ..
           probability_of_insertion =
             forward_row[ target_sampler_state.column - 1 ][ Insertion ];
           probability_of_insertion *=
@@ -14157,7 +14125,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             );
           probability_of_insertion /=
             forward_row[ target_sampler_state.column ][ Insertion ];
-        } // End if the probability is 0 .. else .. 
+        } // End if the probability is 0 .. else ..
         if( parameters.debug >= DEBUG_All ) {
           cout << "[debug] partialPath: probability_of_insertion (I->I) is " << probability_of_insertion << endl;
         }
@@ -14242,14 +14210,14 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       Parameters const& parameters,
       ProfileType const& profile,
       vector<Sequence<SequenceResidueType> > const & sequences,
-      uint32_t sequence_count,
+      uint32_t seq_count,
       typename Matrix::SequentialAccessContainer const& forward_matrices,
       Random & random,
       CountsType * counts,
       MultipleAlignment<ProfileType, SequenceResidueType> * multiple_alignment
     ) const
     {
-      sequence_count = ( ( sequence_count == 0 ) ? sequences.size() : min( static_cast<size_t>( sequence_count ), sequences.size() ) );
+      uint32_t sequence_count = ( ( seq_count == 0 ) ? sequences.size() : min( static_cast<size_t>( seq_count ), sequences.size() ) );
 
       if( multiple_alignment != NULL ) {
         multiple_alignment->reinitialize(
@@ -14263,7 +14231,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         counts->reinitialize( profile ); // reset the counts, copying length
                                          // from the profile.
       } // End if counts != NULL, reinitialize it.
-      
+
 
       // Every other time, we must swap which of the SamplerState vectors is
       // current.
@@ -14400,7 +14368,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         if( false && ( parameters.debug >= DEBUG_All ) ) {
           cout << "[debug] coefficients: row " << row_i << ", col " << col_i << endl;
         }
-        
+
         // calculate row cell:
         if( col_i > 0 ) {
           // If not in the leftmost column, then there's base emission(s)
@@ -14417,7 +14385,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         if(
           ( row_i > 0 ) && ( col_i >= 1 )
 #ifdef DISALLOW_FLANKING_TRANSITIONS
-          && ( col_i == 1 ) 
+          && ( col_i == 1 )
 #endif // DISALLOW_FLANKING_TRANSITIONS
         ) {
           path_likelihood =
@@ -15066,7 +15034,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
      * NOTE: If useRabinerScaling is true but rabinerScaling_useMaximumValue is
      * also true, then you *MUST* supply a value for inverse_scalar.  We can't
      * calculate it here.
-     * 
+     *
      * NOTE: If row_i is 0, prev_forward_row is ignored.
      */
     updateGlobalEntenteForSequence (
@@ -15103,9 +15071,8 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       // TODO: Add support for 0-length sequences!  We should be learning
       // something about the deletion rate, at least.
       if( last_col == 0 ) {
-        cerr << "WARNING: 0-length sequences currently are not supported by updateGEFS(..)." << endl;
+        cout << "WARNING: 0-length sequences currently are not supported by updateGEFS(..)." << endl;
         assert( false );
-        exit( 1 );
         return 0;
       }
 
@@ -15157,7 +15124,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         // TODO: REMOVE
         //cout << "rabiner_within_row_correction_factor is " << rabiner_within_row_correction_factor;
         //cout << " (should ==) " <<
-        //  toDouble( ( forward_row.m_rabinerCumulativeInverseScalar * 
+        //  toDouble( ( forward_row.m_rabinerCumulativeInverseScalar *
         //              backward_row.m_rabinerCumulativeInverseScalar ) /
         //    cumulative_inverse_scalar ) << endl;
 
@@ -15167,7 +15134,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         //    toDouble(rabiner_within_row_correction_factor) -
         //    toDouble(
         //      (
-        //        forward_row.m_rabinerCumulativeInverseScalar * 
+        //        forward_row.m_rabinerCumulativeInverseScalar *
         //        backward_row.m_rabinerCumulativeInverseScalar
         //      ) /
         //      cumulative_inverse_scalar
@@ -15200,17 +15167,17 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         typename Matrix::Row unscaled_row = forward_row;
         if( parameters.useRabinerScaling ) {
           unscaled_row *= forward_row.m_rabinerCumulativeInverseScalar;
-          cout << "updateGEFS: rabiner-unscaled forward_row is " << unscaled_row << endl;  
+          cout << "updateGEFS: rabiner-unscaled forward_row is " << unscaled_row << endl;
         }
         unscaled_row /= parameters.matrixRowScaleFactor;
-        cout << "updateGEFS: unscaled forward_row is " << unscaled_row << endl;  
+        cout << "updateGEFS: unscaled forward_row is " << unscaled_row << endl;
         unscaled_row = backward_row;
         if( parameters.useRabinerScaling ) {
           unscaled_row *= backward_row.m_rabinerCumulativeInverseScalar;
           cout << "updateGEFS: rabiner-unscaled backward_row is " << unscaled_row << endl;
         }
         unscaled_row /= parameters.matrixRowScaleFactor;
-        cout << "updateGEFS: unscaled backward_row is " << unscaled_row << endl;  
+        cout << "updateGEFS: unscaled backward_row is " << unscaled_row << endl;
       } // End if( false ) (DEBUGGING)
 
       // TODO: REMOVE
@@ -15221,7 +15188,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         //if( parameters.debug >= DEBUG_All ) {
         //  cout << "[debug] (entente) row " << row_i << ", col " << col_i << endl;
         //}
-        
+
         // calculate row cell:
         if( col_i > 0 ) {
           // If not in the leftmost column, then there's base emission(s)
@@ -15231,14 +15198,14 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
 //              cout << "[debug ] (entente) residue is " << residue << endl;
 //            }
         }
-    
+
 #if defined( USE_DEL_IN_DEL_OUT ) && !defined( USE_SWENTRY_SWEXIT )
         // to/from DeletionIn
         // from DeletionIn to Match
         if(
           ( row_i > 0 ) && ( col_i >= 1 )
 #ifdef DISALLOW_FLANKING_TRANSITIONS // & USE_DEL_IN_DEL_OUT
-          && ( col_i == 1 ) 
+          && ( col_i == 1 )
 #endif // DISALLOW_FLANKING_TRANSITIONS ( & USE_DEL_IN_DEL_OUT )
         ) {
           path_likelihood =
@@ -15275,7 +15242,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           path_likelihood *=
             profile[ row_i - 1 ][ Emission::Match ][ residue ];
 
-          global_entente_update[ 
+          global_entente_update[
             Transition::fromDeletionIn
           ][
             TransitionFromDeletionIn::toMatch
@@ -15972,7 +15939,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           if( calculate_score && ( row_i != last_row ) ) {
             matrix_value_type_score += path_likelihood;
           } // End if calculate_score
-  
+
           // TODO: PUT BACK.. TESTING.
           global_entente_update[
             Transition::fromMatch
@@ -16357,7 +16324,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         //cout << "global_entente_update is " << global_entente_update.createUnscaledCopy() << endl;
 
         global_entente += global_entente_update;
-        
+
         // NOTE: See alternative below
 #ifdef DISALLOW_FLANKING_TRANSITIONS
         global_entente[ Transition::fromPreAlign ] +=
@@ -16625,7 +16592,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
      * also true, then you *MUST* supply a value for inverse_scalar.  We can't
      * calculate it here.  Likewise when the backward_row is not up-to-date, as
      * happens in ProfileTrainer.hpp.
-     * 
+     *
      * NOTE: If row_i is 0, prev_forward_row is ignored, and coefficients will
      * be all 0.  If row_i == last_row, next_backward_row is ignored.
      */
@@ -16679,13 +16646,9 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       // OUT OF row_i.
 
       static const bool do_extra_debugging = false;
-      //bool do_extra_debugging = ( (row_i == 53) && (sequence.length() == 98) && isnan( backward_row[ 0 ][ Match ] ) );
 
       // TODO: REMOVE
-      if( do_extra_debugging ) {
-        cout << "hi 0" << endl;
-        cout << "parameters.useRabinerScaling is " << parameters.useRabinerScaling << endl;
-      }
+      //cout << "hi 0" << endl;
 
       // TODO: REMOVE
       //cout << "hi 1" << endl;
@@ -16757,7 +16720,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       if( rabiner_within_row_correction_factor > 1E10 ) {
         cout << "rabiner_within_row_correction_factor is " << rabiner_within_row_correction_factor << endl;
         cout << "This should be the same as: " <<
-        toDouble( ( forward_row.m_rabinerCumulativeInverseScalar * 
+        toDouble( ( forward_row.m_rabinerCumulativeInverseScalar *
                     backward_row.m_rabinerCumulativeInverseScalar ) /
           cumulative_inverse_scalar ) << endl;
         assert( false );
@@ -16783,26 +16746,26 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
 //      }
 
       // TODO: REMOVE
-      if( do_extra_debugging ) {
-        cout << "calculateAlignmentProfilePosition: prev_forward_row is " << prev_forward_row << endl;
-        cout << "calculateAlignmentProfilePosition: forward_row is " << forward_row << endl;
-        cout << "calculateAlignmentProfilePosition: backward_row is " << backward_row << endl;
-        cout << "calculateAlignmentProfilePosition: next_backward_row is " << next_backward_row << endl;
-        //typename Matrix::Row unscaled_row = forward_row;
-        //if( parameters.useRabinerScaling ) {
-        //  unscaled_row *= forward_row.m_rabinerCumulativeInverseScalar;
-        //  cout << "calculateAlignmentProfilePosition: rabiner-unscaled forward_row is " << unscaled_row << endl;  
-        //}
-        //unscaled_row /= parameters.matrixRowScaleFactor;
-        //cout << "calculateAlignmentProfilePosition: unscaled forward_row is " << unscaled_row << endl;  
-        //unscaled_row = backward_row;
-        //if( parameters.useRabinerScaling ) {
-        //  unscaled_row *= backward_row.m_rabinerCumulativeInverseScalar;
-        //  cout << "calculateAlignmentProfilePosition: rabiner-unscaled backward_row is " << unscaled_row << endl;
-        //}
-        //unscaled_row /= parameters.matrixRowScaleFactor;
-        //cout << "calculateAlignmentProfilePosition: unscaled forward_row is " << unscaled_row << endl;  
-      } // End if( do_extra_debugging )
+//      if( false ) {
+//        cout << "calculateAlignmentProfilePosition: prev_forward_row is " << prev_forward_row << endl;
+//        cout << "calculateAlignmentProfilePosition: forward_row is " << forward_row << endl;
+//        cout << "calculateAlignmentProfilePosition: backward_row is " << backward_row << endl;
+//        cout << "calculateAlignmentProfilePosition: next_backward_row is " << next_backward_row << endl;
+//        //typename Matrix::Row unscaled_row = forward_row;
+//        //if( parameters.useRabinerScaling ) {
+//        //  unscaled_row *= forward_row.m_rabinerCumulativeInverseScalar;
+//        //  cout << "calculateAlignmentProfilePosition: rabiner-unscaled forward_row is " << unscaled_row << endl;
+//        //}
+//        //unscaled_row /= parameters.matrixRowScaleFactor;
+//        //cout << "calculateAlignmentProfilePosition: unscaled forward_row is " << unscaled_row << endl;
+//        //unscaled_row = backward_row;
+//        //if( parameters.useRabinerScaling ) {
+//        //  unscaled_row *= backward_row.m_rabinerCumulativeInverseScalar;
+//        //  cout << "calculateAlignmentProfilePosition: rabiner-unscaled backward_row is " << unscaled_row << endl;
+//        //}
+//        //unscaled_row /= parameters.matrixRowScaleFactor;
+//        //cout << "calculateAlignmentProfilePosition: unscaled forward_row is " << unscaled_row << endl;
+//      } // End if( false ) (DEBUGGING)
 
       // TODO: REMOVE
       //cout << "calculateAlignmentProfilePosition(..): sequence is " << sequence << endl;
@@ -16842,7 +16805,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         if( false && ( parameters.debug >= DEBUG_All ) ) {
           cout << "[debug] calculateAlignmentProfilePosition(..): row " << row_i << ", col " << col_i << endl;
         }
-        
+
         // calculate row cell:
         // If not in the leftmost column, then there's base emission(s)
         // from this cell.
@@ -16866,7 +16829,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         if(
           ( row_i > 0 ) && ( col_i >= 1 )
 #ifdef DISALLOW_FLANKING_TRANSITIONS
-          && ( col_i == 1 ) 
+          && ( col_i == 1 )
 #endif // DISALLOW_FLANKING_TRANSITIONS
         ) {
           path_likelihood =
@@ -17418,7 +17381,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                   sequence,
                   col_i - 2
                 );
-  
+
               tmp_mvt2 *= tmp_mvt;
 
               // TODO: REMOVE
@@ -17429,7 +17392,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               ][
                 TransitionFromPostAlign::toPostAlign
               ] += tmp_mvt2;
-  
+
               pos[ Emission::PostAlignInsertion ][ residue ] +=
                 tmp_mvt2;
             } else { // if col_i > 1 .. else ..
@@ -17444,7 +17407,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               // is what we whould have calculated.  Let's see.
               tmp_mvt2 += path_likelihood;
               //cout << "total C->C: " << tmp_mvt2 << endl;
-              
+
               // Old:
               path_likelihood =
                 backward_row[ col_i ][ Match ];
@@ -17587,12 +17550,12 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           if( path_likelihood >= 1E10 ) {
             cout << "backward_row[ " << col_i << " ][ Insertion ]: " << backward_row[ col_i ][ Insertion ] << endl;
 #if defined( USE_DEL_IN_DEL_OUT ) && !defined( USE_SWENTRY_SWEXIT )
-            cout << "row_match_distribution[ Transition::fromMatch ][ TransitionFromMatch::toInsertion ]: " << 
+            cout << "row_match_distribution[ Transition::fromMatch ][ TransitionFromMatch::toInsertion ]: " <<
             row_match_distribution[
               TransitionFromMatch::toInsertion
             ] << endl;
 #else
-            cout << "profile[ " << row_i << " - 1 ][ Transition::fromMatch ][ TransitionFromMatch::toInsertion ]: " << 
+            cout << "profile[ " << row_i << " - 1 ][ Transition::fromMatch ][ TransitionFromMatch::toInsertion ]: " <<
             profile[ row_i - 1 ][
               Transition::fromMatch
             ][
@@ -17794,7 +17757,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             coefficients->m_constant +=
               path_likelihood;
           } // End if we are calculating coefficients
-  
+
           if( calculate_score && ( row_i != last_row ) ) {
             matrix_value_type_score += path_likelihood;
           } // End if calculate_score
@@ -18022,14 +17985,14 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         ////// OUT OF row_i //////
         if( row_i == last_row ) {
           // Then do nothing.  No "OUT OF" last_row transitions.
-        } else { // if row_i == last_row .. else .. 
+        } else { // if row_i == last_row .. else ..
 #if defined( USE_DEL_IN_DEL_OUT ) && !defined( USE_SWENTRY_SWEXIT )
           // to/from DeletionIn
           // from DeletionIn to Match
           if(
             ( ( row_i + 1 ) > 0 ) && ( ( col_i + 1 ) >= 1 )
 #ifdef DISALLOW_FLANKING_TRANSITIONS
-            && ( ( col_i + 1 ) == 1 ) 
+            && ( ( col_i + 1 ) == 1 )
 #endif // DISALLOW_FLANKING_TRANSITIONS
           ) {
             path_likelihood =
@@ -18299,11 +18262,11 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               //  TransitionFromMatch::toMatch
               //] ) );
             } // end if ( row_i + 1 ) == 1 .. else ..
-            
+
             // from Match to Insertion
             // Not an "OUT OF" transition
           } // End if col_i != last_col
-          
+
           // from Match to Deletion
           if( ( row_i + 1 ) == 1 ) {
             path_likelihood =
@@ -18493,10 +18456,10 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               TransitionFromInsertion::toMatch
             ] += path_likelihood;
           } // End if it's not the first row and not the last col ..
-          
+
           // from Insertion to Insertion: Not an OUT OF transition
           // End from insertion
-          
+
           // from Deletion
           // from Deletion to Match
           if( ( row_i + 1 ) == last_row ) {
@@ -18582,7 +18545,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             tmp_mvt = forward_row[ col_i ][ Deletion ];
             tmp_mvt /= parameters.matrixRowScaleFactor;
             path_likelihood *= tmp_mvt;
-          
+
             pos[
               Transition::fromDeletion
             ][
@@ -18892,7 +18855,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
      * return value is the (not scaled) sequence score.  Note that the learning
      * rate will *not* be incorporated; the caller is responsible for
      * multiplying the resulting PositionBoltzmannGibbs by the learning
-     * rate afterwards (or equivalently dividing its m_scalar by the learning rate). 
+     * rate afterwards (or equivalently dividing its m_scalar by the learning rate).
      *
      * Don't forget to zero() the PositionBoltzmannGibbs (before calling
      * this for all sequences).  If the inverse_scalar pointer is non-NULL but
@@ -18984,7 +18947,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       uint32_t from_seq_i, to_seq_i;
       double distance;
       for( from_seq_i = 0; from_seq_i < num_sequences; from_seq_i++ ) {
-        
+
         // TODO: REMOVE
         //cout << "Position entente for seq " << from_seq_i << " is " << position_ententes[ from_seq_i ] << endl;
 
@@ -19059,13 +19022,13 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             sequences[ internal_node_i ],
             sequences[ internal_node_i ].size(),
             matrices
-          );          
+          );
         // TODO: REMOVE
         //if( use_viterbi ) {
         //  cout << "again, internal node " << internal_node_i << " is " << endl;
         //  cout << profile_tree.getProfileTreeInternalNode( internal_node_i ) << endl;
         //}
-      } // End foreach internal_node .. 
+      } // End foreach internal_node ..
       return score;
     } // forward_score( Parameters const&, bool, ProfileTree const&, vector<SequenceType> const&, SequentialAccessContainer & ) const
 
@@ -20046,7 +20009,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         //if( parameters.debug == DEBUG_Special ) {
         //  cout << "[forward] row " << row_i << ", col " << col_i << endl;
         //}
-        
+
         // calculate row cell:
         forward_row[ col_i ][ Match ] = 0;
         forward_row[ col_i ][ Insertion ] = 0;
@@ -20087,7 +20050,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
 #else
             // TODO: Implement support for USE_SWENTRY_SWEXIT when !DISALLOW_FLANKING_TRANSITIONS
             tmp_new = prev_forward_row[ col_i - 1 ][ DeletionIn ];
-#endif // DISALLOW_FLANKING_TRANSITIONS .. else .. 
+#endif // DISALLOW_FLANKING_TRANSITIONS .. else ..
 #ifndef USE_SWENTRY_SWEXIT
             tmp_new *=
               profile[
@@ -20171,7 +20134,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
 #else
           tmp_new =
             prev_forward_row[ col_i ][ DeletionIn ];
-#endif // DISALLOW_FLANKING_TRANSITIONS .. else .. 
+#endif // DISALLOW_FLANKING_TRANSITIONS .. else ..
           tmp_new *=
             profile[
               Transition::fromDeletionIn
@@ -20187,7 +20150,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         }
 #else
         col_i_deletion_in_new = tmp_new;
-#endif // DISALLOW_FLANKING_TRANSITIONS .. else .. 
+#endif // DISALLOW_FLANKING_TRANSITIONS .. else ..
 #endif // !USE_SWENTRY_SWEXIT
 #endif // USE_DEL_IN_DEL_OUT
 
@@ -20197,7 +20160,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           if( row_i == 0 ) {
             col_i_match_new =
               parameters.matrixRowScaleFactor;
-          }        
+          }
         } else if( row_i == 0 ) { // col_i > 0 && row_i == 0
           // In the top row, we use preAlignInsertions
           tmp_new =
@@ -20254,7 +20217,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             if( do_extra_debugging && ( isnan( col_i_match_new ) || isinf( col_i_match_new ) || ( col_i_match_new < 0 ) ) ) {
               cout << "forward_calculateRow: *1* col_i_match_new has just become " << col_i_match_new << "!  tmp_new is " << tmp_new << ".  row_i = " << row_i << ", col_i = " << col_i << endl;
             }
-            
+
           }
         } else { // col_i > 0, row_i > 0
           if( row_i == last_row ) { // col_i > 0 && row_i == last_row
@@ -20427,7 +20390,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                   TransitionFromMatch::toMatch
                 ]
 #endif // USE_DEL_IN_DEL_OUT && !USE_SWENTRY_SWEXIT .. else ..
-                     ) << " * " << 
+                     ) << " * " <<
              getEmissionProbability(
                profile[ row_i - 1 ],
                sequence,
@@ -20448,7 +20411,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               cout << "profile[ " << ( row_i - 1 ) << " ] is: " <<
                 profile[ row_i - 1 ] << endl;
             }
-            
+
           }
         } // End if col_i == 0, elsif row_i == 0, else ..
         // from Match to Insertion
@@ -20503,7 +20466,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                   TransitionFromMatch::toInsertion
                 ] <<
 #endif // USE_DEL_IN_DEL_OUT && !USE_SWENTRY_SWEXIT .. else ..
-                " * " << 
+                " * " <<
                 getInsertionEmissionProbability(
                   profile[ row_i - 1 ],
                   sequence,
@@ -20596,7 +20559,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               if( do_extra_debugging && ( isnan( col_i_match_new ) || isinf( col_i_match_new ) || ( col_i_match_new < 0 ) ) ) {
                 cout << "forward_calculateRow: *4* col_i_match_new has just become " << col_i_match_new << "!  tmp_new is " << tmp_new << ".  row_i = " << row_i << ", col_i = " << col_i << endl;
               }
-            
+
             }
           } else {
 #if defined( USE_DEL_IN_DEL_OUT ) && !defined( USE_SWENTRY_SWEXIT )
@@ -20637,7 +20600,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                     TransitionFromMatch::toDeletion
                   ] <<
 #endif // USE_DEL_IN_DEL_OUT && !USE_SWENTRY_SWEXIT .. else ..
-                  " * " << 
+                  " * " <<
                   prev_forward_row[ col_i ][ Match ] << " ) " << endl;
               }
             }
@@ -20796,13 +20759,13 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                   Transition::fromInsertion
                   ][
                   TransitionFromInsertion::toMatch
-                  ] << " * " << 
+                  ] << " * " <<
                 getEmissionProbability(
                   profile[ row_i - 1 ],
                   sequence,
                   col_i - 1
                 ) << " ) * ( ( ( row_i == last_row ) = " <<
-                ( row_i == last_row ) << " ) ? ( " << 
+                ( row_i == last_row ) << " ) ? ( " <<
 #ifdef USE_END_DISTRIBUTION
                    profile[
                       Transition::fromEnd
@@ -20817,7 +20780,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                    << " ) : " <<
                 prev_forward_row[ col_i - 1 ][ Insertion ] << " ) )" << endl;
             }
-            
+
           }
         } // End if it's not the first or second row and not the first col ..
         // from Insertion to Insertion
@@ -20913,7 +20876,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             if( do_extra_debugging && ( isnan( col_i_match_new ) || isinf( col_i_match_new ) || ( col_i_match_new < 0 ) ) ) {
               cout << "forward_calculateRow: *6* col_i_match_new has just become " << col_i_match_new << "!  tmp_new is " << tmp_new << ".  row_i = " << row_i << ", col_i = " << col_i << endl;
             }
-            
+
           }
         } // End if it's the last row..
         if( ( col_i != 0 ) &&
@@ -20973,7 +20936,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                  col_i - 1
                ) << " ) * " <<
                 " ( ( row_i == last_row ) = " << ( row_i == last_row ) << " ? ( ( "
-                   << 
+                   <<
 #ifdef USE_END_DISTRIBUTION
                 profile[
                      Transition::fromEnd
@@ -20988,7 +20951,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                 " ) : " <<
                 prev_forward_row[ col_i - 1 ][ Deletion ] << " ) )" << endl;
             }
-            
+
           }
         } // End if it's not the first or second row and not the first col..
         // from Deletion to Deletion
@@ -21153,8 +21116,8 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
 
           // TODO: REMOVE
           if( do_extra_debugging && isnan( rabiner_inverse_scalar_mvt ) ) {
-            cout << "in forward_calculateRow: rabiner_inverse_scalar_mvt is nan after setting it to ( " << 
-              forward_row[ last_col ][ Match ] << " * " << 
+            cout << "in forward_calculateRow: rabiner_inverse_scalar_mvt is nan after setting it to ( " <<
+              forward_row[ last_col ][ Match ] << " * " <<
              profile[
                 Transition::fromPostAlign
               ][
@@ -21164,8 +21127,8 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           }
           // TODO: REMOVE
           if( do_extra_debugging && ( rabiner_inverse_scalar_mvt == 0 ) ) {
-            cout << "in forward_calculateRow: rabiner_inverse_scalar_mvt is 0 after setting it to ( " << 
-              forward_row[ last_col ][ Match ] << " * " << 
+            cout << "in forward_calculateRow: rabiner_inverse_scalar_mvt is 0 after setting it to ( " <<
+              forward_row[ last_col ][ Match ] << " * " <<
               (
                 profile[
                   Transition::fromPostAlign
@@ -21288,9 +21251,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
     {
 #if defined( USE_DEL_IN_DEL_OUT) && !defined( DISALLOW_FLANKING_TRANSITIONS )
       // Not implemented!
-      cerr << "ERROR: forward_reverseCalculateRow(..) is not implemented for teh case of USE_DEL_IN_DEL_OUT but not DISALLOW_FLANKING_TRANSITIONS" << endl;
       assert( false && "forward_reverseCalculateRow(..) is not implemented for teh case of USE_DEL_IN_DEL_OUT but not DISALLOW_FLANKING_TRANSITIONS" );
-      exit( 1 );
 #endif // USE_DEL_IN_DEL_OUT && !DISALLOW_FLANKING_TRANSITIONS
 
       static const bool do_extra_debugging = false;
@@ -21375,7 +21336,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         //if( parameters.debug == DEBUG_Special ) {
         //  cout << "[forward] row " << row_i << ", col " << col_i << endl;
         //}
-        
+
         // Match
         // wrt Match cell in row_i + 1, col_i + 1
         if( col_i == 0 ) {
@@ -21576,7 +21537,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               cerr << "Warning in reverseCalculateRow at "  << __LINE__ << ": tmp_ItoI is " << tmp_ItoI << endl;
             }
           } // End if col_i > 1
-  
+
           tmp_new_2 =
             tmp_DtoM;
 #if defined( USE_DEL_IN_DEL_OUT ) && !defined( USE_SWENTRY_SWEXIT )
@@ -22016,11 +21977,6 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
     ) const
     {
       static const bool do_extra_debugging = false;
-      //bool do_extra_debugging = ( ( row_i == 53 ) && ( sequence == seqan::String<seqan::Dna>( "GGGCCAGAATACACGTTATTTTCTTAGTCTGGCACGCTCACTGTCCCACAGCCGTTCCCCTAAGCATGTATAACCAGGCTGAAATCAGGCTTCAAGGT" ) ) );
-      if( do_extra_debugging ) {
-        cout << "yo from backward_calculateRow()!!!" << endl;
-        cout << "profile[ row_i ] is " << profile[ row_i ] << endl;
-      }
       static const bool be_extra_verbose = false;
       // Note we would normally use the rabinerInverseScalar from the
       // corresponding forward row, set ahead of time, but since the actual
@@ -22076,8 +22032,8 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       register uint32_t col_i = last_col;
       MatrixValueType col_i_new, tmp_new;
       while( !done ) {
-    
-        if( do_extra_debugging || ( parameters.debug >= DEBUG_All ) ) {
+
+        if( false && ( parameters.debug >= DEBUG_All ) ) {
           cout << "[backward] row " << row_i << ", col " << col_i << endl;
         }
 
@@ -22157,7 +22113,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
 #else
         backward_row[ col_i ][ DeletionIn ] = col_i_new;
 #endif // DISALLOW_FLANKING_TRANSITIONS .. else ..
-        
+
         // From DeletionOut
         col_i_new = 0;
         if( ( col_i == 0 ) || ( row_i == 0 ) ) {
@@ -22300,7 +22256,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           }
           continue;
         } // end if col_i > 0 .. else if row_i == last_row ..
-    
+
         // from Match
         col_i_new = 0;
         tmp_new = 0;
@@ -22326,10 +22282,6 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                // the Insertion cell.
               backward_row[ col_i + 1 ][ Match ];
 
-           if( do_extra_debugging && isnan( tmp_new ) ) {
-             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Match will become nan! Match to Match, bottom row is nan" << endl;
-             exit( 1 );
-           }
             if( use_viterbi ) {
               if( tmp_new > col_i_new ) {
                 col_i_new = tmp_new;
@@ -22355,7 +22307,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               //    ][
               //      TransitionFromPostAlign::toPostAlign
               //    ] << endl;
-              //  tmp_new = 
+              //  tmp_new =
               //    getPostAlignEmissionProbability(
               //      profile,
               //      sequence,
@@ -22423,10 +22375,6 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                   // the Insertion cell.
                 backward_row[ col_i + 1 ][ Match ];
 
-           if( do_extra_debugging && isnan( tmp_new ) ) {
-             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Match will become nan! Match to Match, top row is nan" << endl;
-             exit( 1 );
-           }
               if( use_viterbi ) {
                 if( tmp_new > col_i_new ) {
                   col_i_new = tmp_new;
@@ -22443,20 +22391,12 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                 ][
                   TransitionFromPreAlign::toBegin
                 ];
-           if( do_extra_debugging && isnan( tmp_new ) ) {
-             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Match will become nan! Match to Match (-5) is nan" << endl;
-             exit( 1 );
-           }
               tmp_new *=
                 profile[
                   Transition::fromBegin
                 ][
                   TransitionFromBegin::toMatch
                 ];
-           if( do_extra_debugging && isnan( tmp_new ) ) {
-             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Match will become nan! Match to Match (-4) is nan" << endl;
-             exit( 1 );
-           }
             } else { // row_i > 0
 #if defined( USE_DEL_IN_DEL_OUT ) && !defined( USE_SWENTRY_SWEXIT )
               tmp_new =
@@ -22471,10 +22411,6 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                   TransitionFromMatch::toMatch
                 ];
 #endif // USE_DEL_IN_DEL_OUT && !USE_SWENTRY_SWEXIT .. else ..
-           if( do_extra_debugging && isnan( tmp_new ) ) {
-             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Match will become nan! Match to Match (-3) is nan" << endl;
-             exit( 1 );
-           }
             }
             tmp_new *=
               getEmissionProbability(
@@ -22482,17 +22418,6 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                 sequence,
                 col_i
               );
-           if( do_extra_debugging && isnan( tmp_new ) ) {
-             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Match will become nan! Match to Match (-2) is nan" << endl;
-             cout << "profile[ row_i ] is " << profile[ row_i ] << endl;
-             cout << "getEmissionProbability(..) returns  " << 
-              getEmissionProbability(
-                profile[ row_i ],
-                sequence,
-                col_i
-                                     ) << endl;
-             exit( 1 );
-           }
 #ifdef USE_END_DISTRIBUTION
             if( row_i == ( last_row - 1 ) ) {
               tmp_new *=
@@ -22501,19 +22426,11 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                 ][
                   TransitionFromEnd::toPostAlign
                 ];
-           if( do_extra_debugging && isnan( tmp_new ) ) {
-             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Match will become nan! Match to Match (-1) is nan" << endl;
-             exit( 1 );
-           }
             }
 #endif // USE_END_DISTRIBUTION
             tmp_new *=
               next_backward_row[ col_i + 1 ][ Match ];
 
-           if( do_extra_debugging && isnan( tmp_new ) ) {
-             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Match will become nan! Match to Match is nan" << endl;
-             exit( 1 );
-           }
             if( use_viterbi ) {
               if( tmp_new > col_i_new ) {
                 col_i_new = tmp_new;
@@ -22522,7 +22439,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               col_i_new += tmp_new;
             }
           } // End if this is the first row .. elsif the last row .. else ..
-        } // End if this is not the last column .. 
+        } // End if this is not the last column ..
         // from Match to Insertion
         if( ( col_i != last_col ) &&
             ( row_i != 0 ) &&
@@ -22549,10 +22466,6 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           tmp_new *=
             backward_row[ col_i + 1 ][ Insertion ];
 
-           if( do_extra_debugging && isnan( tmp_new ) ) {
-             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Match will become nan! Match to Insertion is nan" << endl;
-             exit( 1 );
-           }
           if( use_viterbi ) {
             if( tmp_new > col_i_new ) {
               col_i_new = tmp_new;
@@ -22600,7 +22513,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                 TransitionFromMatch::toDeletion
               ];
 #endif // USE_DEL_IN_DEL_OUT && !USE_SWENTRY_SWEXIT .. else ..
-            
+
             // We store the postAlignInsertion stuff in the Match state.
             if( row_i == ( last_row - 1 ) ) {
 #ifdef USE_END_DISTRIBUTION
@@ -22618,10 +22531,6 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                 next_backward_row[ col_i ][ Deletion ];
             }
 
-           if( do_extra_debugging && isnan( tmp_new ) ) {
-             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Match will become nan! Match to Deletion is nan" << endl;
-             exit( 1 );
-           }
             if( use_viterbi ) {
               if( tmp_new > col_i_new ) {
                 col_i_new = tmp_new;
@@ -22707,11 +22616,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
 #else
           tmp_new *= next_backward_row[ col_i ][ DeletionOut ];
 #endif // DISALLOW_FLANKING_TRANSITIONS .. else ..
-          
-           if( do_extra_debugging && isnan( tmp_new ) ) {
-             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Match will become nan! Match to deletionOut is nan" << endl;
-             exit( 1 );
-           }
+
           if( use_viterbi ) {
             if( tmp_new > col_i_new ) {
               col_i_new = tmp_new;
@@ -22723,11 +22628,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
 #endif // USE_DEL_IN_DEL_OUT && !USE_SWENTRY_SWEXIT
         // End from Match
         backward_row[ col_i ][ Match ] = col_i_new;
-    
-           if( do_extra_debugging && isnan( col_i_new ) ) {
-             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Match is nan!" << endl;
-             exit( 1 );
-           }
+
         // from Insertion
         col_i_new = 0;
         tmp_new = 0;
@@ -22735,7 +22636,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           // In the top row we use preAlignInsertions, which are not affine, so we
           // store the values in the Match cell instead of the Insertion cell.
           // Same with the bottom row, where we use postAlignInsertions.
-    
+
           // (So do nothing else.)
         } else {
           // from Insertion to Match
@@ -22801,13 +22702,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         } // End if this is the topmost or bottommost row, else ..
         // End from insertion
         backward_row[ col_i ][ Insertion ] = col_i_new;
-    
-           if( do_extra_debugging && isnan( col_i_new ) ) {
-             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Insertion is nan!" << endl;
-             cout << "\tMatch is " << backward_row[ col_i ][ Match ] << endl;
-             cout << "\tInsertion is " << backward_row[ col_i ][ Insertion ] << endl;
-             cout << "\tDeletion is " << backward_row[ col_i ][ Deletion ] << endl;
-           }
+
         // from Deletion
         col_i_new = 0;
         tmp_new = 0;
@@ -22884,13 +22779,6 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         } // End if it's neither the first nor the last row
         // End from Deletion
         backward_row[ col_i ][ Deletion ] = col_i_new;
-    
-           if( do_extra_debugging && isnan( col_i_new ) ) {
-             cout << "in backward_calculateRow (row_i = " << row_i << ", col_i = " << col_i << "): Deletion is nan!" << endl;
-             cout << "\tMatch is " << backward_row[ col_i ][ Match ] << endl;
-             cout << "\tInsertion is " << backward_row[ col_i ][ Insertion ] << endl;
-             cout << "\tDeletion is " << backward_row[ col_i ][ Deletion ] << endl;
-           }
 
         if(
           use_rabiner_scaling &&
@@ -23085,7 +22973,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
     ) const
     {
       // TODO: PUT BACK.
-      DebugLevel debug = parameters.debug;
+      DebugLevel debug = static_cast<DebugLevel>(parameters.debug);
       // TODO: REMOVE.
       //DebugLevel debug = DEBUG_All;
 
@@ -23120,8 +23008,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         sequence_advances[ 0 ] += 1;
         // Emit from the preAlignInsertion distribution
         residue = profile[ Emission::PreAlignInsertion ].draw( random );
-        //seqan::fill( sequence, ( sequence.length() + 1 ), residue );
-        seqan::append( sequence, residue );
+        seqan::resize(sequence, ( sequence.length() + 1 ), residue); //TAH 10/13 changed fill to resize for seqan v1.4
         current_transition =
           profile[ Transition::fromPreAlign ].draw( random );
       } // End while we continue to insert from the preAlign distribution
@@ -23153,7 +23040,6 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         // ?!
         cerr << "ERROR! current_transition is " << current_transition << ", which is unrecognized!" << endl;
         assert( false );
-        exit( 1 );
       }
 
       pos_i = 0;
@@ -23189,8 +23075,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           // Count one for the pos.
           sequence_advances[ seq_adv_i ] = 1;
           residue = profile[ pos_i ][ Emission::Match ].draw( random );
-          //seqan::fill( sequence, ( sequence.length() + 1 ), residue );
-          seqan::append( sequence, residue );
+          seqan::resize( sequence, ( sequence.length() + 1 ), residue); //TAH 10/13 changed fill to resize
           if( pos_i < ( profile_length - 1 ) ) {
             // Now see about transitioning..
 #if defined( USE_DEL_IN_DEL_OUT ) && !defined( USE_SWENTRY_SWEXIT )
@@ -23237,7 +23122,6 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               // ?!
               cerr << "ERROR! current_transition is " << current_transition << ", which is unrecognized!" << endl;
               assert( false );
-              exit( 1 );
             }
 #if defined( USE_DEL_IN_DEL_OUT ) && !defined( USE_SWENTRY_SWEXIT )
             if( current_substate.isDeletionOut() ) {
@@ -23252,8 +23136,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               sequence_advances[ seq_adv_i ]++;
               // Emit from the insertion distribution
               residue = profile[ pos_i ][ Emission::Insertion ].draw( random );
-              //seqan::fill( sequence, ( sequence.length() + 1 ), residue );
-              seqan::append( sequence, residue );
+              seqan::resize( sequence, ( sequence.length() + 1 ), residue ); //TAH 10/13 changed fill to resize
               current_transition =
                 profile[ pos_i ][ Transition::fromInsertion ].draw( random );
               if( current_transition == TransitionFromInsertion::toMatch ) {
@@ -23301,7 +23184,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       // it.
       //current_transition =
       //  profile[ Transition::fromEnd ].draw( random );
-      
+
       if( debug >= DEBUG_All ) {
         cout << "[drawSequence] current_transition == " << TransitionFromEnd::toPostAlign << endl;
       } // End if debug >= DEBUG_All
@@ -23318,8 +23201,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         sequence_advances[ last_seq_adv_i ]++;
         // Emit from the postAlignInsertion distribution
         residue = profile[ Emission::PostAlignInsertion ].draw( random );
-        //seqan::fill( sequence, ( sequence.length() + 1 ), residue );
-        seqan::append( sequence, residue );
+        seqan::resize( sequence, ( sequence.length() + 1 ), residue ); //TAH 10/13 changed fill to resize
         current_transition =
           profile[ Transition::fromPostAlign ].draw( random );
       } // End while we continue to insert from the postAlign distribution
@@ -23480,7 +23362,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               } // End if there's a problem.. (testing/debugging)
             }
           } // End if it's a leaf. (debugging)
-        
+
           // Do profile-profile alignment between the two profiles
           profileProfile_align_SKL(
             parameters,
@@ -23677,7 +23559,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
                   multiple_alignment.m_insertionsAfterPosition[ ( *multiple_alignment.m_sequenceIndices )[ node_i ][ seq_i ] ][ root_index_maps[ node_i_parent ][ parent_pos_i ] ] = 0;
                 } else {
                   multiple_alignment.m_matchIndicators[ ( *multiple_alignment.m_sequenceIndices )[ node_i ][ seq_i ] ][ root_index_maps[ node_i_parent ][ parent_pos_i ] - 1 ] = true;
-  
+
                   // Ok, but maybe there's also insertions.
                   if( profile_profile_alignments[ node_i - 1 ][ parent_pos_i ] > 1 ) {
                     for( seq_i = 0; seq_i < ( *multiple_alignment.m_sequenceIndices )[ node_i ].size(); seq_i++ ) {
@@ -23752,7 +23634,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           } // End if be_extra_verbose
         } // End if this is an internal node .. else ..
       } while( true ); // We break when done.
- 
+
       return;
     } // alignLeaves( Parameters const &, ProfileTreeType const &, MultipleAlignment & )
 
@@ -23789,7 +23671,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           }
 
           AlignmentProfileAccessor(int nseq) : m_orig_nseq(nseq)
-          {}     
+          {}
 
           typedef ResidueType APAResidueType;
           /**
@@ -23923,7 +23805,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
            fromFile (
     	      std::istream & is,
               AlignmentProfileAccessor<ResidueType, ProbabilityType, ScoreType, MatrixValueType> & prof
-           ) 
+           )
            {
               is >> prof;
               return true;

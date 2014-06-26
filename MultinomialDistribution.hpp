@@ -62,7 +62,8 @@ using std::numeric_limits;
 #include <boost/lexical_cast.hpp>   ///TAH 2/12
 
 #include <seqan/basic.h>
-//#include "Algebra.hpp"
+#include "Algebra.hpp"
+
 //#include <seqan/sequence.h>
 using seqan::ordValue;
 
@@ -680,8 +681,8 @@ namespace galosh {
       for( uint32_t i = 0; i < m_elementCount; i++ ) {
         expected_distances[ i ] = 0.0;
         for( j = 0; j < m_elementCount; j++ ) {
-          dist = toDouble( ( *this )[ j ] );
-          dist *= toDouble( distance_matrix[ i ][ j ] );
+          dist = std::toDouble( ( *this )[ j ] );
+          dist *= std::toDouble( distance_matrix[ i ][ j ] );
           expected_distances[ i ] += dist;
         }
       }
@@ -721,7 +722,7 @@ namespace galosh {
     {
       double total = 0.0;
       for( uint32_t i = 0; i < m_elementCount; i++ ) {
-        total += ( values[ i ] * toDouble( ( *this )[ i ] ) );
+        total += ( values[ i ] * std::toDouble( ( *this )[ i ] ) );
       }
       return total;
     } // calculateExpectedValue( MultinomialDistribution<ValueType, double> const & ) const
@@ -1560,9 +1561,9 @@ namespace galosh {
       register double tmp_dist;
       for( uint32_t i = 0; i < ( m_elementCount - 1 ); i++ ) {
         if( m_probs[ i ] > another_dist.m_probs[ i ] ) {
-          tmp_dist = toDouble( m_probs[ i ] - another_dist.m_probs[ i ] );
+          tmp_dist = std::toDouble( m_probs[ i ] - another_dist.m_probs[ i ] );
         } else {
-          tmp_dist = toDouble( another_dist.m_probs[ i ] - m_probs[ i ] );
+          tmp_dist = std::toDouble( another_dist.m_probs[ i ] - m_probs[ i ] );
         }
         squared_euclidean_distance +=
           ( tmp_dist * tmp_dist );
@@ -1622,7 +1623,7 @@ namespace galosh {
       double gammas[ m_elementCount ];
       double sum_of_gammas = 0.0;
       for( uint32_t i = 0; i < m_elementCount; i++ ) {
-        gammas[ i ] = random.nextGamma( toDouble( counts[ i ] ) );
+        gammas[ i ] = random.nextGamma( std::toDouble( counts[ i ] ) );
         sum_of_gammas += gammas[ i ];
       }
       for( uint32_t i = 0; i < m_elementCount; i++ ) {
@@ -1664,7 +1665,7 @@ namespace galosh {
     {
       register double d;
       for( uint32_t i = 0; i < m_elementCount; i++ ) {
-        d = toDouble( m_probs[ i ] );
+        d = std::toDouble( m_probs[ i ] );
         if( d == 0 ) {
           d = numeric_limits<double>::min();
         }
@@ -1688,7 +1689,7 @@ namespace galosh {
       from_dist *= temperature;
       for( uint32_t i = 0; i < m_elementCount; i++ ) {
         m_probs[ i ] =
-          exp( toDouble( from_dist.m_probs[ i ] ) );
+          exp( std::toDouble( from_dist.m_probs[ i ] ) );
         if( isinf( m_probs[ i ] ) ) {
           m_probs[ i ] = 1.0;
         }

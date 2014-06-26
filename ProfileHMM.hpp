@@ -45,7 +45,10 @@
 
 #include <seqan/basic.h>
 
+typedef unsigned char __uint8;  ///TAH 9/13
+
 namespace galosh {
+
 
 /* ///////////////////////////////////////////////////////////////////////////// */
 
