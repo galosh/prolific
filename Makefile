@@ -15,7 +15,7 @@
 
 #========================================
 ### For Seqan support (required):
-SEQAN_CFLAGS 	= -I./seqan
+SEQAN_CFLAGS 	=  -I./seqan-trunk/core/include -I./seqan-trunk/extras/include
 SEQAN_LDFLAGS 	=
 SEQAN_LIBS	=
 
