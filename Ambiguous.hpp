@@ -42,7 +42,6 @@
 
 #include <seqan/basic.h>
 #include <seqan/sequence.h> // for ordValue
-
 #include "Prolific.hpp"
 #include "AminoAcid20.hpp"
 

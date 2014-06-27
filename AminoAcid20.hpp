@@ -37,7 +37,6 @@
 #define __GALOSH_AMINOACID20_HPP__
 
 #include <seqan/basic.h>
-
 #include "Prolific.hpp"
 
 namespace seqan {
