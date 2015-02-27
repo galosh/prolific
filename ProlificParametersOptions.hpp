@@ -27,30 +27,30 @@
        * reducing the number of possible combinations (since deletions and
        * insertions will go in lock step).
        */
-GALOSH_DEF_OPT(useDeletionsForInsertionsParameter,bool,true,"Lock the indel parameters of the true profile to be the same for insertions and deletions");
+GALOSH_DEF_OPT(useDeletionsForInsertionsParameters,bool,true,"Lock the indel parameters of the true profile to be the same for insertions and deletions");
 
       /**
        * The deletionExtension value of the true profile will be the minimum of
-       * ( 1.0 / ( expectedDeletionLengthAsProfileLengthFraction *
+       * ( 1.0 / ( expectedDeletionLengthAsProfileLengthFractions *
        * profileLength ) ) and ( 1.0 / minExpectedDeletionLength ).  If
        * useDeletionsForInsertionsParameters is true, the insertionExtension
        * value of the true profile will also be the minimum of ( 1.0 / (
-       * expectedDeletionLengthAsProfileLengthFraction * profileLength ) ) and
+       * expectedDeletionLengthAsProfileLengthFractions * profileLength ) ) and
        * ( 1.0 / minExpectedDeletionLength ).
        *
        * @see useDeletionsForInsertionsParameters
        */
-GALOSH_DEF_OPT(minExpectedDeletionLength,double,1.25,"The deletionExtension value of the true profile will be the minimum of ( 1.0 / ( expectedDeletionLengthAsProfileLengthFraction * profileLength ) ) and ( 1.0 / minExpectedDeletionLength )");
+GALOSH_DEF_OPT(minExpectedDeletionLength,double,1.25,"The deletionExtension value of the true profile will be the minimum of ( 1.0 / ( expectedDeletionLengthAsProfileLengthFractions * profileLength ) ) and ( 1.0 / minExpectedDeletionLength )");
 
       /**
        * If useDeletionsForInsertionsParameters is false, the
        * insertionExtension value of the true profile will be the minimum of (
-       * 1.0 / ( expectedInsertionLengthAsProfileLengthFraction * profileLength
+       * 1.0 / ( expectedInsertionLengthAsProfileLengthFractions * profileLength
        * ) ) and ( 1.0 / minExpectedInsertionLength ).
        *
        * @see useDeletionsForInsertionsParameters
        */
-GALOSH_DEF_OPT(minExpectedInsertionLength,double,1.25,"If useDeletionsForInsertionsParameters is false, the insertionExtension value of the true profile will be the minimum of ( 1.0 / ( expectedInsertionLengthAsProfileLengthFraction * profileLength ) ) and ( 1.0 / minExpectedInsertionLength )");
+GALOSH_DEF_OPT(minExpectedInsertionLength,double,1.25,"If useDeletionsForInsertionsParameters is false, the insertionExtension value of the true profile will be the minimum of ( 1.0 / ( expectedInsertionLengthAsProfileLengthFractions * profileLength ) ) and ( 1.0 / minExpectedInsertionLength )");
 
       /**
        * The preAlignInsertion value of the true profile.
@@ -276,16 +276,16 @@ GALOSH_DEF_OPT(expectedInsertionsCounts,myVector<double>,myVector<double>(1,0.5)
 
       /**
        * The deletionExtension value of the true profile will be the minimum of
-       * ( 1.0 / ( expectedDeletionLengthAsProfileLengthFraction *
+       * ( 1.0 / ( expectedDeletionLengthAsProfileLengthFractions *
        * profileLength ) ) and ( 1.0 / minExpectedDeletionLength ).  If
        * useDeletionsForInsertionsParameters is true, the insertionExtension
        * value of the true profile will also be set to be the minimum of ( 1.0
-       * / ( expectedDeletionLengthAsProfileLengthFraction * profileLength ) )
+       * / ( expectedDeletionLengthAsProfileLengthFractions * profileLength ) )
        * and ( 1.0 / minExpectedDeletionLength ).
        *
        * UPDATE: This is now a pointer to a vector.  Tests will be run foreach
        * expected_deletion_length_as_profile_length_fraction in
-       * expectedDeletionLengthAsProfileLengthFraction.  If it is NULL, { 0.1 }
+       * expectedDeletionLengthAsProfileLengthFractions.  If it is NULL, { 0.1 }
        * will be used (this is the default).
        *
        * @see useDeletionsForInsertionsParameters
@@ -300,17 +300,17 @@ GALOSH_DEF_OPT(expectedDeletionLengthAsProfileLengthFractions,myVector<double>,m
       /**
        * If useDeletionsForInsertionsParameters is false, the
        * insertionExtension value of the true profile will be the minimum of (
-       * 1.0 / ( expectedInsertionLengthAsProfileLengthFraction * profileLength
+       * 1.0 / ( expectedInsertionLengthAsProfileLengthFractions * profileLength
        * ) ) and ( 1.0 / minExpectedInsertionLength ).
        *
        * UPDATE: This is now a pointer to a vector.  Tests will be run foreach
        * expected_insertion_length_as_profile_length_fraction in
-       * expectedInsertionLengthAsProfileLengthFraction.  If it is NULL, { 0.1 }
+       * expectedInsertionLengthAsProfileLengthFractions.  If it is NULL, { 0.1 }
        * will be used (this is the default).
        *
        * @see useDeletionsForInsertionsParameters
        */
-GALOSH_DEF_OPT(expecteInsertionLengthAsProfileLengthFractions,myVector<double>,myVector<double>(1,0.1) BOOST_PP_COMMA() string("0.1"),"Expected lengths of deletions. Iterate through all lengths in this list.");
+GALOSH_DEF_OPT(expectedInsertionLengthAsProfileLengthFractions,myVector<double>,myVector<double>(1,0.1) BOOST_PP_COMMA() string("0.1"),"Expected lengths of deletions. Iterate through all lengths in this list.");
 
 /** do this after the vector definition section */
 #undef TMP_EXTRA_STUFF
