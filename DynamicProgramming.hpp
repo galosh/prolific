@@ -1228,7 +1228,6 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
            virtual void
            resetToDefaults ();
 
-           template<class CharT, class Traits>
            friend ostream&
            operator<< (
               std::ostream& os,
@@ -1239,7 +1238,6 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
               return os;
            } // friend operator<< ( ostream &, Parameters const& )
 
-           template<class CharT, class Traits>
            void
            writeParameters (
               std::ostream& os
@@ -1309,7 +1307,6 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
           void
           isModified_reset ();
 
-          template<class CharT, class Traits>
           friend std::ostream&
           operator<< (
              std::ostream & os,
@@ -1320,7 +1317,6 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
              return os;
           } // friend operator<< ( ostream &, ParametersModifierTemplate const& )
 
-          template<class CharT, class Traits>
           void
           writeParametersModifier (
              std::ostream & os
@@ -1954,12 +1950,12 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       DirichletMixtureMatchEmissionPrior &
       operator= ( DirichletMixtureMatchEmissionPrior const& other_prior )
       { 
-        #ifdef DEBUG
-        std::cerr << "In DirichletMixtureMatchEmissionPrior operator=" << endl;
-        std::cerr << vector<MatchEmissionParameters<ResidueType, DirichletParameterType> >::size() << endl;
-        std::cerr << other_prior.size() << endl;
-        std::cerr.flush();
-        #endif 
+        //#ifdef DEBUG
+        //std::cerr << "In DirichletMixtureMatchEmissionPrior operator=" << endl;
+        //std::cerr << vector<MatchEmissionParameters<ResidueType, DirichletParameterType> >::size() << endl;
+        //std::cerr << other_prior.size() << endl;
+        //std::cerr.flush();
+        //#endif 
         if( vector<MatchEmissionParameters<ResidueType, DirichletParameterType> >::size() != other_prior.size() ) {
           vector<MatchEmissionParameters<ResidueType, DirichletParameterType> >::resize( other_prior.size() );
           m_mixingProbs.resize( other_prior.size() );
@@ -11434,7 +11430,6 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             typename ProbabilityType,
             typename ScoreType,
             typename MatrixValueType>
-  template<class CharT, class Traits>
   GALOSH_INLINE_OSTREAM
   void
   DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::Parameters::
@@ -11594,7 +11589,6 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
             typename ScoreType,
             typename MatrixValueType>
   template <class ParametersType>
-  template<class CharT, class Traits>
   GALOSH_INLINE_OSTREAM
   void
   DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::ParametersModifierTemplate<ParametersType>::

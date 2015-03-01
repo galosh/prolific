@@ -136,7 +136,6 @@ template <class ResidueType,
       void
       resetToDefaults ();
 
-      template<class CharT, class Traits>
       friend std::ostream&
       operator<< (
         std::ostream& os,
@@ -147,7 +146,6 @@ template <class ResidueType,
         return os;
       } // friend operator<< ( ostream &, Parameters const& )
 
-      template<class CharT, class Traits>
       void
       writeParameters (
         std::ostream& os
@@ -216,7 +214,6 @@ template <class ResidueType,
       void
       isModified_reset ();
 
-      template<class CharT, class Traits>
       friend std::ostream&
       operator<< (
         std::ostream& os,
@@ -228,7 +225,6 @@ template <class ResidueType,
         return os;
       } // friend operator<< ( ostream &, ParametersModifierTemplate const& )
 
-      template<class CharT, class Traits>
       void
       writeParametersModifier (
         std::ostream& os
@@ -386,7 +382,6 @@ template <class ResidueType,
             class ProbabilityType,
             class ScoreType,
             class MatrixValueType>
-  template<class CharT, class Traits>
   GALOSH_INLINE_OSTREAM
   void
   ProlificParameters<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::Parameters::
@@ -405,6 +400,7 @@ template <class ResidueType,
          * file, so that program_options parsers can read it back in
          *   TAH 9/13
          **/
+
         #undef GALOSH_DEF_OPT
         #define GALOSH_DEF_OPT(NAME,TYPE,DEFAULTVAL,HELP) os << #NAME << " = " << lexical_cast<string>(NAME) << endl 
         #include "ProlificParametersOptions.hpp"  /// write all ProlificParameters::Parameters members to os
@@ -550,7 +546,6 @@ template <class ResidueType,
             typename ScoreType,
             typename MatrixValueType>
   template <class ParametersType>
-  template<class CharT, class Traits>
   GALOSH_INLINE_OSTREAM
   void
   ProlificParameters<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::ParametersModifierTemplate<ParametersType>::

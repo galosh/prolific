@@ -22,7 +22,7 @@
       /**
        * Use (our rotated, state-specific) Rabiner-style scaling to keep
        * forward matrix values from underflowing?  Note that if this is false,
-       * you should use a log type for the ScoreType (unless the profile and
+       * you should use a log or bfloat type for the ScoreType (unless the profile and
        * sequences are very short and there are few sequences, in which case
        * you might not encounter underflow).
        */

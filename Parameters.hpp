@@ -74,11 +74,29 @@ using boost::bad_lexical_cast;
 #include "CommandlineParameters.hpp"
 namespace po = boost::program_options;
 
+namespace std {
+  // Print a vector to an ostream.  Put this in namespace std so boost can use it.
+  template<typename T>
+  ostream& operator<< ( ostream& out, const vector<T>& v ) {
+      out << "[";
+      size_t last = v.size() - 1;
+      for(size_t i = 0; i < v.size(); ++i) {
+          out << v[i];
+          if (i != last) 
+              out << ", ";
+      }
+      out << "]";
+      return out;
+  }
+
+} // namespace std
+
+
 namespace galosh {
 
   enum DebugLevel {
     DEBUG_None = 0,
-    DEBUG_Special = 1,
+    DEBUG_Special = 2,
     DEBUG_Medium = 500,
     DEBUG_All = 1000
   };
@@ -143,7 +161,7 @@ namespace galosh {
 
     virtual ~Parameters () {};
 
-    // Copy constructor
+    // Copy constructor; NOTE THAT THIS DOES NOT COPY THE "DEFAULTS" (THE KEY/VALUE PAIRS IN m_galosh_options_map.)
     Parameters ( const Parameters & copy_from )
     {
       if( copy_from.debug >= DEBUG_All ) {
@@ -200,15 +218,19 @@ namespace galosh {
       Parameters const& parameters
     )
     {
+      //TODO: REMOVE
+      cout << "in Parameters operator<<" << endl;
       parameters.writeParameters( os );
       return os;
     } // friend operator<< ( ostream, Parameters const& )
 
     void
     writeParameters (
-      ostream &os
+       std::ostream &os
     ) const
     { // TAH 9/13  [Parameters] is commented out because tokens in square brackets have
+      //TODO: REMOVE
+      cout << "in Parameters writeParameters()" << endl;
       // have a special meaning in "configuration files" sensu program_options
       os << "#[Parameters]" << endl;
 
@@ -322,7 +344,6 @@ namespace galosh {
 
     } // isModified_reset()
 
-    template<class CharT, class Traits>
     friend std::ostream&
     operator<< (
       std::ostream& os,
@@ -333,7 +354,6 @@ namespace galosh {
       return os;
     } // friend operator<< ( ostream &, ParametersModifierTemplate const& )
 
-    template<class CharT, class Traits>
     void
     writeParametersModifier (
       std::ostream os

@@ -24,5 +24,5 @@
 #endif
 
 GALOSH_DEF_OPT(debug,int,DEBUG_None,"Controls amount of diagnostic information");
-GALOSH_DEF_OPT(verbosity,int,VERBOSITY_None,"Controls verbosity of informative messages");
+GALOSH_DEF_OPT(verbosity,int,VERBOSITY_Low,"Controls verbosity of informative messages");
 

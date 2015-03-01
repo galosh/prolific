@@ -62,6 +62,7 @@ GALOSH_DEF_OPT(preAlignInsertion,double,0.01,"The preAlignInsertion value of the
        */
 GALOSH_DEF_OPT(postAlignInsertion,double,0.01,"The postAlignInsertion value of the true profile");
 
+
       /**
        * The effective number of sequences "observed" a priori.  Note that we
        * use a different prior strength for main-model transitions: see
@@ -76,24 +77,133 @@ GALOSH_DEF_OPT(priorStrength,float,1.0f,"The effective number of sequences 'obse
 GALOSH_DEF_OPT(priorStrength_internal_transitions,float,10.0f,"The effective number of sequences 'observed' a priori, for main-model transitions");
 
       /**
+       * The prior contribution (per "a priori sequence": see priorStrength) of
+       * B->D transitions.  This will be multiplied by the profile length and
+       * by the priorStrength when setting up the global prior.
+       */
+#ifdef USE_DEL_IN_DEL_OUT
+GALOSH_DEF_OPT(priorBtoD,float,0.01f,"The prior contribution (per 'a priori sequence': see priorStrength) of B->D transitions");
+#else
+GALOSH_DEF_OPT(priorBtoD,float,0.01f,"The prior contribution (per 'a priori sequence': see priorStrength) of B->D transitions");
+#endif
+
+      /**
+       * The prior contribution (per "a priori sequence": see priorStrength) of
+       * B->M transitions.  This will be multiplied by the profile length and
+       * by the priorStrength when setting up the global prior.
+       */
+#ifdef USE_DEL_IN_DEL_OUT
+GALOSH_DEF_OPT(priorBtoM,float,0.09f,"The prior contribution (per 'a priori sequence': see priorStrength) of B->M transitions");
+#else
+GALOSH_DEF_OPT(priorBtoM,float,0.99f,"The prior contribution (per 'a priori sequence': see priorStrength) of B->M transitions");
+#endif
+
+#ifdef USE_DEL_IN_DEL_OUT
+      /**
+       * The prior contribution (per "a priori sequence": see priorStrength) of
+       * B->Z transitions.  This will be multiplied by the profile length and
+       * by the priorStrength when setting up the global prior.
+       */
+GALOSH_DEF_OPT(priorBtoZ,float,0.9f,"The prior contribution (per 'a priori sequence': see priorStrength) of B->Z transitions");
+#endif
+
+#ifndef DISALLOW_FLANKING_TRANSITIONS
+      /**
+       * The prior contribution  of
+       * C->C transitions. 
+       */
+GALOSH_DEF_OPT(priorCtoC,float,0.01f,"The prior contribution of C->C transitions");
+
+      /**
+       * The prior contribution  of
+       * C->T transitions. 
+       */
+GALOSH_DEF_OPT(priorCtoT,float,0.99f,"The prior contribution of C->T transitions");
+
+      /**
+       * The prior contribution  of
+       * N->N transitions. 
+       */
+GALOSH_DEF_OPT(priorNtoN,float,0.01f,"The prior contribution of N->N transitions");
+
+      /**
+       * The prior contribution  of
+       * N->B transitions. 
+       */
+GALOSH_DEF_OPT(priorNtoB,float,0.99f,"The prior contribution of N->B transitions");
+
+#endif /* !DISALLOW_FLANKING_TRANSITIONS */
+
+      /**
        *  This will be multiplied by the profile length and
        * by the priorStrength when setting up the global prior.
        */
+#ifdef USE_DEL_IN_DEL_OUT
+GALOSH_DEF_OPT(priorMtoM,float,0.095f,"The prior contribution (per 'a priori sequence': see priorStrength) of M->M transitions");
+#else
 GALOSH_DEF_OPT(priorMtoM,float,0.95f,"The prior contribution (per 'a priori sequence': see priorStrength) of M->M transitions");
+#endif
 
       /**
        * The prior contribution (per "a priori sequence": see priorStrength) of
        * M->I transitions.  This will be multiplied by the profile length and
        * by the priorStrength when setting up the global prior.
        */
+#ifdef USE_DEL_IN_DEL_OUT
+GALOSH_DEF_OPT(priorMtoI,float,0.0025f,"The prior contribution (per 'a priori sequence': see priorStrength) of M->I transitions");
+#else
 GALOSH_DEF_OPT(priorMtoI,float,0.025f,"The prior contribution (per 'a priori sequence': see priorStrength) of M->I transitions");
+#endif
 
       /**
        * The prior contribution (per "a priori sequence": see priorStrength) of
        * M->D transitions.  This will be multiplied by the profile length and
        * by the priorStrength when setting up the global prior.
        */
+#ifdef USE_DEL_IN_DEL_OUT
+GALOSH_DEF_OPT(priorMtoD,float,0.0025f,"The prior contribution (per 'a priori sequence': see priorStrength) of M->D transitions");
+#else
 GALOSH_DEF_OPT(priorMtoD,float,0.025f,"The prior contribution (per 'a priori sequence': see priorStrength) of M->D transitions");
+#endif
+
+
+#ifdef USE_DEL_IN_DEL_OUT
+      /**
+       * The prior contribution (per "a priori sequence": see priorStrength) of
+       * M->W transitions.  This will be multiplied by the profile length and
+       * by the priorStrength when setting up the global prior.
+       */
+GALOSH_DEF_OPT(priorMtoW,float,0.9f,"The prior contribution (per 'a priori sequence': see priorStrength) of M->W transitions");
+
+      /**
+       * The prior contribution (per "a priori sequence": see priorStrength) of
+       * W->W transitions.  This will be multiplied by the profile length and
+       * by the priorStrength when setting up the global prior.
+       */
+GALOSH_DEF_OPT(priorWtoW,float,0.9999f,"The prior contribution (per 'a priori sequence': see priorStrength) of W->W transitions");
+
+      /**
+       * The prior contribution (per "a priori sequence": see priorStrength) of
+       * W->E transitions.  This will be multiplied by the profile length and
+       * by the priorStrength when setting up the global prior.
+       */
+GALOSH_DEF_OPT(priorWtoE,float,0.0001f,"The prior contribution (per 'a priori sequence': see priorStrength) of W->E transitions");
+
+
+      /**
+       * The prior contribution (per "a priori sequence": see priorStrength) of
+       * Z->Z transitions.  This will be multiplied by the profile length and
+       * by the priorStrength when setting up the global prior.
+       */
+GALOSH_DEF_OPT(priorZtoZ,float,0.9999f,"The prior contribution (per 'a priori sequence': see priorStrength) of Z->Z transitions");
+
+      /**
+       * The prior contribution (per "a priori sequence": see priorStrength) of
+       * Z->M transitions.  This will be multiplied by the profile length and
+       * by the priorStrength when setting up the global prior.
+       */
+GALOSH_DEF_OPT(priorZtoM,float,0.0001f,"The prior contribution (per 'a priori sequence': see priorStrength) of Z->M transitions");
+#endif /* USE_DEL_IN_DEL_OUT */
 
       /**
        * The prior contribution (per "a priori sequence": see priorStrength) of
