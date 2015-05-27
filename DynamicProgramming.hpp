@@ -1521,6 +1521,8 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       } // serialize( Archive &, const unsigned int )
 
     public:
+      std::string m_comment; //TAH 5/15   
+
       AlignmentProfile ();
 
       AlignmentProfile (
@@ -16457,7 +16459,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       typename Matrix::RowVector * backward_rows_ptr = &backward_rows_1;
       typename Matrix::RowVector * next_backward_rows_ptr = &backward_rows_2;
       typename Matrix::RowVector * temp_backward_rows_ptr;
-
+    
       uint32_t last_seq =
         ( ( sequence_count == 0 ) ? ( sequences.size() - 1 ) : ( min( static_cast<size_t>( sequence_count ), sequences.size() ) - 1 ) );
       // TODO: REMOVE
@@ -16466,6 +16468,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
       bool we_are_calculating_scores = false;
       vector<ScoreType> local_sequence_scores;
       if( parameters.useRabinerScaling && parameters.rabinerScaling_useMaximumValue ) {
+
         // We need to pass scores to the calculateAlignmentProfilePosition(..)
         // method.
         if( sequence_scores == 0 ) {
@@ -16495,7 +16498,7 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
 
           // TODO: REMOVE
           //cout << "seq_i is " << seq_i << endl;
-
+          
           if( ( row_i == last_row ) && we_are_calculating_scores ) {
             local_sequence_scores[ seq_i ] =
               ( *forward_matrices_rev_iter )[ seq_i ][ sequences[ seq_i ].length() ][ Match ];
