@@ -14,7 +14,7 @@
  *    relevant papers* in your documentation and publications associated with
  *    uses of this library.  Thank you!
  *
- * \copyright &copy; 2008, 2011 by Paul T. Edlefsen, Fred Hutchinson Cancer
+ * \copyright &copy; 2015 by Paul T. Edlefsen, Fred Hutchinson Cancer
  *    Research Center.
  * \par License: 
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,6 +42,7 @@
 
 #include <seqan/basic.h>
 #include <seqan/sequence.h> // for ordValue
+#include <seqan/stream.h> // now required to avoid "use of undeclared identifier 'directionIterator'" error
 #include "Prolific.hpp"
 #include "AminoAcid20.hpp"
 
@@ -146,23 +147,23 @@ struct _Translate_Table_Ambiguous_Iupac_2_Dna
 template <typename T>
 char const _Translate_Table_Ambiguous_Iupac_2_Dna<T>::VALUE[ 16 ][ 4 ] =
 {
-  // 'U'=0, 'T', 'A', 'W', 'C', 'Y', 'M', 'H', 'G', 'K', 'R', 'D', 'S', 'B', 'V', 'N'=15.
-  { 3, 3, 3, 3 }, // U
-  { 3, 3, 3, 3 }, // T
-  { 0, 0, 0, 0 }, // A
-  { 0, 3, 0, 0 }, // W: A or T/U
-  { 1, 1, 1, 1 }, // C
-  { 1, 3, 1, 1 }, // Y: Pyrimidine (C or T/U)
-  { 0, 1, 0, 0 }, // M: A or C
-  { 0, 1, 3, 0 }, // H: A or C or T/U
-  { 2, 2, 2, 2 }, // G
-  { 2, 3, 2, 2 }, // K: G or T/U
-  { 0, 2, 0, 0 }, // R: Purine (A or G)
-  { 0, 2, 3, 0 }, // D: A or G or T/U
-  { 1, 2, 1, 1 }, // S: C or G
-  { 1, 2, 3, 1 }, // B: C or G or T/U
-  { 0, 1, 2, 0 }, // V: A or C or G
-  { 0, 1, 2, 3 }  // N: A or C or G or T/U
+  //              //TGCA=[hex]            // IUPAC
+  { 3, 3, 3, 3 }, //0000=0 = or U         // U
+  { 0, 0, 0, 0 }, //0001=1                // A
+  { 1, 1, 1, 1 }, //0010=2                // C
+  { 0, 1, 0, 0 }, //0011=3 AC             // M: A or C
+  { 2, 2, 2, 2 }, //0100=4                // G
+  { 0, 2, 0, 0 }, //0101=5 AG (purine)    // R: Purine (A or G)
+  { 1, 2, 0, 0 }, //0110=6 CG             // S: C or G
+  { 0, 1, 2, 0 }, //0111=7 non-T          // V: A or C or G
+  { 3, 3, 3, 3 }, //1000=8                // T
+  { 0, 3, 0, 0 }, //1001=9 TA             // W: A or T/U
+  { 1, 3, 0, 0 }, //1010=A TC (pyrimidine)// Y: Pyrimidine (C or T/U)
+  { 0, 1, 3, 0 }, //1011=B not-G          // H: A or C or T/U
+  { 2, 3, 0, 0 }, //1100=C TG             // K: G or T/U
+  { 0, 2, 3, 0 }, //1101=D not-C          // D: A or G or T/U
+  { 1, 2, 3, 1 }, //1110=E non-A          // B: C or G or T/U
+  { 0, 1, 2, 3 }  //1111=F any            // N: A or C or G or T/U
 };
 template <typename T = void>
 struct _Size_Table_Ambiguous_Iupac_2_Dna
@@ -172,7 +173,7 @@ struct _Size_Table_Ambiguous_Iupac_2_Dna
 template <typename T>
 char const _Size_Table_Ambiguous_Iupac_2_Dna<T>::VALUE[ 16 ] =
 {
-// U, T, A, W, C, Y, M, H, G, K, R, D, S, B, V, N.
+// U, A, C, M, G, R, S, V, T, W, Y, H, K, D, B, N.
    1, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4
 };
 
@@ -207,45 +208,48 @@ struct IsAmbiguous<seqan::AminoAcid, seqan::AminoAcid20>
 template <typename T = void>
 struct _Translate_Table_Ambiguous_AminoAcid_2_AminoAcid20
 {
-  static char const VALUE[ 24 ][ 20 ];
+  static char const VALUE[ 27 ][ 20 ];
 };
 template <typename T>
-char const _Translate_Table_Ambiguous_AminoAcid_2_AminoAcid20<T>::VALUE[ 24 ][ 20 ] =
+char const _Translate_Table_Ambiguous_AminoAcid_2_AminoAcid20<T>::VALUE[ 27 ][ 20 ] =
 {
   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, // A
-  { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, // R
-  { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // N
-  { 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 }, // D
-  { 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 }, // C
-  { 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5 }, // Q
-  { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, // E
-  { 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7 }, // G
-  { 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8 }, // H
-  { 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 }, // I
-  { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 }, // L
-  { 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11 }, // K
-  { 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12 }, // M
-  { 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13 }, // F
-  { 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14 }, // P
+  { 2, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, // (it's B = D or N)
+  { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, // C
+  { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, // D
+  { 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 }, // E
+  { 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 }, // F
+  { 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5 }, // G
+  { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, // H
+  { 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7 }, // I
+  { 7, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, // (it's J = L or I)
+  { 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8 }, // K
+  { 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 }, // L
+  { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 }, // M
+  { 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11 }, // N
+  { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 }, // (it's O, but we'll map it to all)
+  { 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12 }, // P
+  { 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13 }, // Q
+  { 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14 }, // R
   { 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 }, // S
   { 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16 }, // T
-  { 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17 }, // W
-  { 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18 }, // Y
-  { 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19 }, // V
-  { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 }, // (it's B, but we'll map it to all)
-  { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 }, // (it's Z, but we'll map it to all)
+  { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 }, // (it's U, but we'll map it to all)
+  { 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17 }, // V
+  { 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18 }, // W
   { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 }, // (it's X, but we'll map it to all)
+  { 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19 }, // Y
+  { 3, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, // (it's Z = E or Q)
   { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 } // (it's *, but we'll map it to all)
 };
 template <typename T = void>
 struct _Size_Table_Ambiguous_AminoAcid_2_AminoAcid20
 {
-  static char const VALUE[ 24 ];
+  static char const VALUE[ 27 ];
 };
 template <typename T>
-char const _Size_Table_Ambiguous_AminoAcid_2_AminoAcid20<T>::VALUE[ 24 ] =
+char const _Size_Table_Ambiguous_AminoAcid_2_AminoAcid20<T>::VALUE[ 27 ] =
 {
-  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 20, 20, 20, 20
+  1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 20, 1, 1, 1, 1, 1, 20, 1, 1, 20, 1, 2, 20
 };
 
 //////////////////////////////////////////////////////////////////////////////

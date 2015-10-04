@@ -13,7 +13,7 @@
  *    relevant papers* in your documentation and publications associated with
  *    uses of this library.  Thank you!
  *
- * \copyright &copy; 2012 by Paul T. Edlefsen, Fred Hutchinson Cancer
+ * \copyright &copy; 2015 by Paul T. Edlefsen, Fred Hutchinson Cancer
  *    Research Center.
  * \par License: 
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,29 +40,137 @@
 #include "Prolific.hpp"
 
 namespace seqan {
-  // Copied and modified (Nov 21, 2012) from latest svn update of SeqAn (GNU Lesser General Public License v3): seqan-trunk/core/include/seqan/basic/alphabet_residue.h 
+// Copied and modified (Oct 3, 2015) from latest git update of SeqAn (GNU Lesser General Public License v3)
 
+// --------------------------------------------------------------------------
+// Amino Acid
+// --------------------------------------------------------------------------
+
+template <typename T = void>
+struct TranslateTableAminoAcid20ToChar_
+{
+    static char const VALUE[20];
+};
+template <typename T>
+char const TranslateTableAminoAcid20ToChar_<T>::VALUE[20] =
+{
+    'A', // Ala Alanine
+    'C', // Cys Cystine
+    'D', // Asp Aspartic Acid
+    'E', // Glu Glutamic Acid
+    'F', // Phe Phenylalanine
+    'G', // Gly Glycine
+    'H', // His Histidine
+    'I', // Ile Isoleucine
+    'K', // Lys Lysine
+    'L', // Leu Leucine
+    'M', // Met Methionine
+    'N', // Asn Asparagine
+    'P', // Pro Proline
+    'Q', // Gln Glutamine
+    'R', // Arg Arginine
+    'S', // Ser Serine
+    'T', // Thr Threonine
+    'V', // Val Valine
+    'W', // Trp Tryptophan
+    'Y' // Tyr Tyrosine
+};
+
+template <typename T = void>
+struct TranslateTableCharToAminoAcid20_
+{
+    static char const VALUE[256];
+};
+
+template <typename T>
+char const TranslateTableCharToAminoAcid20_<T>::VALUE[256] =
+{
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, //0
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, //1
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, //2
+//                                                     *
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, //3
+    0,   0,   0,   1,   2,   3,   4,   5,   6,   7,   0,  8,  9,  10,  11,  0, //4
+//    ,   A,   ,    C,   D,   E,   F,   G,   H,   I,    ,   K,   L,   M,   N,   ,
+
+    12,  13,  14,  15,  16,  0,  17,  18,  0,  19,  0,  0,  0,  0,  0,  0, //5
+//   P,   Q,   R,   S,   T,    ,   V,   W,   X,   Y,   Z,    ,    ,    ,    ,    ,
+
+    0,   0,   0,   1,   2,   3,   4,   5,   6,   7,   0,  8,  9,  10,  11,  0, //6
+//    ,   a,    ,   c,   d,   e,   f,   g,   h,   i,    ,   k,   l,   m,   n,   ,
+
+    12,  13,  14,  15,  16,  0,  17,  18,  0,  19,  0,  0,  0,  0,  0,  0, //7
+//   p,   q,   r,   s,   t,   ,   v,   w,   ,  y,   ,    ,    ,    ,    ,    ,
+
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, //8
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, //9
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, //10
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, //11
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, //12
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, //13
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, //14
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0  //15
+};
+
+template <typename T = void>
+struct TranslateTableByteToAminoAcid20_
+{
+    static char const VALUE[256];
+};
+
+template <typename T>
+char const TranslateTableByteToAminoAcid20_<T>::VALUE[256] =
+{
+    0,   1,   2,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,  13,  14,  15, //0
+    16,  17,  18,  19,  20,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, //1
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, //2
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, //3
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, //4
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, //5
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, //6
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, //7
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, //8
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, //9
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, //10
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, //11
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, //12
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, //13
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, //14
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0  //15
+};
+  
 // ----------------------------------------------------------------------------
 // Specialization AminoAcid20
 // ----------------------------------------------------------------------------
 
-/**
-.Spec.AminoAcid20:
-..cat:Alphabets
-..summary:Iupac code for amino acids with exactly 20 categories.
-..general:Class.SimpleType
-..signature:AminoAcid
-..remarks:
-...text:The @Metafunction.ValueSize@ of $AminoAcid$ is 20. 
-...text:The amino acids are enumerated from 0 to 19 in this order: 
-...text:'A'=0, 'R', 'N', 'D', 'C', 'Q', 'E', 'G', 'H', 'I', 'L', 'K', 'M', 'F', 'P', 'S', 'T', 'W', 'Y', 'V'=19.
-...text:Objects of type $AminoAcid$ can be converted to $char$ and vice versa. 
-Unknown values are converted to $'A'$.
-...text:$AminoAcid$ is typedef for $SimpleType<char,AminoAcid20_>$, while $AminoAcid20_$ is a helper
-specialization tag class.
-..see:Metafunction.ValueSize
-..include:AminoAcid20.h
-*/
+/*!
+ * @class AminoAcid20
+ * @extends SimpleType
+ * @headerfile <seqan/basic.h>
+ * @brief IUPAC code for amino acids.
+ * @signature typedef SingleType<unsigned char, AminoAcid20_> AminoAcid20;
+ *
+ * The ValueSize of <tt>AminoAcid20</tt> is 20.
+ *
+ * The amino acid symbols are as follows, i.e. they are sorted alphabetically
+ * up until the last two symbols:
+ *
+ * 'A' = 0, 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y'
+ *
+ * These are the 20 AAs, differing from the AminoAcid type in that it does _not_ include the wildcards, rare AAs, or terminator.
+ * 'B' is a wildcard for (Aspartic Acid, Asparagine),
+ * 'J' for (Leucine, Isoleucine), 'Z' for (Glutamic Acid, Glutamine) and
+ * 'X' for "any amino acid".
+ *
+ * 'O' refers to the rare Pyrrolysine, 'U' refers to the rare Selenocysteine and '*' to the terminator tRNA.
+ *
+ * Objects of type <tt>AminoAcid20</tt> can be converted to <tt>char</tt> and vice versa.  Unknown values are converted to
+ * <tt>'A'</tt>.
+ *
+ * @see FiniteOrderedAlphabetConcept#ValueSize
+ * @see PeptideIterator
+ * @see Peptide
+ */
 
 struct AminoAcid20_ {};
 typedef SimpleType<unsigned char, AminoAcid20_> AminoAcid20;
@@ -86,50 +194,33 @@ unknownValueImpl(AminoAcid20 *)
     return _result;
 }
 
-
-//____________________________________________________________________________
 inline void assign(char & c_target, AminoAcid20 const & source)
 {
-    c_target = TranslateTableAAToAscii_<>::VALUE[source.value];
+    c_target = TranslateTableAminoAcid20ToChar_<>::VALUE[source.value];
 }
 
-//____________________________________________________________________________
-// ---------------------------------------------------------------------------
-// Amino Acid 20
-// ---------------------------------------------------------------------------
-
 template <>
-struct CompareType<AminoAcid20, __uint8>
+struct CompareTypeImpl<AminoAcid20, __uint8>
 {
     typedef AminoAcid20 Type;
 };
 
 inline void assign(AminoAcid20 & target, __uint8 c_source)
 {
-    target.value = TranslateTableByteToAA_<>::VALUE[c_source];
+    target.value = TranslateTableByteToAminoAcid20_<>::VALUE[c_source];
 }
 
 template <>
-struct CompareType<AminoAcid20, char>
+struct CompareTypeImpl<AminoAcid20, char>
 {
     typedef AminoAcid20 Type;
 };
 
 inline void assign(AminoAcid20 & target, char c_source)
 {
-    target.value = TranslateTableAsciiToAA_<>::VALUE[(unsigned char) c_source];
+    target.value = TranslateTableCharToAminoAcid20_<>::VALUE[(unsigned char) c_source];
 }
 
-template <>
-struct CompareType<AminoAcid20, Unicode>
-{
-    typedef AminoAcid20 Type;
-};
-
-inline void assign(AminoAcid20 & target, Unicode c_source)
-{
-    target.value = TranslateTableAsciiToAA_<>::VALUE[(unsigned char) c_source];
-}
 
 //////////////////////////////////////////////////////////////////////////////
 } // End namespace seqan

@@ -191,6 +191,22 @@ namespace galosh {
 
       return muscle_seq;
     } // copyIntoSeq ( Seq const &, Sequence<ResidueType> const & )
+
+    template<class CharT, class Traits>
+    template <typename ResidueType, typename AllocType>
+    friend std::basic_ostream<CharT,Traits>&
+    operator<< (
+      std::basic_ostream<CharT,Traits>& os,
+      Sequence<ResidueType, AllocType> const & sequence ) 
+    {
+      return(
+             operator<<(
+                        os,
+                        static_cast<seqan::String<ResidueType, AllocType > const &>( sequence )
+                        )
+             );
+    } // friend operator<< ( basic_ostream, Sequence const & )
+
 #endif //__HAVE_MUSCLE
 
   }; // End class Sequence
