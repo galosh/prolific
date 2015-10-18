@@ -6131,7 +6131,8 @@ template <typename ResidueType, typename ProbabilityType, typename IsActualInser
         std::cerr << "WARNING: Underflow detected (maximumValue() returns 0).  You should try setting the MatrixValueType to bfloat, which is the type with the largest range available." << endl;
         std::cerr << "\t *this is " << *this << endl;
       ////// TODO: PUT BACK!!!!!!!
-        //assert( largest_value > 0.0 );
+        assert( largest_value > 0.0 );
+        // TODO: ? even();
         return;
       }
 

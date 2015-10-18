@@ -18680,20 +18680,20 @@ static dynamicprogramming_DeletionOut_subcell_tag const DeletionOut =
         //cout << "calculateAlignmentProfilePosition: pos (after scaling by the inverse of the sequence score) is " << pos << endl;
       } else if( *inverse_scalar != 0.0 ) {
         // TODO: REMOVE.  TESTING
-#ifndef NDEBUG
-        if( calculate_score ) {
-          if( matrix_value_type_score != *inverse_scalar ) {
-            bool mvt_score_gt_inv_scalar = ( static_cast<ScoreType>( matrix_value_type_score ) > *inverse_scalar );
-            ScoreType diff = ( mvt_score_gt_inv_scalar ? ( static_cast<ScoreType>( matrix_value_type_score ) - *inverse_scalar ) : ( *inverse_scalar  - static_cast<ScoreType>( matrix_value_type_score ) ) );
-            if( ( diff / ( mvt_score_gt_inv_scalar ? static_cast<ScoreType>( matrix_value_type_score ) : *inverse_scalar ) ) > 1E-5 ) { // TODO: DEHACKIFY MAGIC # MACHINE EPSILON!
-              cout << "UH OH: matrix_value_type_score is " << matrix_value_type_score << " but *inverse_scalar is " << *inverse_scalar << ".  Their diff is ( matrix_value_type_score - *inverse_scalar ) = " << ( mvt_score_gt_inv_scalar ? ' ' : '-' ) << diff << ", and abs(diff) / (the greater value) is " << ( diff / ( mvt_score_gt_inv_scalar ? static_cast<ScoreType>( matrix_value_type_score ) : *inverse_scalar ) ) << "." << endl;
-              // NOTE: When using anchor rows and columns, the score can drift slightly, and that's ok.  It should suffice to check that the scores are on the same scale (eg. < 1 rather than < 1E-5 after diving out the scale)
-              assert(  toDouble( ( diff / ( mvt_score_gt_inv_scalar ? static_cast<ScoreType>( matrix_value_type_score ) : *inverse_scalar ) ) < 1 ) ); // TODO: DEHACIFY MAGIC # 1 !!!
-              //assert(  toDouble( ( diff / ( mvt_score_gt_inv_scalar ? static_cast<ScoreType>( matrix_value_type_score ) : *inverse_scalar ) ) < 1E-5 ) ); // TODO: DEHACIFY MAGIC # MACHINE EPSILON!
-            }
-          }
-        }
-#endif // !NDEBUG
+//#ifndef NDEBUG
+//        if( calculate_score ) {
+//          if( matrix_value_type_score != *inverse_scalar ) {
+//            bool mvt_score_gt_inv_scalar = ( static_cast<ScoreType>( matrix_value_type_score ) > *inverse_scalar );
+//            ScoreType diff = ( mvt_score_gt_inv_scalar ? ( static_cast<ScoreType>( matrix_value_type_score ) - *inverse_scalar ) : ( *inverse_scalar  - static_cast<ScoreType>( matrix_value_type_score ) ) );
+//            if( ( diff / ( mvt_score_gt_inv_scalar ? static_cast<ScoreType>( matrix_value_type_score ) : *inverse_scalar ) ) > 1E-5 ) { // TODO: DEHACKIFY MAGIC # MACHINE EPSILON!
+//              cout << "UH OH: matrix_value_type_score is " << matrix_value_type_score << " but *inverse_scalar is " << *inverse_scalar << ".  Their diff is ( matrix_value_type_score - *inverse_scalar ) = " << ( mvt_score_gt_inv_scalar ? ' ' : '-' ) << diff << ", and abs(diff) / (the greater value) is " << ( diff / ( mvt_score_gt_inv_scalar ? static_cast<ScoreType>( matrix_value_type_score ) : *inverse_scalar ) ) << "." << endl;
+//              // NOTE: When using anchor rows and columns, the score can drift slightly, and that's ok.  It should suffice to check that the scores are on the same scale (eg. < 1 rather than < 1E-5 after diving out the scale)
+//              assert(  toDouble( ( diff / ( mvt_score_gt_inv_scalar ? static_cast<ScoreType>( matrix_value_type_score ) : *inverse_scalar ) ) < 1 ) ); // TODO: DEHACIFY MAGIC # 1 !!!
+//              //assert(  toDouble( ( diff / ( mvt_score_gt_inv_scalar ? static_cast<ScoreType>( matrix_value_type_score ) : *inverse_scalar ) ) < 1E-5 ) ); // TODO: DEHACIFY MAGIC # MACHINE EPSILON!
+//            }
+//          }
+//        }
+//#endif // !NDEBUG
         // TODO: REMOVE
         //cout << "calculateAlignmentProfilePosition: scaling by *inverse_scalar:" << *inverse_scalar << endl;
         if( parameters.useRabinerScaling ) {
