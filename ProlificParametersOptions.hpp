@@ -333,7 +333,15 @@ GALOSH_DEF_OPT(useRabinerScaling,bool,false,"Temporarily broken; do not use.");
  */
 GALOSH_DEF_OPT(rabinerScaling_useMaximumValue,bool,false,"Temporarily broken; do not use.");
 
+ /**
+  * The preAlignInsertion value of the true profile.
+  */
+GALOSH_DEF_OPT(preAlignInsertion,double,.01,"The preAlignInsertion value of the true profile");
 
+ /**
+  * The postAlignInsertion value of the true profile.
+  */
+GALOSH_DEF_OPT(postAlignInsertion,double,.01,"The postAlignInsertion value of the true profile");
 
 
 ///
