@@ -256,7 +256,7 @@ struct StateLabelTransitionTargets {};
 template <typename TValue>
 struct StateLabelId
 {
-  enum { VALUE = 9 };
+  typedef __uint8 Type; static const Type VALUE = 9;
 };
 template <typename TValue>
 struct StateLabelId<TValue const>:
@@ -344,7 +344,7 @@ namespace galosh {
 struct StartStateLabel {};
 
 ///.Metafunction.StateLabelId.param.T.type:Class.StartStateLabel
-template <> struct StateLabelId< galosh::StartStateLabel > { enum { VALUE = 0 }; };
+template <> struct StateLabelId< galosh::StartStateLabel > { typedef __uint8 Type; static const Type VALUE = 0; };
 
 ///.Metafunction.IsEmitting.param.T.type:Class.StartStateLabel
 template <>
@@ -1206,7 +1206,7 @@ namespace galosh {
 struct MatchStateLabel {};
 
 ///.Metafunction.StateLabelId.param.T.type:Class.MatchStateLabel
-template <> struct StateLabelId< galosh::MatchStateLabel > { enum { VALUE = 3 }; };
+template <> struct StateLabelId< galosh::MatchStateLabel > { typedef __uint8 Type; static const Type VALUE = 3; };
 
 ///.Metafunction.IsEmitting.param.T.type:Class.MatchStateLabel
 template <>
@@ -1370,7 +1370,7 @@ char const TranslateTableByteToMatchStateTransitionTargets_<T>::VALUE[ 256 ] =
 namespace SEQAN_NAMESPACE_MAIN
 {
 
-template <> struct ValueSize< galosh::MatchStateTransitionTargets > { enum { VALUE = 4 }; };
+template <> struct ValueSize< galosh::MatchStateTransitionTargets > { typedef __uint8 Type; static const Type VALUE = 4; };
 template <> struct BitsPerValue< galosh::MatchStateTransitionTargets > { typedef __uint8 Type; static const Type VALUE = 2; };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1550,7 +1550,7 @@ char const TranslateTableByteToMatchStateTransitionTargetsOld_<T>::VALUE[ 256 ] 
 namespace SEQAN_NAMESPACE_MAIN
 {
 
-template <> struct ValueSize< galosh::MatchStateTransitionTargetsOld > { enum { VALUE = 3 }; };
+template <> struct ValueSize< galosh::MatchStateTransitionTargetsOld > { typedef __uint8 Type; static const Type VALUE = 3; };
 template <> struct BitsPerValue< galosh::MatchStateTransitionTargetsOld > { typedef __uint8 Type; static const Type VALUE = 2; };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1617,7 +1617,7 @@ namespace galosh {
 struct InsertionStateLabel {};
 
 ///.Metafunction.StateLabelId.param.T.type:Class.InsertionStateLabel
-template <> struct StateLabelId< galosh::InsertionStateLabel > { enum { VALUE = 4 }; };
+template <> struct StateLabelId< galosh::InsertionStateLabel > { typedef __uint8 Type; static const Type VALUE = 4; };
 
 ///.Metafunction.IsEmitting.param.T.type:Class.InsertionStateLabel
 template <>
@@ -1778,7 +1778,7 @@ char const TranslateTableByteToInsertionStateTransitionTargetsPlan9_<T>::VALUE[ 
 namespace SEQAN_NAMESPACE_MAIN
 {
 
-template <> struct ValueSize< galosh::InsertionStateTransitionTargetsPlan9 > { enum { VALUE = 3 }; };
+template <> struct ValueSize< galosh::InsertionStateTransitionTargetsPlan9 > { typedef __uint8 Type; static const Type VALUE = 3; };
 template <> struct BitsPerValue< galosh::InsertionStateTransitionTargetsPlan9 > { typedef __uint8 Type; static const Type VALUE = 2; };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -2020,7 +2020,7 @@ namespace galosh {
 struct DeletionStateLabel {};
 
 ///.Metafunction.StateLabelId.param.T.type:Class.DeletionStateLabel
-template <> struct StateLabelId< galosh::DeletionStateLabel > { enum { VALUE = 5 }; };
+template <> struct StateLabelId< galosh::DeletionStateLabel > { typedef __uint8 Type; static const Type VALUE = 5; };
 
 ///.Metafunction.IsEmitting.param.T.type:Class.DeletionStateLabel
 template <>
@@ -2182,7 +2182,7 @@ char const TranslateTableByteToDeletionStateTransitionTargetsPlan9_<T>::VALUE[ 2
 namespace SEQAN_NAMESPACE_MAIN
 {
 
-template <> struct ValueSize< galosh::DeletionStateTransitionTargetsPlan9 > { enum { VALUE = 4 }; };
+template <> struct ValueSize< galosh::DeletionStateTransitionTargetsPlan9 > { typedef __uint8 Type; static const Type VALUE = 4; };
 template <> struct BitsPerValue< galosh::DeletionStateTransitionTargetsPlan9 > { typedef __uint8 Type; static const Type VALUE = 2; };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -2360,7 +2360,7 @@ char const TranslateTableByteToDeletionStateTransitionTargetsPlan7_<T>::VALUE[ 2
 namespace SEQAN_NAMESPACE_MAIN
 {
 
-template <> struct ValueSize< galosh::DeletionStateTransitionTargetsPlan7 > { enum { VALUE = 3 }; };
+template <> struct ValueSize< galosh::DeletionStateTransitionTargetsPlan7 > { typedef __uint8 Type; static const Type VALUE = 3; };
 template <> struct BitsPerValue< galosh::DeletionStateTransitionTargetsPlan7 > { typedef __uint8 Type; static const Type VALUE = 2; };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -2538,7 +2538,7 @@ char const TranslateTableByteToDeletionStateTransitionTargetsPlan9Old_<T>::VALUE
 namespace SEQAN_NAMESPACE_MAIN
 {
 
-template <> struct ValueSize< galosh::DeletionStateTransitionTargetsPlan9Old > { enum { VALUE = 3 }; };
+template <> struct ValueSize< galosh::DeletionStateTransitionTargetsPlan9Old > { typedef __uint8 Type; static const Type VALUE = 3; };
 template <> struct BitsPerValue< galosh::DeletionStateTransitionTargetsPlan9Old > { typedef __uint8 Type; static const Type VALUE = 2; };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -2781,7 +2781,7 @@ namespace galosh {
 struct EndStateLabel {};
 
 ///.Metafunction.StateLabelId.param.T.type:Class.EndStateLabel
-template <> struct StateLabelId< galosh::EndStateLabel > { enum { VALUE = 6 }; };
+template <> struct StateLabelId< galosh::EndStateLabel > { typedef __uint8 Type; static const Type VALUE = 6; };
 
 ///.Metafunction.IsEmitting.param.T.type:Class.EndStateLabel
 template <>
@@ -3007,7 +3007,7 @@ namespace galosh {
 struct LoopStateLabel {};
 
 ///.Metafunction.StateLabelId.param.T.type:Class.LoopStateLabel
-template <> struct StateLabelId< galosh::LoopStateLabel > { enum { VALUE = 7 }; };
+template <> struct StateLabelId< galosh::LoopStateLabel > { typedef __uint8 Type; static const Type VALUE = 7; };
 
 ///.Metafunction.IsEmitting.param.T.type:Class.LoopStateLabel
 template <>
@@ -3233,7 +3233,7 @@ namespace galosh {
 struct PostAlignStateLabel {};
 
 ///.Metafunction.StateLabelId.param.T.type:Class.PostAlignStateLabel
-template <> struct StateLabelId< galosh::PostAlignStateLabel > { enum { VALUE = 8 }; };
+template <> struct StateLabelId< galosh::PostAlignStateLabel > { typedef __uint8 Type; static const Type VALUE = 8; };
 
 ///.Metafunction.IsEmitting.param.T.type:Class.PostAlignStateLabel
 template <>
@@ -3459,7 +3459,7 @@ namespace galosh {
 struct TerminalStateLabel {};
 
 ///.Metafunction.StateLabelId.param.T.type:Class.TerminalStateLabel
-template <> struct StateLabelId< galosh::TerminalStateLabel > { enum { VALUE = 9 }; };
+template <> struct StateLabelId< galosh::TerminalStateLabel > { typedef __uint8 Type; static const Type VALUE = 9; };
 
 ///.Metafunction.IsEmitting.param.T.type:Class.TerminalStateLabel
 template <>
@@ -3508,7 +3508,7 @@ namespace galosh {
 struct DeletionInStateLabel {};
 
 ///.Metafunction.StateLabelId.param.T.type:Class.DeletionInStateLabel
-template <> struct StateLabelId< galosh::DeletionInStateLabel > { enum { VALUE = 10 }; };
+template <> struct StateLabelId< galosh::DeletionInStateLabel > { typedef __uint8 Type; static const Type VALUE = 10; };
 
 ///.Metafunction.IsEmitting.param.T.type:Class.DeletionInStateLabel
 template <>
@@ -3734,7 +3734,7 @@ namespace galosh {
 struct DeletionOutStateLabel {};
 
 ///.Metafunction.StateLabelId.param.T.type:Class.DeletionOutStateLabel
-template <> struct StateLabelId< galosh::DeletionOutStateLabel > { enum { VALUE = 11 }; };
+template <> struct StateLabelId< galosh::DeletionOutStateLabel > { typedef __uint8 Type; static const Type VALUE = 11; };
 
 ///.Metafunction.IsEmitting.param.T.type:Class.DeletionOutStateLabel
 template <>
