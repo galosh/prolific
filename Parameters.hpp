@@ -334,9 +334,9 @@ namespace galosh {
     void
     isModified_reset ()
     {
-      if( parameters.debug) {
+      #ifdef DEBUG
         cout << "[debug] GALOSH::ParametersModifierTemplate::isModified_reset()" << endl;
-      }
+      #endif
       /// TAH 9/13 set all isModified_<member> to false
       #undef GALOSH_DEF_OPT
       #define GALOSH_DEF_OPT(NAME,TYPE,DEFAULTVAL,HELP) isModified_##NAME = false;

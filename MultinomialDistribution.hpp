@@ -1183,7 +1183,9 @@ namespace galosh {
   MultinomialDistribution<ValueType, ProbabilityType>::
     operator[] ( const ValueType & which )
     {
-      return m_probs[ ( uint32_t )which ];
+      // TODO: REMOVE!
+      //cout << "ABOUT TO SET m_probs. 'which' is " << which << "(" << static_cast<uint32_t>( ordValue( which ) ) << ")" << endl;
+      return m_probs[ static_cast<uint32_t>( seqan::ordValue( which ) ) ];
     } // operator[]( ValueType const & )
 
   template <typename ValueType,
@@ -1193,7 +1195,9 @@ namespace galosh {
   MultinomialDistribution<ValueType, ProbabilityType>::
     operator[] ( const ValueType & which ) const
     {
-      return m_probs[ ( uint32_t )which ];
+      // TODO: REMOVE!
+      //cout << "const accessor into m_probs. 'which' is " << which << "(" << static_cast<uint32_t>( ordValue( which ) ) << ")" << endl;
+      return m_probs[ static_cast<uint32_t>( seqan::ordValue( which ) ) ];
     } // operator[]( ValueType const & ) const
 
   template <typename ValueType,
