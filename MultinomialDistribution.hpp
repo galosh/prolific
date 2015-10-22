@@ -807,7 +807,7 @@ namespace galosh {
   GALOSH_INLINE_INIT
   MultinomialDistribution<ValueType, ProbabilityType>::
     // Starts out with an even distribution
-  MultinomialDistribution ()
+  MultinomialDistribution () : m_probs()
   {
     // Start out with an even distribution.
     even();
@@ -819,7 +819,7 @@ namespace galosh {
   GALOSH_INLINE_INIT
   MultinomialDistribution<ValueType, ProbabilityType>::
     // Copy constructor
-    MultinomialDistribution ( MultinomialDistribution<ValueType,AnyProbabilityType> const & copy_from )
+    MultinomialDistribution ( MultinomialDistribution<ValueType,AnyProbabilityType> const & copy_from ) : m_probs()
     {
       // Call operator=
       *this = copy_from;
