@@ -153,8 +153,8 @@ char const TranslateTableByteToStateLabel_<T>::VALUE[ 256 ] =
 namespace SEQAN_NAMESPACE_MAIN
 {
 
-template <> struct ValueSize< galosh::StateLabel > { enum { VALUE = 12 }; };
-template <> struct BitsPerValue< galosh::StateLabel > { enum { VALUE = 4 }; };
+  template <> struct ValueSize< galosh::StateLabel > { typedef __uint8 Type; static const Type VALUE = 12; };
+  template <> struct BitsPerValue< galosh::StateLabel > { typedef __uint8 Type; static const Type VALUE = 12; };
 
 //////////////////////////////////////////////////////////////////////////////
 //Char
@@ -505,8 +505,8 @@ char const TranslateTableByteToStartStateTransitionTargets_<T>::VALUE[ 256 ] =
 namespace SEQAN_NAMESPACE_MAIN
 {
 
-template <> struct ValueSize< galosh::StartStateTransitionTargets > { enum { VALUE = 1 }; };
-template <> struct BitsPerValue< galosh::StartStateTransitionTargets > { enum { VALUE = 1 }; };
+  template <> struct ValueSize< galosh::StartStateTransitionTargets > { typedef __uint8 Type; static const Type VALUE = 1; };
+  template <> struct BitsPerValue< galosh::StartStateTransitionTargets > { typedef __uint8 Type; static const Type VALUE = 1; };
 
 //////////////////////////////////////////////////////////////////////////////
 //Char
@@ -570,7 +570,7 @@ namespace galosh {
 struct PreAlignStateLabel {};
 
 ///.Metafunction.StateLabelId.param.T.type:Class.PreAlignStateLabel
-template <> struct StateLabelId< galosh::PreAlignStateLabel > { enum { VALUE = 1 }; };
+template <> struct StateLabelId< galosh::PreAlignStateLabel > { typedef __uint8 Type; static const Type VALUE = 1; };
 
 ///.Metafunction.IsEmitting.param.T.type:Class.PreAlignStateLabel
 template <>
@@ -731,8 +731,8 @@ char const TranslateTableByteToPreAlignStateTransitionTargets_<T>::VALUE[ 256 ] 
 namespace SEQAN_NAMESPACE_MAIN
 {
 
-template <> struct ValueSize< galosh::PreAlignStateTransitionTargets > { enum { VALUE = 2 }; };
-template <> struct BitsPerValue< galosh::PreAlignStateTransitionTargets > { enum { VALUE = 1 }; };
+template <> struct ValueSize< galosh::PreAlignStateTransitionTargets > { typedef __uint8 Type; static const Type VALUE = 2; };
+template <> struct BitsPerValue< galosh::PreAlignStateTransitionTargets > { typedef __uint8 Type; static const Type VALUE = 1; };
 
 //////////////////////////////////////////////////////////////////////////////
 //Char
@@ -796,7 +796,7 @@ namespace galosh {
 struct BeginStateLabel {};
 
 ///.Metafunction.StateLabelId.param.T.type:Class.BeginStateLabel
-template <> struct StateLabelId< galosh::BeginStateLabel > { enum { VALUE = 2 }; };
+template <> struct StateLabelId< galosh::BeginStateLabel > { typedef __uint8 Type; static const Type VALUE = 2; };
 
 ///.Metafunction.IsEmitting.param.T.type:Class.BeginStateLabel
 template <>
@@ -960,8 +960,8 @@ char const TranslateTableByteToBeginStateTransitionTargets_<T>::VALUE[ 256 ] =
 namespace SEQAN_NAMESPACE_MAIN
 {
 
-template <> struct ValueSize< galosh::BeginStateTransitionTargets > { enum { VALUE = 3 }; };
-template <> struct BitsPerValue< galosh::BeginStateTransitionTargets > { enum { VALUE = 2 }; };
+  template <> struct ValueSize< galosh::BeginStateTransitionTargets > { typedef __uint8 Type; static const Type VALUE = 3; };
+  template <> struct BitsPerValue< galosh::BeginStateTransitionTargets > { typedef __uint8 Type; static const Type VALUE = 2; };
 
 //////////////////////////////////////////////////////////////////////////////
 //Char
@@ -1141,8 +1141,8 @@ char const TranslateTableByteToBeginStateTransitionTargetsOld_<T>::VALUE[ 256 ] 
 namespace SEQAN_NAMESPACE_MAIN
 {
 
-template <> struct ValueSize< galosh::BeginStateTransitionTargetsOld > { enum { VALUE = 2 }; };
-template <> struct BitsPerValue< galosh::BeginStateTransitionTargetsOld > { enum { VALUE = 1 }; };
+template <> struct ValueSize< galosh::BeginStateTransitionTargetsOld > { typedef __uint8 Type; static const Type VALUE = 2; };
+template <> struct BitsPerValue< galosh::BeginStateTransitionTargetsOld > { typedef __uint8 Type; static const Type VALUE = 1; };
 
 //////////////////////////////////////////////////////////////////////////////
 //Char
@@ -1371,7 +1371,7 @@ namespace SEQAN_NAMESPACE_MAIN
 {
 
 template <> struct ValueSize< galosh::MatchStateTransitionTargets > { enum { VALUE = 4 }; };
-template <> struct BitsPerValue< galosh::MatchStateTransitionTargets > { enum { VALUE = 2 }; };
+template <> struct BitsPerValue< galosh::MatchStateTransitionTargets > { typedef __uint8 Type; static const Type VALUE = 2; };
 
 //////////////////////////////////////////////////////////////////////////////
 //Char
@@ -1551,7 +1551,7 @@ namespace SEQAN_NAMESPACE_MAIN
 {
 
 template <> struct ValueSize< galosh::MatchStateTransitionTargetsOld > { enum { VALUE = 3 }; };
-template <> struct BitsPerValue< galosh::MatchStateTransitionTargetsOld > { enum { VALUE = 2 }; };
+template <> struct BitsPerValue< galosh::MatchStateTransitionTargetsOld > { typedef __uint8 Type; static const Type VALUE = 2; };
 
 //////////////////////////////////////////////////////////////////////////////
 //Char
@@ -1779,7 +1779,7 @@ namespace SEQAN_NAMESPACE_MAIN
 {
 
 template <> struct ValueSize< galosh::InsertionStateTransitionTargetsPlan9 > { enum { VALUE = 3 }; };
-template <> struct BitsPerValue< galosh::InsertionStateTransitionTargetsPlan9 > { enum { VALUE = 2 }; };
+template <> struct BitsPerValue< galosh::InsertionStateTransitionTargetsPlan9 > { typedef __uint8 Type; static const Type VALUE = 2; };
 
 //////////////////////////////////////////////////////////////////////////////
 //Char
@@ -1955,8 +1955,8 @@ char const TranslateTableByteToInsertionStateTransitionTargetsPlan7_<T>::VALUE[ 
 namespace SEQAN_NAMESPACE_MAIN
 {
 
-template <> struct ValueSize< galosh::InsertionStateTransitionTargetsPlan7 > { enum { VALUE = 2 }; };
-template <> struct BitsPerValue< galosh::InsertionStateTransitionTargetsPlan7 > { enum { VALUE = 1 }; };
+template <> struct ValueSize< galosh::InsertionStateTransitionTargetsPlan7 > { typedef __uint8 Type; static const Type VALUE = 2; };
+template <> struct BitsPerValue< galosh::InsertionStateTransitionTargetsPlan7 > { typedef __uint8 Type; static const Type VALUE = 1; };
 
 //////////////////////////////////////////////////////////////////////////////
 //Char
@@ -2183,7 +2183,7 @@ namespace SEQAN_NAMESPACE_MAIN
 {
 
 template <> struct ValueSize< galosh::DeletionStateTransitionTargetsPlan9 > { enum { VALUE = 4 }; };
-template <> struct BitsPerValue< galosh::DeletionStateTransitionTargetsPlan9 > { enum { VALUE = 2 }; };
+template <> struct BitsPerValue< galosh::DeletionStateTransitionTargetsPlan9 > { typedef __uint8 Type; static const Type VALUE = 2; };
 
 //////////////////////////////////////////////////////////////////////////////
 //Char
@@ -2361,7 +2361,7 @@ namespace SEQAN_NAMESPACE_MAIN
 {
 
 template <> struct ValueSize< galosh::DeletionStateTransitionTargetsPlan7 > { enum { VALUE = 3 }; };
-template <> struct BitsPerValue< galosh::DeletionStateTransitionTargetsPlan7 > { enum { VALUE = 2 }; };
+template <> struct BitsPerValue< galosh::DeletionStateTransitionTargetsPlan7 > { typedef __uint8 Type; static const Type VALUE = 2; };
 
 //////////////////////////////////////////////////////////////////////////////
 //Char
@@ -2539,7 +2539,7 @@ namespace SEQAN_NAMESPACE_MAIN
 {
 
 template <> struct ValueSize< galosh::DeletionStateTransitionTargetsPlan9Old > { enum { VALUE = 3 }; };
-template <> struct BitsPerValue< galosh::DeletionStateTransitionTargetsPlan9Old > { enum { VALUE = 2 }; };
+template <> struct BitsPerValue< galosh::DeletionStateTransitionTargetsPlan9Old > { typedef __uint8 Type; static const Type VALUE = 2; };
 
 //////////////////////////////////////////////////////////////////////////////
 //Char
@@ -2715,8 +2715,8 @@ char const TranslateTableByteToDeletionStateTransitionTargetsPlan7Old_<T>::VALUE
 namespace SEQAN_NAMESPACE_MAIN
 {
 
-template <> struct ValueSize< galosh::DeletionStateTransitionTargetsPlan7Old > { enum { VALUE = 2 }; };
-template <> struct BitsPerValue< galosh::DeletionStateTransitionTargetsPlan7Old > { enum { VALUE = 1 }; };
+template <> struct ValueSize< galosh::DeletionStateTransitionTargetsPlan7Old > { typedef __uint8 Type; static const Type VALUE = 2; };
+template <> struct BitsPerValue< galosh::DeletionStateTransitionTargetsPlan7Old > { typedef __uint8 Type; static const Type VALUE = 1; };
 
 //////////////////////////////////////////////////////////////////////////////
 //Char
@@ -2942,8 +2942,8 @@ char const TranslateTableByteToEndStateTransitionTargets_<T>::VALUE[ 256 ] =
 namespace SEQAN_NAMESPACE_MAIN
 {
 
-template <> struct ValueSize< galosh::EndStateTransitionTargets > { enum { VALUE = 2 }; };
-template <> struct BitsPerValue< galosh::EndStateTransitionTargets > { enum { VALUE = 1 }; };
+template <> struct ValueSize< galosh::EndStateTransitionTargets > { typedef __uint8 Type; static const Type VALUE = 2; };
+template <> struct BitsPerValue< galosh::EndStateTransitionTargets > { typedef __uint8 Type; static const Type VALUE = 1; };
 
 //////////////////////////////////////////////////////////////////////////////
 //Char
@@ -3168,8 +3168,8 @@ char const TranslateTableByteToLoopStateTransitionTargets_<T>::VALUE[ 256 ] =
 namespace SEQAN_NAMESPACE_MAIN
 {
 
-template <> struct ValueSize< galosh::LoopStateTransitionTargets > { enum { VALUE = 2 }; };
-template <> struct BitsPerValue< galosh::LoopStateTransitionTargets > { enum { VALUE = 1 }; };
+template <> struct ValueSize< galosh::LoopStateTransitionTargets > { typedef __uint8 Type; static const Type VALUE = 2; };
+template <> struct BitsPerValue< galosh::LoopStateTransitionTargets > { typedef __uint8 Type; static const Type VALUE = 1; };
 
 //////////////////////////////////////////////////////////////////////////////
 //Char
@@ -3394,8 +3394,8 @@ char const TranslateTableByteToPostAlignStateTransitionTargets_<T>::VALUE[ 256 ]
 namespace SEQAN_NAMESPACE_MAIN
 {
 
-template <> struct ValueSize< galosh::PostAlignStateTransitionTargets > { enum { VALUE = 2 }; };
-template <> struct BitsPerValue< galosh::PostAlignStateTransitionTargets > { enum { VALUE = 1 }; };
+template <> struct ValueSize< galosh::PostAlignStateTransitionTargets > { typedef __uint8 Type; static const Type VALUE = 2; };
+template <> struct BitsPerValue< galosh::PostAlignStateTransitionTargets > { typedef __uint8 Type; static const Type VALUE = 1; };
 
 //////////////////////////////////////////////////////////////////////////////
 //Char
@@ -3669,8 +3669,8 @@ char const TranslateTableByteToDeletionInStateTransitionTargets_<T>::VALUE[ 256 
 namespace SEQAN_NAMESPACE_MAIN
 {
 
-template <> struct ValueSize< galosh::DeletionInStateTransitionTargets > { enum { VALUE = 2 }; };
-template <> struct BitsPerValue< galosh::DeletionInStateTransitionTargets > { enum { VALUE = 1 }; };
+template <> struct ValueSize< galosh::DeletionInStateTransitionTargets > { typedef __uint8 Type; static const Type VALUE = 2; };
+template <> struct BitsPerValue< galosh::DeletionInStateTransitionTargets > { typedef __uint8 Type; static const Type VALUE = 1; };
 
 //////////////////////////////////////////////////////////////////////////////
 //Char
@@ -3895,8 +3895,8 @@ char const TranslateTableByteToDeletionOutStateTransitionTargets_<T>::VALUE[ 256
 namespace SEQAN_NAMESPACE_MAIN
 {
 
-template <> struct ValueSize< galosh::DeletionOutStateTransitionTargets > { enum { VALUE = 2 }; };
-template <> struct BitsPerValue< galosh::DeletionOutStateTransitionTargets > { enum { VALUE = 1 }; };
+template <> struct ValueSize< galosh::DeletionOutStateTransitionTargets > { typedef __uint8 Type; static const Type VALUE = 2; };
+template <> struct BitsPerValue< galosh::DeletionOutStateTransitionTargets > { typedef __uint8 Type; static const Type VALUE = 1; };
 
 //////////////////////////////////////////////////////////////////////////////
 //Char
