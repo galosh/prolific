@@ -164,9 +164,9 @@ namespace galosh {
     // Copy constructor; NOTE THAT THIS DOES NOT COPY THE "DEFAULTS" (THE KEY/VALUE PAIRS IN m_galosh_options_map.)
     Parameters ( const Parameters & copy_from )
     {
-      if( copy_from.debug >= DEBUG_All ) {
+      #ifdef DEBUG
         cout << "[debug] Parameters::<init>( copy_from )" << endl;
-      }
+     #endif
       copyFrom( copy_from );
     } // <init>( Parameters & )
 
@@ -272,9 +272,9 @@ namespace galosh {
     ParametersModifierTemplate () :
       parameters()
     {
-      if( parameters.debug) {
+      #ifdef DEBUG
         cout << "[debug] GALOSH::ParametersModifierTemplate::<init>()" << endl;
-      }
+      #endif
       isModified_reset();
     } // <init>()
 
@@ -283,9 +283,9 @@ namespace galosh {
     ParametersModifierTemplate ( const AnyParametersModifierTemplate & copy_from ) :
       parameters()
     {
-      if( copy_from.parameters.debug >= DEBUG_All ) {
+      #ifdef DEBUG
         cout << "[debug] GALOSH::ParametersModifierTemplate::<init>( copy_from )" << endl;
-      }
+      #endif
       copyFromNonVirtual( copy_from );
     } // <init>( AnyParametersModifierTemplate const & )
 
@@ -295,9 +295,9 @@ namespace galosh {
       const AnyParametersModifierTemplate & copy_from
     )
     {
-      if( copy_from.parameters.debug >= DEBUG_All ) {
+      #ifdef DEBUG
         cout << "[debug] GALOSH::ParametersModifierTemplate::operator=( copy_from )" << endl;
-      }
+      #endif
       copyFromNonVirtual( copy_from );
       return *this;
     } // operator=( AnyParametersModifierTemplate const & )
