@@ -219,7 +219,7 @@ namespace galosh {
     )
     {
       //TODO: REMOVE
-      cout << "in Parameters operator<<" << endl;
+      //cout << "in Parameters operator<<" << endl;
       parameters.writeParameters( os );
       return os;
     } // friend operator<< ( ostream, Parameters const& )
@@ -230,9 +230,9 @@ namespace galosh {
     ) const
     { // TAH 9/13  [Parameters] is commented out because tokens in square brackets have
       //TODO: REMOVE
-      cout << "in Parameters writeParameters()" << endl;
+      //cout << "in Parameters writeParameters()" << endl;
       // have a special meaning in "configuration files" sensu program_options
-      os << "#[Parameters]" << endl;
+      //os << "#[Parameters]" << endl;
 
       #undef GALOSH_DEF_OPT
       #define GALOSH_DEF_OPT(NAME,TYPE,DEFAULTVAL,HELP)          \
