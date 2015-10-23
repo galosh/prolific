@@ -1,0 +1,58 @@
+This is prolific, a C++ library for representing and working with
+Profile HMMs.  Please see the document CITING, which should have been
+included with this file.  You may use at will, subject to the license
+(GPL v2), but *please cite the relevant papers* in your
+documentation and publications associated with uses of this library.
+Thank you!
+
+Copyright (C) 2015 by Paul T Edlefsen, Fred Hutchinson Cancer Research
+Center.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-----
+PLATFORMS:
+
+Although prolific has been designed for cross-platform use, the
+current version has only been tested on Mac OS X systems.  It should
+easily install on any other *nix platform.  If you are on Windows, and
+want to compile this, we recommend using Cygwin.  If you are able to
+compile this on Windows or elsewhere, please let us know and tell us
+what you did to make it happen.  Thanks.
+
+DEPENDENCIES:
+
+prolific relies on a number of other libraries.  All are open source
+and are easy to install.
+
+Required external libraries:
+---
+BOOST (tested with version 1.59.0)
+Seqan (direct from github)
+
+HMMoC-BFloat-Algebra:
+https://github.com/pedlefsen/HMMoC-BFloat-Algebra
+
+Recommended galosh libraries:
+---
+prolific:  https://github.com/galosh/prolific
+profuse:  https://github.com/galosh/profuse
+
+See the document INSTALL for more information.
+
+Thank you,
+  Paul
+
+Paul T. Edlefsen
+October 23, 2015
