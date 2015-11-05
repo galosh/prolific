@@ -16,7 +16,7 @@
 #include <string>
 
 namespace io = boost::iostreams;
-using namespace io;
+using namespace boost::iostreams;
 
 namespace galosh {
 
