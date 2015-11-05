@@ -15,7 +15,6 @@
 #include <boost/iostreams/operations.hpp>  // get
 #include <string>
 
-namespace io = boost::iostreams;
 using namespace boost::iostreams;
 
 namespace galosh {
@@ -32,7 +31,7 @@ public:
     {
         int c;
         while (true) {
-            if ((c = io::get(src)) == EOF || c == WOULD_BLOCK) break;
+            if ((c = boost::iostreams::get(src)) == EOF || c == WOULD_BLOCK) break;
             skip_ =
                c == comment_char_ ?
                  true :
